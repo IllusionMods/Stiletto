@@ -21,7 +21,7 @@ namespace Stiletto
         private static int GUID_HASH = GUID.GetHashCode();
 
         private static Harmony hi;
-        private ConfigEntry<KeyboardShortcut> toggleGuiKey { get; set; }
+        private ConfigEntry<KeyboardShortcut> ToggleGuiKey { get; set; }
 
         private Rect windowRect = new Rect(200, 200, 220, 120);
         private GUILayoutOption glo_width20 = GUILayout.Width(20);
@@ -52,19 +52,18 @@ namespace Stiletto
             var di = new DirectoryInfo(CONFIG_PATH);
             if (!di.Exists) di.Create();
 
-            //PLUGIN_ACTIVE = (Application.productName == "Koikatu");
             if (!PLUGIN_ACTIVE) return;
 
             ReloadConfig();
 
-            toggleGuiKey = Config.AddSetting("Hotkeys", "GUI Toggle", new KeyboardShortcut(KeyCode.RightShift), "Toggles stiletto UI");
+            ToggleGuiKey = Config.Bind("Hotkeys", "GUI Toggle", new KeyboardShortcut(KeyCode.RightShift), "Toggles stiletto UI");
 
             hi = new Harmony(nameof(Stiletto));
-            HarmonyWrapper.PatchAll(typeof(Stiletto), hi);
+            hi.PatchAll(GetType());
 
             // For hot reload.
             int v = (int)ClothesKind.shoes_outer;
-            foreach (var cc in GameObject.FindObjectsOfType<ChaControl>())
+            foreach (var cc in FindObjectsOfType<ChaControl>())
             {
                 foreach (var comp in cc.GetComponents<Component>())
                     if (comp.GetType().Name == nameof(HeelInfo))
@@ -75,7 +74,7 @@ namespace Stiletto
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), "ActiveKinematicMode")]
-        public static void OCIChar_ActiveKinematicModeHook(OCIChar __instance)
+        public static void OCIChar_ActiveKinematicModeHook()
         {
             if (heelIndex == -1 || heelInfos.Count == 0) return;
             foreach (var cc in heelInfos.Select(x => x.cc).ToArray()) LoadHeelFile(cc);
@@ -207,7 +206,7 @@ namespace Stiletto
         internal void Update()
         {
             if (PLUGIN_ACTIVE)
-                if (toggleGuiKey.Value.IsDown())
+                if (ToggleGuiKey.Value.IsDown())
                     GUI_ACTIVE = !GUI_ACTIVE;
         }
 
