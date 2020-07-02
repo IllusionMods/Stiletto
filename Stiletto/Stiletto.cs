@@ -1,6 +1,5 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
-using BepInEx.Harmony;
 using HarmonyLib;
 using Studio;
 using System;
@@ -20,7 +19,7 @@ namespace Stiletto
         private const string GUID = "com.essu.stiletto";
         private static int GUID_HASH = GUID.GetHashCode();
 
-        private static Harmony hi;
+        private static Harmony harmony;
         private ConfigEntry<KeyboardShortcut> ToggleGuiKey { get; set; }
 
         private Rect windowRect = new Rect(200, 200, 220, 120);
@@ -34,7 +33,7 @@ namespace Stiletto
         private static Dictionary<string, HeelFlags> dictAnimFlags = new Dictionary<string, HeelFlags>();
         private static ConcurrentList<HeelInfo> heelInfos = new ConcurrentList<HeelInfo>();
         private static int _heelIndex = -1;
-        private static int heelIndex
+        private static int HeelIndex
         {
             get => _heelIndex;
             set
@@ -58,8 +57,8 @@ namespace Stiletto
 
             ToggleGuiKey = Config.Bind("Hotkeys", "GUI Toggle", new KeyboardShortcut(KeyCode.RightShift), "Toggles stiletto UI");
 
-            hi = new Harmony(nameof(Stiletto));
-            hi.PatchAll(GetType());
+            harmony = new Harmony(nameof(Stiletto));
+            harmony.PatchAll(GetType());
 
             // For hot reload.
             int v = (int)ClothesKind.shoes_outer;
@@ -76,7 +75,7 @@ namespace Stiletto
         [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), "ActiveKinematicMode")]
         public static void OCIChar_ActiveKinematicModeHook()
         {
-            if (heelIndex == -1 || heelInfos.Count == 0) return;
+            if (HeelIndex == -1 || heelInfos.Count == 0) return;
             foreach (var cc in heelInfos.Select(x => x.cc).ToArray()) LoadHeelFile(cc);
         }
 
@@ -200,7 +199,7 @@ namespace Stiletto
             foreach (var cc in GameObject.FindObjectsOfType<ChaControl>())
                 GameObject.DestroyImmediate(cc.GetComponent<HeelInfo>());
 
-            hi.UnpatchAll(nameof(Stiletto));
+            harmony.UnpatchAll(nameof(Stiletto));
         }
 
         internal void Update()
@@ -230,13 +229,13 @@ namespace Stiletto
         internal static void RegisterHeelInfo(HeelInfo hi)
         {
             heelInfos.Add(hi);
-            if (heelIndex == -1) heelIndex = 0;
+            if (HeelIndex == -1) HeelIndex = 0;
         }
 
         internal static void UnregisterHeelInfo(HeelInfo hi)
         {
             heelInfos.Remove(hi);
-            if (heelInfos.Count == 0) heelIndex = -1;
+            if (heelInfos.Count == 0) HeelIndex = -1;
         }
 
         internal void OnGUI()
@@ -251,38 +250,38 @@ namespace Stiletto
 
         private static void HeelIndexChanged()
         {
-            if (heelIndex == -1 || heelInfos.Count == 0) heightBuffer = "0.000";
-            else heightBuffer = heelInfos[heelIndex].height.y.ToString("F3");
+            if (HeelIndex == -1 || heelInfos.Count == 0) heightBuffer = "0.000";
+            else heightBuffer = heelInfos[HeelIndex].height.y.ToString("F3");
         }
 
         internal void Window(int id)
         {
             int count;
-            if (heelIndex == -1 || (count = heelInfos.Count) == 0)
+            if (HeelIndex == -1 || (count = heelInfos.Count) == 0)
             {
                 GUILayout.Label("No characters detected.");
                 GUI.DragWindow();
                 return;
             }
 
-            var selected = heelInfos[heelIndex];
+            var selected = heelInfos[HeelIndex];
             GUILayout.BeginVertical();
 
             GUILayout.BeginHorizontal();
-            GUI.enabled = heelIndex > 0;
+            GUI.enabled = HeelIndex > 0;
             if (GUILayout.Button("<", glo_width20))
             {
-                heelIndex = Math.Max(0, heelIndex - 1);
+                HeelIndex = Math.Max(0, HeelIndex - 1);
                 GUI.changed = false;
             }
 
             GUI.enabled = true;
             GUILayout.Label(selected.cc.fileParam.fullname);
 
-            GUI.enabled = heelIndex < count - 1;
+            GUI.enabled = HeelIndex < count - 1;
             if (GUILayout.Button(">", glo_width20))
             {
-                heelIndex = Math.Min(heelIndex + 1, count - 1);
+                HeelIndex = Math.Min(HeelIndex + 1, count - 1);
                 GUI.changed = false;
             }
             GUI.enabled = true;
