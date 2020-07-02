@@ -128,7 +128,7 @@ namespace Stiletto
         internal static void SaveHeelFile(HeelInfo hi)
         {
             var configFile = $"{CONFIG_PATH}/{hi.heelName}.txt";
-            File.WriteAllText(configFile, $"angleAnkle={hi.angleA.eulerAngles.x}\r\nangleLeg={hi.angleLeg.eulerAngles.x}\r\nheight={hi.height.y}\r\naughStuff={(hi.aughStuff ? 1 : 0)}\r\n");
+            File.WriteAllText(configFile, $"angleAnkle={hi.angleA.eulerAngles.x}\r\nangleLeg={hi.angleLeg.eulerAngles.x}\r\nheight={hi.height.y}\r\n");
         }
 
         internal static void LoadHeelFile(ChaControl __instance)
@@ -148,7 +148,6 @@ namespace Stiletto
             float angleAnkle = 0f;
             float angleLeg = 0f;
             float height = 0f;
-            bool aughStuff = false;
 
             if (!File.Exists(configFile))
             {
@@ -169,15 +168,11 @@ namespace Stiletto
                     case nameof(height):
                         float.TryParse(line[1], out height);
                         break;
-                    case nameof(aughStuff):
-                        int.TryParse(line[1], out int augh);
-                        aughStuff = augh == 1;
-                        break;
                 }
             }
 
             var heelInfo = __instance.gameObject.GetOrAddComponent<HeelInfo>();
-            heelInfo.Setup(fileName, __instance, height, angleAnkle, angleLeg, aughStuff);
+            heelInfo.Setup(fileName, __instance, height, angleAnkle, angleLeg);
             heightBuffer = height.ToString("F3");
         }
 
@@ -340,28 +335,23 @@ namespace Stiletto
             GUILayout.BeginHorizontal();
             GUILayout.Label("Height:");
             heightBuffer = GUILayout.TextField(heightBuffer);
-            //var height = GUILayout.TextField(selected.height.y.ToString("F3"));
             GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Augh:");
-            var b_aughStuff = GUILayout.Toggle(selected.aughStuff, "");
-            //var height = GUILayout.TextField(selected.height.y.ToString("F3"));
-            GUILayout.EndHorizontal();
+
             if (GUI.changed)
             {
                 if (angleA.Length == 0) angleA = "0";
                 if (angleLeg.Length == 0) angleLeg = "0";
                 if (heightBuffer.Length == 0) heightBuffer = "0";
-                if (
-                    float.TryParse(angleA, out float f_angleA) &&
+
+                if (float.TryParse(angleA, out float f_angleA) &&
                     float.TryParse(angleLeg, out float f_angleLeg) &&
-                    float.TryParse(heightBuffer, out float f_height)
-                )
+                    float.TryParse(heightBuffer, out float f_height))
                 {
-                    selected.UpdateValues(f_height, f_angleA, f_angleLeg, b_aughStuff);
+                    selected.UpdateValues(f_height, f_angleA, f_angleLeg);
                 }
                 //heelInfos[heelIndex] = selected;
             }
+
             if (GUILayout.Button("Save Preset"))
             {
                 SaveHeelFile(selected);

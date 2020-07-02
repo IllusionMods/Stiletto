@@ -19,7 +19,6 @@ namespace Stiletto
         internal Quaternion angleA;
         private Quaternion angleB;
         internal Quaternion angleLeg;
-        internal bool aughStuff;
 
         private bool active;
 
@@ -30,7 +29,7 @@ namespace Stiletto
 
         internal Quaternion AngleA
         {
-            get => active && flags.ACTIVE && (flags.ANKLE_ROLL && !aughStuff) ? angleA : Quaternion.identity;
+            get => active && flags.ACTIVE && flags.ANKLE_ROLL ? angleA : Quaternion.identity;
         }
 
         internal Quaternion AngleB
@@ -99,22 +98,21 @@ namespace Stiletto
             }
         }
 
-        internal void UpdateValues(float height, float angleAnkle, float angleLeg, bool aughStuff)
+        internal void UpdateValues(float height, float angleAnkle, float angleLeg)
         {
             this.height = new Vector3(0, height, 0);
             angleA = Quaternion.Euler(angleAnkle, 0f, 0f);
             angleB = Quaternion.Euler(-angleAnkle, 0f, 0f);
             this.angleLeg = Quaternion.Euler(angleLeg, 0f, 0f);
-            this.aughStuff = aughStuff;
         }
 
-        internal void Setup(string heelName, ChaControl chaControl, float height, float angleAnkle, float angleLeg, bool aughStuff)
+        internal void Setup(string heelName, ChaControl chaControl, float height, float angleAnkle, float angleLeg)
         {
             animBody = chaControl.animBody;
             this.heelName = heelName;
             cc = chaControl;
             body = cc.objBodyBone.transform.parent;
-            UpdateValues(height, angleAnkle, angleLeg, aughStuff);
+            UpdateValues(height, angleAnkle, angleLeg);
 
             var waist = body.Find("cf_j_root/cf_n_height/cf_j_hips/cf_j_waist01/cf_j_waist02");
             if (waist == null) return;
