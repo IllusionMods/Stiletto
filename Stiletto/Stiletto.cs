@@ -74,14 +74,14 @@ namespace Stiletto
             }
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), "ActiveKinematicMode")]
+        [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ActiveKinematicMode))]
         public static void OCIChar_ActiveKinematicModeHook()
         {
             if (HeelIndex == -1 || heelInfos.Count == 0) return;
             foreach (var cc in heelInfos.Select(x => x.cc).ToArray()) LoadHeelFile(cc);
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), "SetClothesState")]
+        [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.SetClothesState))]
         public static void ChaControl_SetClothesStateHook(ChaControl __instance, ref int clothesKind)
         {
             var ck = (ClothesKind)clothesKind;
@@ -89,7 +89,7 @@ namespace Stiletto
                 LoadHeelFile(__instance);
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(YS_Assist), "SetActiveControl", new[] { typeof(GameObject), typeof(bool[]) })]
+        [HarmonyPostfix, HarmonyPatch(typeof(YS_Assist), nameof(YS_Assist.SetActiveControl), new[] { typeof(GameObject), typeof(bool[]) })]
         public static void YS_Assist_SetActiveControl(ref bool __result, ref GameObject obj, ref bool[] flags)
         {
             if (__result)
@@ -108,7 +108,7 @@ namespace Stiletto
                     }
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(ChaFileStatus), "set_shoesType")]
+        [HarmonyPostfix, HarmonyPatch(typeof(ChaFileStatus), nameof(ChaFileStatus.shoesType), MethodType.Setter)]
         public static void ChaFileStatus_set_shoesTypeHook(ChaFileStatus __instance)
         {
             var cc = FindObjectsOfType<ChaControl>().Where(x => x?.chaFile?.status == __instance).FirstOrDefault();
@@ -117,7 +117,7 @@ namespace Stiletto
             ChangeCustomClothesHook(cc, ref ind);
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), "ChangeCustomClothes")]
+        [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.ChangeCustomClothes))]
         public static void ChangeCustomClothesHook(ChaControl __instance, ref int kind)
         {
             var ck = (ClothesKind)kind;
