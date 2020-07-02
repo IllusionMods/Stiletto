@@ -51,10 +51,6 @@ namespace Stiletto
             //Stiletto.RegisterHeelInfo(this);
         }
 
-        //void OnDestroy()
-        //{
-        //}
-
         //void OnDisable()
         //{
         //    //Stiletto.UnregisterHeelInfo(this);

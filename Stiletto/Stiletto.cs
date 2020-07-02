@@ -11,12 +11,14 @@ using static ChaFileDefine;
 
 namespace Stiletto
 {
-    [BepInPlugin(GUID, nameof(Stiletto), "1.4")]
+    [BepInPlugin(GUID, nameof(Stiletto), Version)]
     public class Stiletto : BaseUnityPlugin
     {
-        private const string CONFIG_PATH = "BepInEx/Stiletto";
-        private const string FLAG_PATH = CONFIG_PATH + "/_flags.txt";
         private const string GUID = "com.essu.stiletto";
+        private const string Version = "1.4.1";
+
+        private static string CONFIG_PATH = Path.Combine(Paths.ConfigPath, "Stiletto");
+        private static string FLAG_PATH = Path.Combine(CONFIG_PATH, "_flags.txt");
         private static int GUID_HASH = GUID.GetHashCode();
 
         private static Harmony harmony;
@@ -196,8 +198,8 @@ namespace Stiletto
         void OnDestroy()
         {
             // For hot reload.
-            foreach (var cc in GameObject.FindObjectsOfType<ChaControl>())
-                GameObject.DestroyImmediate(cc.GetComponent<HeelInfo>());
+            foreach (var cc in FindObjectsOfType<ChaControl>())
+                DestroyImmediate(cc.GetComponent<HeelInfo>());
 
             harmony.UnpatchAll(nameof(Stiletto));
         }
