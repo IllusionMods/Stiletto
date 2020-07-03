@@ -144,42 +144,24 @@ namespace Stiletto
         internal static void LoadHeelFile(ChaControl __instance)
         {
             if (__instance == null) return;
+
             var fs = __instance.fileStatus;
             if (fs == null) return;
 
             var currentShoes = (int)(fs.shoesType == 0 ? ClothesKind.shoes_inner : ClothesKind.shoes_outer);
             var ic = __instance.infoClothes;
             if (ic == null || currentShoes > ic.Length) return;
-            var shoeInfo = ic[currentShoes];
-            var fileName = shoeInfo?.Name;
+
+            var shoeListInfo = ic[currentShoes];
+            var fileName = shoeListInfo?.Name;
             if (fileName == null) return;
 
             float angleAnkle = 0f;
             float angleLeg = 0f;
             float height = 0f;
 
-            var resolveInfo = Sideloader.AutoResolver.UniversalAutoResolver.TryGetResolutionInfo(ChaListDefine.CategoryNo.co_shoes, shoeInfo.Id);
             var configFile = Path.Combine(CONFIG_PATH, $"{fileName}.txt");
-            var configExists = File.Exists(configFile);
-            XElement stilettoXml = null;
-
-            if(resolveInfo != null)
-            {
-                var manifest = Sideloader.Sideloader.GetManifest(resolveInfo.GUID);
-                stilettoXml = manifest.manifestDocument.Root.Element("Stiletto");
-                
-                if(stilettoXml != null)
-                {
-                    var elements = stilettoXml.Elements("ShoeConfig");
-                    var shoeConfig = elements.First(x => int.TryParse(x.Attribute("id").Value, out int id) && id == resolveInfo.Slot);
-                    float.TryParse(shoeConfig.Attribute(nameof(angleAnkle)).Value, out angleAnkle);
-                    float.TryParse(shoeConfig.Attribute(nameof(angleLeg)).Value, out angleLeg);
-                    float.TryParse(shoeConfig.Attribute(nameof(height)).Value, out height);
-                    Logger.LogInfo($"Loading config from manifest ({shoeInfo.Name})");
-                }
-            }
-
-            if(configExists && stilettoXml == null)
+            if(File.Exists(configFile))
             {
                 var lines = File.ReadAllLines(configFile).Select(x => x.Split('='));
                 foreach(var line in lines)
@@ -199,10 +181,21 @@ namespace Stiletto
                     }
                 }
             }
-
-            if(!configExists && stilettoXml == null)
+            else
             {
-                File.WriteAllText(configFile, $"{nameof(angleAnkle)}=0\r\n{nameof(angleLeg)}=0\r\n{nameof(height)}=0\r\n");
+                var resolveInfo = Sideloader.AutoResolver.UniversalAutoResolver.TryGetResolutionInfo(ChaListDefine.CategoryNo.co_shoes, shoeListInfo.Id);
+                if(resolveInfo != null)
+                {
+                    var stilettoXml = Sideloader.Sideloader.GetManifest(resolveInfo.GUID).manifestDocument.Root.Element("Stiletto");
+                    if(stilettoXml != null)
+                    {
+                        var elements = stilettoXml.Elements("ShoeConfig");
+                        var shoeConfig = elements.First(x => int.TryParse(x.Attribute("id").Value, out int id) && id == resolveInfo.Slot);
+                        float.TryParse(shoeConfig.Attribute(nameof(angleAnkle)).Value, out angleAnkle);
+                        float.TryParse(shoeConfig.Attribute(nameof(angleLeg)).Value, out angleLeg);
+                        float.TryParse(shoeConfig.Attribute(nameof(height)).Value, out height);
+                    }
+                }
             }
 
             var heelInfo = __instance.gameObject.GetOrAddComponent<HeelInfo>();
