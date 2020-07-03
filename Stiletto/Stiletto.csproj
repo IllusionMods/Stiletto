@@ -57,6 +57,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\IllusionLibs.Koikatu.UnityEngine.5.6.2\lib\net35\UnityEngine.dll</HintPath>
@@ -68,6 +69,7 @@
     <Compile Include="HeelFlags.cs" />
     <Compile Include="HeelInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShoeConfig.cs" />
     <Compile Include="Stiletto.cs" />
   </ItemGroup>
   <ItemGroup>

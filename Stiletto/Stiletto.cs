@@ -9,7 +9,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 using UnityEngine;
 using static ChaFileDefine;
 
@@ -52,6 +54,10 @@ namespace Stiletto
                 }
             }
         }
+
+        private static XmlSerializer xmlSerializer = new XmlSerializer(typeof(XMLContainer));
+        private static XmlSerializerNamespaces xmlSerializerNamespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
+        private static XmlWriterSettings xmlWriterSettings = new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true };
 
         internal Stiletto()
         {
@@ -137,8 +143,12 @@ namespace Stiletto
 
         internal static void SaveHeelFile(HeelInfo hi)
         {
-            var configFile = Path.Combine(CONFIG_PATH, $"{hi.heelName}.txt");
-            File.WriteAllText(configFile, $"angleAnkle={hi.angleA.eulerAngles.x}\r\nangleLeg={hi.angleLeg.eulerAngles.x}\r\nheight={hi.height.y}\r\n");
+            var configFile = Path.Combine(CONFIG_PATH, $"{hi.heelName}.xml");
+            var shoeConfig = new XMLContainer(hi.id, hi.angleA.eulerAngles.x, hi.angleLeg.eulerAngles.x, hi.height.y);
+
+            using(var stream = new StreamWriter(configFile))
+            using(var writer = XmlWriter.Create(stream, xmlWriterSettings))
+                xmlSerializer.Serialize(writer, shoeConfig, xmlSerializerNamespaces);
         }
 
         internal static void LoadHeelFile(ChaControl __instance)
@@ -159,26 +169,17 @@ namespace Stiletto
             float angleAnkle = 0f;
             float angleLeg = 0f;
             float height = 0f;
+            int id = -1;
 
-            var configFile = Path.Combine(CONFIG_PATH, $"{fileName}.txt");
+            var configFile = Path.Combine(CONFIG_PATH, $"{fileName}.xml");
             if(File.Exists(configFile))
             {
-                var lines = File.ReadAllLines(configFile).Select(x => x.Split('='));
-                foreach(var line in lines)
+                using(var fileStream = new FileStream(configFile, FileMode.Open))
                 {
-                    if(line.Length != 2) continue;
-                    switch(line[0].Trim())
-                    {
-                        case nameof(angleAnkle):
-                            float.TryParse(line[1], out angleAnkle);
-                            break;
-                        case nameof(angleLeg):
-                            float.TryParse(line[1], out angleLeg);
-                            break;
-                        case nameof(height):
-                            float.TryParse(line[1], out height);
-                            break;
-                    }
+                    var shoeConfig = ((XMLContainer)xmlSerializer.Deserialize(fileStream)).ShoeConfig.First();
+                    angleAnkle = shoeConfig.AngleAnkle;
+                    angleLeg = shoeConfig.AngleLeg;
+                    height = shoeConfig.Height;
                 }
             }
             else
@@ -187,19 +188,24 @@ namespace Stiletto
                 if(resolveInfo != null)
                 {
                     var stilettoXml = Sideloader.Sideloader.GetManifest(resolveInfo.GUID).manifestDocument.Root.Element("Stiletto");
+                    id = resolveInfo.Slot;
+
                     if(stilettoXml != null)
                     {
-                        var elements = stilettoXml.Elements("ShoeConfig");
-                        var shoeConfig = elements.First(x => int.TryParse(x.Attribute("id").Value, out int id) && id == resolveInfo.Slot);
-                        float.TryParse(shoeConfig.Attribute(nameof(angleAnkle)).Value, out angleAnkle);
-                        float.TryParse(shoeConfig.Attribute(nameof(angleLeg)).Value, out angleLeg);
-                        float.TryParse(shoeConfig.Attribute(nameof(height)).Value, out height);
+                        using(var reader = new StringReader(stilettoXml.ToString()))
+                        {
+                            var xmlContainer = (XMLContainer)xmlSerializer.Deserialize(reader);
+                            var shoeConfig = xmlContainer.ShoeConfig.First(x => x.Id == resolveInfo.Slot);
+                            angleAnkle = shoeConfig.AngleAnkle;
+                            angleLeg = shoeConfig.AngleLeg;
+                            height = shoeConfig.Height;
+                        }
                     }
                 }
             }
 
             var heelInfo = __instance.gameObject.GetOrAddComponent<HeelInfo>();
-            heelInfo.Setup(fileName, __instance, height, angleAnkle, angleLeg);
+            heelInfo.Setup(fileName, id, __instance, height, angleAnkle, angleLeg);
             heightBuffer = height.ToString("F3");
         }
 

@@ -14,6 +14,7 @@ namespace Stiletto
         public HeelFlags flags;
 
         public string heelName { get; private set; } = "-- NONE --";
+        public int id = -1;
         public ChaControl cc;
         internal Vector3 height;
         internal Quaternion angleA;
@@ -106,10 +107,11 @@ namespace Stiletto
             this.angleLeg = Quaternion.Euler(angleLeg, 0f, 0f);
         }
 
-        internal void Setup(string heelName, ChaControl chaControl, float height, float angleAnkle, float angleLeg)
+        internal void Setup(string heelName, int id, ChaControl chaControl, float height, float angleAnkle, float angleLeg)
         {
             animBody = chaControl.animBody;
             this.heelName = heelName;
+            this.id = id;
             cc = chaControl;
             body = cc.objBodyBone.transform.parent;
             UpdateValues(height, angleAnkle, angleLeg);
