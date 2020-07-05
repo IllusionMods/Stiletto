@@ -36,18 +36,18 @@ namespace Stiletto
             slider_AngleLeg = e.AddControl(new MakerSlider(category, "AngleLeg", 0f, 60f, 0f, plugin) { StringToValue = CreateStringToValueFunc(10f), ValueToString = CreateValueToStringFunc(10f) });
             slider_Height = e.AddControl(new MakerSlider(category, "Height", 0f, 0.5f, 0f, plugin) { StringToValue = CreateStringToValueFunc(1000f), ValueToString = CreateValueToStringFunc(1000f) });
 
-            slider_AngleAnkle.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.AngleA.eulerAngles.x, (ctrl, f) => ctrl.UpdateAnkleAngle(f));
-            slider_AngleLeg.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.AngleLeg.eulerAngles.x, (ctrl, f) => ctrl.UpdateLegAngle(f));
-            slider_Height.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.Height.y, (ctrl, f) => ctrl.UpdateHeight(f));
+            slider_AngleAnkle.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.AnkleAngle, (ctrl, f) => ctrl.AnkleAngle = f);
+            slider_AngleLeg.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.LegAngle, (ctrl, f) => ctrl.LegAngle = f);
+            slider_Height.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.Height, (ctrl, f) => ctrl.Height = f);
         }
 
-        public static void UpdateMakerValues(float angleAnkle, float angleLeg, float height)
+        public static void UpdateMakerValues(HeelInfoController heelInfo)
         {
             if(slider_AngleAnkle != null)
             {
-                slider_AngleAnkle.Value = angleAnkle;
-                slider_AngleLeg.Value = angleLeg;
-                slider_Height.Value = height;
+                slider_AngleAnkle.Value = heelInfo.AnkleAngle;
+                slider_AngleLeg.Value = heelInfo.LegAngle;
+                slider_Height.Value = heelInfo.Height;
             }
         }
 
@@ -63,9 +63,9 @@ namespace Stiletto
 
         private static void RegisterStudioControls()
         {
-            var slider_AngleAnkle = CreateSlider("AngleAnkle", x => x.AngleA.eulerAngles.x, (x, y) => x.UpdateAnkleAngle(y), 0f, 60f);
-            var slider_AngleLeg = CreateSlider("AngleLeg", x => x.AngleLeg.eulerAngles.x, (x, y) => x.UpdateLegAngle(y), 0f, 60f);
-            var slider_Height = CreateSlider("Height", x => x.Height.y, (x, y) => x.UpdateHeight(y), 0f, 0.5f);
+            var slider_AngleAnkle = CreateSlider("AngleAnkle", ctrl => ctrl.AnkleAngle, (ctrl, f) => ctrl.AnkleAngle = f, 0f, 60f);
+            var slider_AngleLeg = CreateSlider("AngleLeg", ctrl => ctrl.LegAngle, (ctrl, f) => ctrl.LegAngle = f, 0f, 60f);
+            var slider_Height = CreateSlider("Height", ctrl => ctrl.Height, (ctrl, f) => ctrl.Height = f, 0f, 0.5f);
 
             StudioAPI.GetOrCreateCurrentStateCategory("Stiletto").AddControls(slider_AngleAnkle, slider_AngleLeg, slider_Height);
 

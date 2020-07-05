@@ -2,7 +2,7 @@
 
 namespace Stiletto
 {
-    internal struct HeelFlags
+    public struct HeelFlags
     {
         public bool ACTIVE;
         public bool HEIGHT;

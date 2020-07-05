@@ -29,21 +29,42 @@ namespace Stiletto
         private Quaternion angleB;
         private Quaternion angleLeg;
 
-        private static XmlSerializer xmlSerializer = new XmlSerializer(typeof(XMLContainer));
-        private static XmlSerializerNamespaces xmlSerializerNamespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
-        private static XmlWriterSettings xmlWriterSettings = new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true };
+        private XmlSerializer xmlSerializer = new XmlSerializer(typeof(XMLContainer));
+        private XmlSerializerNamespaces xmlSerializerNamespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
+        private XmlWriterSettings xmlWriterSettings = new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true };
+
+        private Vector3 HeightInternal => active && flags.ACTIVE && flags.HEIGHT ? height : Vector3.zero;
+        private Quaternion AngleAInternal => active && flags.ACTIVE && flags.ANKLE_ROLL ? angleA : Quaternion.identity;
+        private Quaternion AngleBInternal => active && flags.ACTIVE && flags.TOE_ROLL ? angleB : Quaternion.identity;
+        private Quaternion AngleLegInternal => active && flags.ACTIVE ? angleLeg : Quaternion.identity;
 
         public string HeelName { get; private set; } = "-- NONE --";
         public int Id { get; private set; } = -1;
 
-        public Vector3 Height => active && flags.ACTIVE && flags.HEIGHT ? height : Vector3.zero;
-        public Quaternion AngleA => active && flags.ACTIVE && flags.ANKLE_ROLL ? angleA : Quaternion.identity;
-        public Quaternion AngleB => active && flags.ACTIVE && flags.TOE_ROLL ? angleB : Quaternion.identity;
-        public Quaternion AngleLeg => active && flags.ACTIVE ? angleLeg : Quaternion.identity;
+        public float AnkleAngle
+        {
+            get => AngleAInternal.eulerAngles.x;
+            set
+            {
+                angleA = Quaternion.Euler(value, 0f, 0f);
+                angleB = Quaternion.Euler(-value, 0f, 0f);
+            }
+        }
+
+        public float LegAngle
+        {
+            get => angleLeg.eulerAngles.x;
+            set => angleLeg = Quaternion.Euler(value, 0f, 0f);
+        }
+
+        public float Height
+        {
+            get => HeightInternal.y;
+            set => height = new Vector3(0, value, 0);
+        }
 
         protected override void OnCardBeingSaved(GameMode currentGameMode)
         {
-
         }
 
         protected override void OnReload(GameMode currentGameMode)
@@ -73,7 +94,7 @@ namespace Stiletto
             if(clothesKind == ChaFileDefine.ClothesKind.shoes_inner || clothesKind == ChaFileDefine.ClothesKind.shoes_outer)
             {
                 LoadHeelFile();
-                StilettoGui.UpdateMakerValues(AngleA.eulerAngles.x, AngleLeg.eulerAngles.x, Height.y);
+                StilettoGui.UpdateMakerValues(this);
             }
         }
 
@@ -82,7 +103,7 @@ namespace Stiletto
             if(clothesKind == ChaFileDefine.ClothesKind.shoes_inner || clothesKind == ChaFileDefine.ClothesKind.shoes_outer)
             {
                 LoadHeelFile();
-                StilettoGui.UpdateMakerValues(AngleA.eulerAngles.x, AngleLeg.eulerAngles.x, Height.y);
+                StilettoGui.UpdateMakerValues(this);
             }
         }
 
@@ -101,49 +122,33 @@ namespace Stiletto
             flags = Stiletto.FetchFlags($"{ChaControl.animBody.runtimeAnimatorController.name}/{aci[0].clip.name}");
         }
 
-        public void UpdateHeight(float value)
-        {
-            height = new Vector3(0, value, 0);
-        }
-
-        public void UpdateAnkleAngle(float value)
-        {
-            angleA = Quaternion.Euler(value, 0f, 0f);
-            angleB = Quaternion.Euler(-value, 0f, 0f);
-        }
-
-        public void UpdateLegAngle(float value)
-        {
-            angleLeg = Quaternion.Euler(value, 0f, 0f);
-        }
-
-        internal void OnPreRead()
+        private void OnPreRead()
         {
             if(flags.KNEE_BEND && solver != null)
-                solver.bodyEffector.positionOffset = -Height;
+                solver.bodyEffector.positionOffset = -HeightInternal;
             else
-                body.localPosition = Height;
+                body.localPosition = HeightInternal;
         }
 
-        internal void PostUpdate()
+        private void PostUpdate()
         {
             if(flags.KNEE_BEND && solver != null)
             {
-                solver.rightFootEffector.target.position += Height;
-                solver.leftFootEffector.target.position += Height;
+                solver.rightFootEffector.target.position += HeightInternal;
+                solver.leftFootEffector.target.position += HeightInternal;
                 body.localPosition = Vector3.zero;
             }
 
-            footL.localRotation *= AngleA;
-            footR.localRotation *= AngleA;
-            toesL.localRotation *= AngleB;
-            toesR.localRotation *= AngleB;
+            footL.localRotation *= AngleAInternal;
+            footR.localRotation *= AngleAInternal;
+            toesL.localRotation *= AngleBInternal;
+            toesR.localRotation *= AngleBInternal;
 
-            leg_L.localRotation *= AngleLeg;
-            leg_R.localRotation *= AngleLeg;
+            leg_L.localRotation *= AngleLegInternal;
+            leg_R.localRotation *= AngleLegInternal;
         }
 
-        internal void SetFBBIK(FullBodyBipedIK fbbik)
+        private void SetFBBIK(FullBodyBipedIK fbbik)
         {
             if(fbbik != null)
                 solver = fbbik.solver;
@@ -181,17 +186,17 @@ namespace Stiletto
             }
         }
 
-        internal void SaveHeelFile()
+        private void SaveHeelFile()
         {
             var configFile = Path.Combine(Stiletto.CONFIG_PATH, $"{HeelName}.xml");
-            var shoeConfig = new XMLContainer(Id, AngleA.eulerAngles.x, AngleLeg.eulerAngles.x, Height.y);
+            var shoeConfig = new XMLContainer(Id, AngleAInternal.eulerAngles.x, AngleLegInternal.eulerAngles.x, HeightInternal.y);
 
             using(var stream = new StreamWriter(configFile))
             using(var writer = XmlWriter.Create(stream, xmlWriterSettings))
                 xmlSerializer.Serialize(writer, shoeConfig, xmlSerializerNamespaces);
         }
 
-        internal void LoadHeelFile()
+        private void LoadHeelFile()
         {
             var currentShoes = (int)(ChaControl.fileStatus.shoesType == 0 ? ChaFileDefine.ClothesKind.shoes_inner : ChaFileDefine.ClothesKind.shoes_outer);
             var ic = ChaControl.infoClothes;
