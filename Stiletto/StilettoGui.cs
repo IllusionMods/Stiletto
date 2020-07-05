@@ -5,11 +5,16 @@ using KKAPI.Studio;
 using KKAPI.Studio.UI;
 using System;
 using UniRx;
+using UnityEngine;
 
 namespace Stiletto
 {
     public static class StilettoGui
     {
+        private static MakerSlider slider_AngleAnkle;
+        private static MakerSlider slider_AngleLeg;
+        private static MakerSlider slider_Height;
+
         public static void Init(Stiletto plugin)
         {
             if(StudioAPI.InsideStudio)
@@ -27,16 +32,33 @@ namespace Stiletto
             var category = new MakerCategory(shoesCategory.CategoryName, "stiletto", shoesCategory.Position + 1, "Stiletto");
             e.AddSubCategory(category);
 
-            var stringToValue = new Func<string, float>(txt => float.Parse(txt));
-            var valueToString = new Func<float, string>(f => f.ToString("0.#"));
-
-            var slider_AngleAnkle = e.AddControl(new MakerSlider(category, "AngleAnkle", 0f, 60f, 0f, plugin) { StringToValue = stringToValue, ValueToString = valueToString });
-            var slider_AngleLeg = e.AddControl(new MakerSlider(category, "AngleLeg", 0f, 60f, 0f, plugin) { StringToValue = stringToValue, ValueToString = valueToString });
-            var slider_Height = e.AddControl(new MakerSlider(category, "Height", 0f, 0.5f, 0f, plugin) { StringToValue = stringToValue, ValueToString = valueToString });
+            slider_AngleAnkle = e.AddControl(new MakerSlider(category, "AngleAnkle", 0f, 60f, 0f, plugin) { StringToValue = CreateStringToValueFunc(10f), ValueToString = CreateValueToStringFunc(10f),  });
+            slider_AngleLeg = e.AddControl(new MakerSlider(category, "AngleLeg", 0f, 60f, 0f, plugin) { StringToValue = CreateStringToValueFunc(10f), ValueToString = CreateValueToStringFunc(10f) });
+            slider_Height = e.AddControl(new MakerSlider(category, "Height", 0f, 0.5f, 0f, plugin) { StringToValue = CreateStringToValueFunc(1000f), ValueToString = CreateValueToStringFunc(1000f) });
 
             slider_AngleAnkle.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.AngleA.eulerAngles.x, (ctrl, f) => ctrl.UpdateAnkleAngle(f));
             slider_AngleLeg.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.AngleLeg.eulerAngles.x, (ctrl, f) => ctrl.UpdateLegAngle(f));
             slider_Height.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.Height.y, (ctrl, f) => ctrl.UpdateHeight(f));
+        }
+
+        public static void UpdateMakerValues(float angleAnkle, float angleLeg, float height)
+        {
+            if(slider_AngleAnkle != null)
+            {
+                slider_AngleAnkle.Value = angleAnkle;
+                slider_AngleLeg.Value = angleLeg;
+                slider_Height.Value = height; 
+            }
+        }
+
+        public static Func<string, float> CreateStringToValueFunc(float multi)
+        {
+            return new Func<string, float>(txt => float.Parse(txt) / multi);
+        }
+
+        public static Func<float, string> CreateValueToStringFunc(float multi)
+        {
+            return new Func<float, string>(f => Mathf.RoundToInt(f * multi).ToString());
         }
 
         private static void RegisterStudioControls()

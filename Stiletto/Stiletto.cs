@@ -61,46 +61,43 @@ namespace Stiletto
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.SetClothesState))]
         public static void ChaControl_SetClothesStateHook(ChaControl __instance, ref int clothesKind)
         {
-            var ck = (ClothesKind)clothesKind;
-            if(ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
-                __instance.GetComponent<HeelInfoController>().ClothesStateChangeEvent();
+            __instance.GetComponent<HeelInfoController>().ClothesStateChangeEvent((ClothesKind)clothesKind);
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(YS_Assist), nameof(YS_Assist.SetActiveControl), new[] { typeof(GameObject), typeof(bool[]) })]
-        public static void YS_Assist_SetActiveControl(ref bool __result, ref GameObject obj, ref bool[] flags)
-        {
-            if(__result)
-                if(obj && obj.activeSelf)
-                    if(flags != null && flags.Length > 1 && flags[2])
-                    {
-                        var ind = -1;
-                        if(obj.name == "ct_shoes_inner") ind = (int)ClothesKind.shoes_inner;
-                        if(obj.name == "ct_shoes_outer") ind = (int)ClothesKind.shoes_outer;
-                        if(ind != -1)
-                        {
-                            var obj_nonRef = obj;
-                            var ccs = FindObjectsOfType<ChaControl>().Where(x => x.objClothes[ind] == obj_nonRef);
-                            if(ccs.Any()) ChangeCustomClothesHook(ccs.First(), ref ind);
-                        }
-                    }
-        }
-
-        //[HarmonyPostfix, HarmonyPatch(typeof(ChaFileStatus), nameof(ChaFileStatus.shoesType), MethodType.Setter)]
-        //public static void ChaFileStatus_set_shoesTypeHook(ChaFileStatus __instance)
+        //[HarmonyPostfix, HarmonyPatch(typeof(YS_Assist), nameof(YS_Assist.SetActiveControl), new[] { typeof(GameObject), typeof(bool[]) })]
+        //public static void YS_Assist_SetActiveControl(ref bool __result, ref GameObject obj, ref bool[] flags)
         //{
-        //    var cc = FindObjectsOfType<ChaControl>().Where(x => x?.chaFile?.status == __instance).FirstOrDefault();
-        //    if(cc == null) return;
-
-        //    var ind = cc.fileStatus.shoesType == 0 ? 8 : 7;
-        //    ChangeCustomClothesHook(cc, ref ind);
+        //    if(__result)
+        //        if(obj && obj.activeSelf)
+        //            if(flags != null && flags.Length > 1 && flags[2])
+        //            {
+        //                var ind = -1;
+        //                if(obj.name == "ct_shoes_inner") ind = (int)ClothesKind.shoes_inner;
+        //                if(obj.name == "ct_shoes_outer") ind = (int)ClothesKind.shoes_outer;
+        //                if(ind != -1)
+        //                {
+        //                    var obj_nonRef = obj;
+        //                    var ccs = FindObjectsOfType<ChaControl>().Where(x => x.objClothes[ind] == obj_nonRef);
+        //                    if(ccs.Any()) ChangeCustomClothesHook(ccs.First(), ref ind);
+        //                }
+        //            }
         //}
+
+        [HarmonyPostfix, HarmonyPatch(typeof(ChaFileStatus), nameof(ChaFileStatus.shoesType), MethodType.Setter)]
+        public static void ChaFileStatus_set_shoesTypeHook(ChaFileStatus __instance)
+        {
+            var cc = FindObjectsOfType<ChaControl>().FirstOrDefault(x => x?.chaFile?.status == __instance);
+            if(cc == null)
+                return;
+
+            var ind = cc.fileStatus.shoesType == 0 ? 8 : 7;
+            cc.GetComponent<HeelInfoController>().ChangeCustomClothesEvent((ClothesKind)ind);
+        }
 
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.ChangeCustomClothes))]
         public static void ChangeCustomClothesHook(ChaControl __instance, ref int kind)
         {
-            var ck = (ClothesKind)kind;
-            if(ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
-                __instance.GetComponent<HeelInfoController>().ChangeCustomClothesEvent();
+            __instance.GetComponent<HeelInfoController>().ChangeCustomClothesEvent((ClothesKind)kind);
         }
 
         internal static HeelFlags FetchFlags(string name)

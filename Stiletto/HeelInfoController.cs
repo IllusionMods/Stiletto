@@ -48,40 +48,8 @@ namespace Stiletto
 
         protected override void OnReload(GameMode currentGameMode)
         {
-            LoadHeelFile();
-        }
-
-        internal void ClothesStateChangeEvent()
-        {
-            LoadHeelFile();
-        }
-
-        internal void ChangeCustomClothesEvent()
-        {
-            LoadHeelFile();
-        }
-
-        protected override void Update()
-        {
             var currentShoes = (int)(ChaControl.fileStatus.shoesType == 0 ? ChaFileDefine.ClothesKind.shoes_inner : ChaFileDefine.ClothesKind.shoes_outer);
             active = ChaControl.fileStatus.clothesState[currentShoes] == 0;
-
-            if(ChaControl.animBody == null)
-                return;
-
-            var aci = ChaControl.animBody.GetCurrentAnimatorClipInfo(0);
-            if(aci.Length == 0)
-                return;
-
-            flags = Stiletto.FetchFlags($"{ChaControl.animBody.runtimeAnimatorController.name}/{aci[0].clip.name}");
-        }
-
-        public void Setup(string heelName, int id, float height, float angleAnkle, float angleLeg)
-        {
-            HeelName = heelName;
-            Id = id;
-            body = ChaControl.objBodyBone.transform.parent;
-            UpdateValues(height, angleAnkle, angleLeg);
 
             var waist = body.Find("cf_j_root/cf_n_height/cf_j_hips/cf_j_waist01/cf_j_waist02");
             if(waist == null)
@@ -97,15 +65,40 @@ namespace Stiletto
             footR = leg_R.Find("cf_j_foot_R");
             toesR = footR.Find("cf_j_toes_R");
 
-            SetFBBIK(ChaControl.animBody.GetComponent<FullBodyBipedIK>());
+            LoadHeelFile();
         }
 
-        public void UpdateValues(float height, float angleAnkle, float angleLeg)
+        internal void ClothesStateChangeEvent(ChaFileDefine.ClothesKind clothesKind)
         {
-            this.height = new Vector3(0, height, 0);
-            angleA = Quaternion.Euler(angleAnkle, 0f, 0f);
-            angleB = Quaternion.Euler(-angleAnkle, 0f, 0f);
-            this.angleLeg = Quaternion.Euler(angleLeg, 0f, 0f);
+            if(clothesKind == ChaFileDefine.ClothesKind.shoes_inner || clothesKind == ChaFileDefine.ClothesKind.shoes_outer)
+            {
+                LoadHeelFile();
+                StilettoGui.UpdateMakerValues(AngleA.eulerAngles.x, AngleLeg.eulerAngles.x, Height.y);
+            }
+        }
+
+        internal void ChangeCustomClothesEvent(ChaFileDefine.ClothesKind clothesKind)
+        {
+            if(clothesKind == ChaFileDefine.ClothesKind.shoes_inner || clothesKind == ChaFileDefine.ClothesKind.shoes_outer)
+            {
+                LoadHeelFile();
+                StilettoGui.UpdateMakerValues(AngleA.eulerAngles.x, AngleLeg.eulerAngles.x, Height.y);
+            }
+        }
+
+        protected override void Update()
+        {
+            var currentShoes = (int)(ChaControl.fileStatus.shoesType == 0 ? ChaFileDefine.ClothesKind.shoes_inner : ChaFileDefine.ClothesKind.shoes_outer);
+            active = ChaControl.fileStatus.clothesState[currentShoes] == 0;
+
+            if(ChaControl.animBody == null)
+                return;
+
+            var aci = ChaControl.animBody.GetCurrentAnimatorClipInfo(0);
+            if(aci.Length == 0)
+                return;
+
+            flags = Stiletto.FetchFlags($"{ChaControl.animBody.runtimeAnimatorController.name}/{aci[0].clip.name}");
         }
 
         public void UpdateHeight(float value)
@@ -248,7 +241,16 @@ namespace Stiletto
                 }
             }
 
-            Setup(fileName, id, height, angleAnkle, angleLeg);
+            HeelName = fileName;
+            Id = id;
+            body = ChaControl.objBodyBone.transform.parent;
+
+            this.height = new Vector3(0, height, 0);
+            angleA = Quaternion.Euler(angleAnkle, 0f, 0f);
+            angleB = Quaternion.Euler(-angleAnkle, 0f, 0f);
+            this.angleLeg = Quaternion.Euler(angleLeg, 0f, 0f);
+
+            SetFBBIK(ChaControl.animBody.GetComponent<FullBodyBipedIK>());
         }
     }
 }
