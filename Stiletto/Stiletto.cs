@@ -5,7 +5,6 @@ using KKAPI.Chara;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using static ChaFileDefine;
 
 namespace Stiletto
 {
@@ -53,7 +52,7 @@ namespace Stiletto
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.SetClothesState))]
         public static void ChaControl_SetClothesStateHook(ChaControl __instance, ref int clothesKind)
         {
-            __instance.GetComponent<HeelInfoController>().ClothesStateChangeEvent((ClothesKind)clothesKind);
+            __instance.GetComponent<HeelInfoController>().ClothesStateChangeEvent((ChaFileDefine.ClothesKind)clothesKind);
         }
 
         //[HarmonyPostfix, HarmonyPatch(typeof(YS_Assist), nameof(YS_Assist.SetActiveControl), new[] { typeof(GameObject), typeof(bool[]) })]
@@ -83,13 +82,13 @@ namespace Stiletto
                 return;
 
             var ind = cc.fileStatus.shoesType == 0 ? 8 : 7;
-            cc.GetComponent<HeelInfoController>().ChangeCustomClothesEvent((ClothesKind)ind);
+            cc.GetComponent<HeelInfoController>().ChangeCustomClothesEvent((ChaFileDefine.ClothesKind)ind);
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.ChangeCustomClothes))]
         public static void ChangeCustomClothesHook(ChaControl __instance, ref int kind)
         {
-            __instance.GetComponent<HeelInfoController>().ChangeCustomClothesEvent((ClothesKind)kind);
+            __instance.GetComponent<HeelInfoController>().ChangeCustomClothesEvent((ChaFileDefine.ClothesKind)kind);
         }
 
         internal static HeelFlags FetchFlags(string name)
