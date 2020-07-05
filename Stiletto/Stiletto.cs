@@ -1,17 +1,10 @@
 ﻿using BepInEx;
-using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using KKAPI.Chara;
-using Studio;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
-using System.Xml.Serialization;
-using UnityEngine;
 using static ChaFileDefine;
 
 namespace Stiletto
@@ -28,7 +21,6 @@ namespace Stiletto
         private static string FLAG_PATH = Path.Combine(CONFIG_PATH, "_flags.txt");
 
         private static Dictionary<string, HeelFlags> dictAnimFlags = new Dictionary<string, HeelFlags>();
-        private static ConcurrentList<HeelInfoController> heelInfos = new ConcurrentList<HeelInfoController>();
 
         private void Awake()
         {
@@ -118,12 +110,12 @@ namespace Stiletto
 
         internal void ReloadConfig()
         {
-            if (File.Exists(FLAG_PATH))
+            if(File.Exists(FLAG_PATH))
             {
-                foreach (var l in File.ReadAllLines(FLAG_PATH).Where(x => !x.StartsWith(";")))
+                foreach(var l in File.ReadAllLines(FLAG_PATH).Where(x => !x.StartsWith(";")))
                 {
                     var args = l.Split('=');
-                    if (args.Length == 2)
+                    if(args.Length == 2)
                     {
                         var name = args[0].Trim();
                         var flags = args[1].Trim();

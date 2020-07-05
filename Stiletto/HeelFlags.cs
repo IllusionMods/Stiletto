@@ -10,13 +10,16 @@ namespace Stiletto
         public bool ANKLE_ROLL;
         public bool KNEE_BEND;
 
-        public override string ToString() =>  string.Join(",", new[] { ACTIVE, HEIGHT, TOE_ROLL, ANKLE_ROLL, KNEE_BEND }.Select(x => x ? "1" : "0").ToArray());
+        public override string ToString()
+        {
+            return string.Join(",", new[] { ACTIVE, HEIGHT, TOE_ROLL, ANKLE_ROLL, KNEE_BEND }.Select(x => x ? "1" : "0").ToArray());
+        }
 
         public static HeelFlags Parse(string s)
         {
             var args = s.Split(',').Select(x => x.Trim() == "1").ToArray();
             var hf = new HeelFlags();
-            if (args.Length != 5) return hf;
+            if(args.Length != 5) return hf;
             hf.ACTIVE = args[0];
             hf.HEIGHT = args[1];
             hf.TOE_ROLL = args[2];

@@ -32,7 +32,7 @@ namespace Stiletto
             var category = new MakerCategory(shoesCategory.CategoryName, "stiletto", shoesCategory.Position + 1, "Stiletto");
             e.AddSubCategory(category);
 
-            slider_AngleAnkle = e.AddControl(new MakerSlider(category, "AngleAnkle", 0f, 60f, 0f, plugin) { StringToValue = CreateStringToValueFunc(10f), ValueToString = CreateValueToStringFunc(10f),  });
+            slider_AngleAnkle = e.AddControl(new MakerSlider(category, "AngleAnkle", 0f, 60f, 0f, plugin) { StringToValue = CreateStringToValueFunc(10f), ValueToString = CreateValueToStringFunc(10f), });
             slider_AngleLeg = e.AddControl(new MakerSlider(category, "AngleLeg", 0f, 60f, 0f, plugin) { StringToValue = CreateStringToValueFunc(10f), ValueToString = CreateValueToStringFunc(10f) });
             slider_Height = e.AddControl(new MakerSlider(category, "Height", 0f, 0.5f, 0f, plugin) { StringToValue = CreateStringToValueFunc(1000f), ValueToString = CreateValueToStringFunc(1000f) });
 
@@ -47,7 +47,7 @@ namespace Stiletto
             {
                 slider_AngleAnkle.Value = angleAnkle;
                 slider_AngleLeg.Value = angleLeg;
-                slider_Height.Value = height; 
+                slider_Height.Value = height;
             }
         }
 
