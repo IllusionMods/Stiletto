@@ -9,13 +9,13 @@ using UnityEngine;
 
 namespace Stiletto
 {
-    public static class StilettoGui
+    internal static class StilettoGui
     {
         private static MakerSlider slider_AngleAnkle;
         private static MakerSlider slider_AngleLeg;
         private static MakerSlider slider_Height;
 
-        public static void Init(Stiletto plugin)
+        internal static void Init(Stiletto plugin)
         {
             if(StudioAPI.InsideStudio)
                 RegisterStudioControls();
@@ -41,7 +41,7 @@ namespace Stiletto
             slider_Height.ValueChanged.Subscribe(x => MakerAPI.GetCharacterControl().GetComponent<HeelInfo>().SafeProc(y => y.Heightf = x));
         }
 
-        public static void UpdateMakerValues(HeelInfo heelInfo)
+        internal static void UpdateMakerValues(HeelInfo heelInfo)
         {
             if(slider_AngleAnkle != null)
             {
@@ -51,12 +51,12 @@ namespace Stiletto
             }
         }
 
-        public static Func<string, float> CreateStringToValueFunc(float multi)
+        private static Func<string, float> CreateStringToValueFunc(float multi)
         {
             return new Func<string, float>(txt => float.Parse(txt) / multi);
         }
 
-        public static Func<float, string> CreateValueToStringFunc(float multi)
+        private static Func<float, string> CreateValueToStringFunc(float multi)
         {
             return new Func<float, string>(f => Mathf.RoundToInt(f * multi).ToString());
         }

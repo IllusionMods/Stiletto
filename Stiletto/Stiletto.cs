@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
 using static ChaFileDefine;
@@ -19,9 +18,10 @@ namespace Stiletto
         public const string GUID = "com.essu.stiletto";
         public const string Version = "1.4.1";
 
-        private static string CONFIG_PATH = Path.Combine(Paths.ConfigPath, "Stiletto");
-        private static string FLAG_PATH = Path.Combine(CONFIG_PATH, "_flags.txt");
         internal static new ManualLogSource Logger;
+
+        private static readonly string CONFIG_PATH = Path.Combine(Paths.ConfigPath, "Stiletto");
+        private static readonly string FLAG_PATH = Path.Combine(CONFIG_PATH, "_flags.txt");
 
         private static Dictionary<string, HeelFlags> dictAnimFlags = new Dictionary<string, HeelFlags>();
         private static ConcurrentList<HeelInfo> heelInfos = new ConcurrentList<HeelInfo>();
@@ -30,32 +30,32 @@ namespace Stiletto
         private static XmlSerializerNamespaces xmlSerializerNamespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
         private static XmlWriterSettings xmlWriterSettings = new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true };
 
-        internal Stiletto()
+        private void Awake()
         {
+            Logger = base.Logger;
+
             var di = new DirectoryInfo(CONFIG_PATH);
             if(!di.Exists) di.Create();
 
             ReloadConfig();
 
             Harmony.CreateAndPatchAll(GetType());
+        }
 
+        private void Start()
+        {
             StilettoGui.Init(this);
         }
 
-        private void Awake()
-        {
-            Logger = base.Logger;
-        }
-
         [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ActiveKinematicMode))]
-        public static void OCIChar_ActiveKinematicModeHook()
+        private static void OCIChar_ActiveKinematicModeHook()
         {
             if(heelInfos.Count == 0) return;
             foreach(var cc in heelInfos.Select(x => x.cc).ToArray()) LoadHeelFile(cc);
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.SetClothesState))]
-        public static void ChaControl_SetClothesStateHook(ChaControl __instance, ref int clothesKind)
+        private static void ChaControl_SetClothesStateHook(ChaControl __instance, ref int clothesKind)
         {
             var ck = (ClothesKind)clothesKind;
             if(ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
@@ -63,7 +63,7 @@ namespace Stiletto
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(YS_Assist), nameof(YS_Assist.SetActiveControl), new[] { typeof(GameObject), typeof(bool[]) })]
-        public static void YS_Assist_SetActiveControl(ref bool __result, ref GameObject obj, ref bool[] flags)
+        private static void YS_Assist_SetActiveControl(ref bool __result, ref GameObject obj, ref bool[] flags)
         {
             if(__result)
                 if(obj && obj.activeSelf)
@@ -82,7 +82,7 @@ namespace Stiletto
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(ChaFileStatus), nameof(ChaFileStatus.shoesType), MethodType.Setter)]
-        public static void ChaFileStatus_set_shoesTypeHook(ChaFileStatus __instance)
+        private static void ChaFileStatus_set_shoesTypeHook(ChaFileStatus __instance)
         {
             var cc = FindObjectsOfType<ChaControl>().Where(x => x?.chaFile?.status == __instance).FirstOrDefault();
             if(cc == null) return;
@@ -91,14 +91,14 @@ namespace Stiletto
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.ChangeCustomClothes))]
-        public static void ChangeCustomClothesHook(ChaControl __instance, ref int kind)
+        private static void ChangeCustomClothesHook(ChaControl __instance, ref int kind)
         {
             var ck = (ClothesKind)kind;
             if(ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
                 LoadHeelFile(__instance);
         }
 
-        internal static void SaveHeelFile(HeelInfo hi)
+        private static void SaveHeelFile(HeelInfo hi)
         {
             var configFile = Path.Combine(CONFIG_PATH, $"{hi.heelName}.xml");
             var shoeConfig = new XMLContainer(hi.id, hi.angleA.eulerAngles.x, hi.angleLeg.eulerAngles.x, hi.height.y);
@@ -108,7 +108,7 @@ namespace Stiletto
                 xmlSerializer.Serialize(writer, shoeConfig, xmlSerializerNamespaces);
         }
 
-        internal static void LoadHeelFile(ChaControl __instance)
+        private static void LoadHeelFile(ChaControl __instance)
         {
             if(__instance == null) return;
 
@@ -174,12 +174,12 @@ namespace Stiletto
             return hf;
         }
 
-        internal static void SaveHeelFlags()
+        private static void SaveHeelFlags()
         {
             File.WriteAllLines(FLAG_PATH, dictAnimFlags.Keys.OrderBy(x => x).Select(x => $"{x}={dictAnimFlags[x]}").ToArray());
         }
 
-        internal void ReloadConfig()
+        private void ReloadConfig()
         {
             if(File.Exists(FLAG_PATH))
             {
