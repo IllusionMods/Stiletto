@@ -1,12 +1,11 @@
-﻿using KKAPI.Chara;
-using KKAPI.Maker;
+﻿using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
 using KKAPI.Studio.UI;
 using System;
+using System.Linq;
 using UniRx;
 using UnityEngine;
-using System.Linq;
 
 namespace Stiletto
 {

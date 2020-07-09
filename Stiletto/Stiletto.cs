@@ -1,14 +1,10 @@
 ﻿using BepInEx;
-using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using Studio;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -20,14 +16,12 @@ namespace Stiletto
     [BepInPlugin(GUID, nameof(Stiletto), Version)]
     public class Stiletto : BaseUnityPlugin
     {
-        private const string GUID = "com.essu.stiletto";
-        private const string Version = "1.4.1";
+        public const string GUID = "com.essu.stiletto";
+        public const string Version = "1.4.1";
 
         private static string CONFIG_PATH = Path.Combine(Paths.ConfigPath, "Stiletto");
         private static string FLAG_PATH = Path.Combine(CONFIG_PATH, "_flags.txt");
         internal static new ManualLogSource Logger;
-
-        internal static readonly bool InStudio = Paths.ProcessName == "CharaStudio";
 
         private static Dictionary<string, HeelFlags> dictAnimFlags = new Dictionary<string, HeelFlags>();
         private static ConcurrentList<HeelInfo> heelInfos = new ConcurrentList<HeelInfo>();
@@ -39,7 +33,7 @@ namespace Stiletto
         internal Stiletto()
         {
             var di = new DirectoryInfo(CONFIG_PATH);
-            if (!di.Exists) di.Create();
+            if(!di.Exists) di.Create();
 
             ReloadConfig();
 
@@ -56,33 +50,33 @@ namespace Stiletto
         [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ActiveKinematicMode))]
         public static void OCIChar_ActiveKinematicModeHook()
         {
-            if (heelInfos.Count == 0) return;
-            foreach (var cc in heelInfos.Select(x => x.cc).ToArray()) LoadHeelFile(cc);
+            if(heelInfos.Count == 0) return;
+            foreach(var cc in heelInfos.Select(x => x.cc).ToArray()) LoadHeelFile(cc);
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.SetClothesState))]
         public static void ChaControl_SetClothesStateHook(ChaControl __instance, ref int clothesKind)
         {
             var ck = (ClothesKind)clothesKind;
-            if (ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
+            if(ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
                 LoadHeelFile(__instance);
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(YS_Assist), nameof(YS_Assist.SetActiveControl), new[] { typeof(GameObject), typeof(bool[]) })]
         public static void YS_Assist_SetActiveControl(ref bool __result, ref GameObject obj, ref bool[] flags)
         {
-            if (__result)
-                if (obj && obj.activeSelf)
-                    if (flags != null && flags.Length > 1 && flags[2])
+            if(__result)
+                if(obj && obj.activeSelf)
+                    if(flags != null && flags.Length > 1 && flags[2])
                     {
                         var ind = -1;
-                        if (obj.name == "ct_shoes_inner") ind = (int)ClothesKind.shoes_inner;
-                        if (obj.name == "ct_shoes_outer") ind = (int)ClothesKind.shoes_outer;
-                        if (ind != -1)
+                        if(obj.name == "ct_shoes_inner") ind = (int)ClothesKind.shoes_inner;
+                        if(obj.name == "ct_shoes_outer") ind = (int)ClothesKind.shoes_outer;
+                        if(ind != -1)
                         {
                             var obj_nonRef = obj;
                             var ccs = FindObjectsOfType<ChaControl>().Where(x => x.objClothes[ind] == obj_nonRef);
-                            if (ccs.Any()) ChangeCustomClothesHook(ccs.First(), ref ind);
+                            if(ccs.Any()) ChangeCustomClothesHook(ccs.First(), ref ind);
                         }
                     }
         }
@@ -91,7 +85,7 @@ namespace Stiletto
         public static void ChaFileStatus_set_shoesTypeHook(ChaFileStatus __instance)
         {
             var cc = FindObjectsOfType<ChaControl>().Where(x => x?.chaFile?.status == __instance).FirstOrDefault();
-            if (cc == null) return;
+            if(cc == null) return;
             var ind = cc.fileStatus.shoesType == 0 ? 8 : 7;
             ChangeCustomClothesHook(cc, ref ind);
         }
@@ -100,7 +94,7 @@ namespace Stiletto
         public static void ChangeCustomClothesHook(ChaControl __instance, ref int kind)
         {
             var ck = (ClothesKind)kind;
-            if (ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
+            if(ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
                 LoadHeelFile(__instance);
         }
 
@@ -116,18 +110,18 @@ namespace Stiletto
 
         internal static void LoadHeelFile(ChaControl __instance)
         {
-            if (__instance == null) return;
+            if(__instance == null) return;
 
             var fs = __instance.fileStatus;
-            if (fs == null) return;
+            if(fs == null) return;
 
             var currentShoes = (int)(fs.shoesType == 0 ? ClothesKind.shoes_inner : ClothesKind.shoes_outer);
             var ic = __instance.infoClothes;
-            if (ic == null || currentShoes > ic.Length) return;
+            if(ic == null || currentShoes > ic.Length) return;
 
             var shoeListInfo = ic[currentShoes];
             var fileName = shoeListInfo?.Name;
-            if (fileName == null) return;
+            if(fileName == null) return;
 
             float angleAnkle = 0f;
             float angleLeg = 0f;
@@ -173,7 +167,7 @@ namespace Stiletto
 
         internal static HeelFlags FetchFlags(string name)
         {
-            if (dictAnimFlags.TryGetValue(name, out HeelFlags hf)) return hf;
+            if(dictAnimFlags.TryGetValue(name, out HeelFlags hf)) return hf;
             hf = new HeelFlags();
             dictAnimFlags[name] = hf;
             SaveHeelFlags();
@@ -187,12 +181,12 @@ namespace Stiletto
 
         internal void ReloadConfig()
         {
-            if (File.Exists(FLAG_PATH))
+            if(File.Exists(FLAG_PATH))
             {
-                foreach (var l in File.ReadAllLines(FLAG_PATH).Where(x => !x.StartsWith(";")))
+                foreach(var l in File.ReadAllLines(FLAG_PATH).Where(x => !x.StartsWith(";")))
                 {
                     var args = l.Split('=');
-                    if (args.Length == 2)
+                    if(args.Length == 2)
                     {
                         var name = args[0].Trim();
                         var flags = args[1].Trim();

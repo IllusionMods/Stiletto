@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
-using ActionGame.Chara;
+﻿using KKAPI.Studio;
 using RootMotion.FinalIK;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using static ChaFileDefine;
 
 namespace Stiletto
@@ -13,7 +10,7 @@ namespace Stiletto
     {
         public HeelFlags flags;
 
-        public string heelName { get; private set; } = "-- NONE --";
+        public string heelName = "-- NONE --";
         public int id = -1;
         public ChaControl cc;
         internal Vector3 height;
@@ -23,25 +20,10 @@ namespace Stiletto
 
         private bool active;
 
-        internal Vector3 Height
-        {
-            get => active && flags.ACTIVE && flags.HEIGHT ? height : Vector3.zero;
-        }
-
-        internal Quaternion AngleA
-        {
-            get => active && flags.ACTIVE && flags.ANKLE_ROLL ? angleA : Quaternion.identity;
-        }
-
-        internal Quaternion AngleB
-        {
-            get => active && flags.ACTIVE && flags.TOE_ROLL ? angleB : Quaternion.identity;
-        }
-
-        internal Quaternion AngleLeg
-        {
-            get => active && flags.ACTIVE ? angleLeg : Quaternion.identity;
-        }
+        private Vector3 Height => active && flags.ACTIVE && flags.HEIGHT ? height : Vector3.zero;
+        private Quaternion AngleA => active && flags.ACTIVE && flags.ANKLE_ROLL ? angleA : Quaternion.identity;
+        private Quaternion AngleB => active && flags.ACTIVE && flags.TOE_ROLL ? angleB : Quaternion.identity;
+        private Quaternion AngleLeg => active && flags.ACTIVE ? angleLeg : Quaternion.identity;
 
         public float AnkleAnglef
         {
@@ -65,7 +47,7 @@ namespace Stiletto
             set => height = new Vector3(0, value, 0);
         }
 
-        void Awake()
+        private void Awake()
         {
             flags = new HeelFlags();
             cc = gameObject.GetComponent<ChaControl>();
@@ -81,7 +63,7 @@ namespace Stiletto
         //private bool registered = false;
         //private NPC npc = null;
 
-        void Start()
+        private void Start()
         {
             //npc = Singleton<Manager.Game>.Instance.actScene.npcList.FirstOrDefault(x => x.chaCtrl.chaID == cc.chaID);
             //if (!npc)
@@ -89,39 +71,39 @@ namespace Stiletto
             Stiletto.RegisterHeelInfo(this);
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             //Console.WriteLine("ONDESTROY - " + cc.fileParam.fullname);
             Stiletto.UnregisterHeelInfo(this);
         }
 
-        internal void Update()
+        private void Update()
         {
             var currentShoes = (int)(cc.fileStatus.shoesType == 0 ? ClothesKind.shoes_inner : ClothesKind.shoes_outer);
             active = (cc.fileStatus.clothesState[currentShoes] == 0);
-            if (animBody == null) return;
+            if(animBody == null) return;
             var aci = animBody.GetCurrentAnimatorClipInfo(0);
-            if (aci.Length == 0) return;
+            if(aci.Length == 0) return;
 
 
             var first = aci[0];
             animationName = first.clip.name;
-            
+
             pathName = animBody.runtimeAnimatorController.name;
 #warning optimise by detecting animation change?
             flags = Stiletto.FetchFlags(key);
         }
 
-        internal void LateUpdate()
+        private void LateUpdate()
         {
-            if (solver == null)
+            if(solver == null)
             {
                 OnPreRead();
                 PostUpdate();
             }
         }
 
-        internal void UpdateValues(float height, float angleAnkle, float angleLeg)
+        private void UpdateValues(float height, float angleAnkle, float angleLeg)
         {
             this.height = new Vector3(0, height, 0);
             angleA = Quaternion.Euler(angleAnkle, 0f, 0f);
@@ -140,7 +122,7 @@ namespace Stiletto
             UpdateValues(height, angleAnkle, angleLeg);
 
             var waist = body.Find("cf_j_root/cf_n_height/cf_j_hips/cf_j_waist01/cf_j_waist02");
-            if (waist == null) return;
+            if(waist == null) return;
 
             var legl3 = waist.Find("cf_j_thigh00_L/cf_j_leg01_L");
             leg_L = legl3.Find("cf_j_leg03_L");
@@ -151,7 +133,7 @@ namespace Stiletto
             leg_R = legr3.Find("cf_j_leg03_R");
             footR = leg_R.Find("cf_j_foot_R");
             toesR = footR.Find("cf_j_toes_R");
-            
+
             SetFBBIK(animBody.GetComponent<FullBodyBipedIK>());
         }
 
@@ -166,20 +148,17 @@ namespace Stiletto
         private Transform footR = null;
         private Transform toesR = null;
 
-        internal Animator animBody;
+        private Animator animBody;
 
         public string animationName { get; private set; } = "-- NONE --";
         public string pathName { get; private set; } = "-- NONE --";
 
-        public string key
-        {
-            get => $"{pathName}/{animationName}";
-        }
+        public string key => $"{pathName}/{animationName}";
 
-        internal void OnPreRead()
+        private void OnPreRead()
         {
 #warning fix this
-            if (flags.KNEE_BEND && solver != null)
+            if(flags.KNEE_BEND && solver != null)
             {
                 solver.bodyEffector.positionOffset = -Height;
             }
@@ -189,9 +168,9 @@ namespace Stiletto
             }
         }
 
-        internal void PostUpdate()
+        private void PostUpdate()
         {
-            if (flags.KNEE_BEND && solver != null)
+            if(flags.KNEE_BEND && solver != null)
             {
                 solver.rightFootEffector.target.position += Height;
                 solver.leftFootEffector.target.position += Height;
@@ -211,17 +190,17 @@ namespace Stiletto
         }
 
 
-        internal void SetFBBIK(FullBodyBipedIK fbbik)
+        private void SetFBBIK(FullBodyBipedIK fbbik)
         {
-            if (fbbik != null) solver = fbbik.solver;
+            if(fbbik != null) solver = fbbik.solver;
 
-            if (solver != null)
+            if(solver != null)
             {
-                
-                if (!Stiletto.InStudio)
+
+                if(!StudioAPI.InsideStudio)
                 {
                     var currentSceneName = fbbik.gameObject.scene.name;
-                    if (! new[] { SceneNames.CustomScene, SceneNames.H, SceneNames.MyRoom }.Contains(currentSceneName))
+                    if(!new[] { SceneNames.CustomScene, SceneNames.H, SceneNames.MyRoom }.Contains(currentSceneName))
                     {
                         //Disable arm weights, we only affect feet/knees.
                         fbbik.GetIKSolver().Initiate(fbbik.transform);
@@ -240,7 +219,7 @@ namespace Stiletto
             }
 #warning Detect overworld and adjust weights?
 
-            if (Stiletto.InStudio)
+            if(StudioAPI.InsideStudio)
             {
                 Update();
                 OnPreRead();
