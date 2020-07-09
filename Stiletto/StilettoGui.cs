@@ -1,9 +1,9 @@
-﻿using KKAPI.Chara;
-using KKAPI.Maker;
+﻿using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
 using KKAPI.Studio.UI;
 using System;
+using System.Linq;
 using UniRx;
 using UnityEngine;
 
@@ -36,18 +36,18 @@ namespace Stiletto
             slider_AngleLeg = e.AddControl(new MakerSlider(category, "AngleLeg", 0f, 60f, 0f, plugin) { StringToValue = CreateStringToValueFunc(10f), ValueToString = CreateValueToStringFunc(10f) });
             slider_Height = e.AddControl(new MakerSlider(category, "Height", 0f, 0.5f, 0f, plugin) { StringToValue = CreateStringToValueFunc(1000f), ValueToString = CreateValueToStringFunc(1000f) });
 
-            slider_AngleAnkle.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.AnkleAngle, (ctrl, f) => ctrl.AnkleAngle = f);
-            slider_AngleLeg.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.LegAngle, (ctrl, f) => ctrl.LegAngle = f);
-            slider_Height.BindToFunctionController<HeelInfoController, float>(ctrl => ctrl.Height, (ctrl, f) => ctrl.Height = f);
+            slider_AngleAnkle.ValueChanged.Subscribe(x => MakerAPI.GetCharacterControl().GetComponent<HeelInfo>().SafeProc(y => y.AnkleAnglef = x));
+            slider_AngleLeg.ValueChanged.Subscribe(x => MakerAPI.GetCharacterControl().GetComponent<HeelInfo>().SafeProc(y => y.LegAnglef = x));
+            slider_Height.ValueChanged.Subscribe(x => MakerAPI.GetCharacterControl().GetComponent<HeelInfo>().SafeProc(y => y.Heightf = x));
         }
 
-        public static void UpdateMakerValues(HeelInfoController heelInfo)
+        public static void UpdateMakerValues(HeelInfo heelInfo)
         {
             if(slider_AngleAnkle != null)
             {
-                slider_AngleAnkle.Value = heelInfo.AnkleAngle;
-                slider_AngleLeg.Value = heelInfo.LegAngle;
-                slider_Height.Value = heelInfo.Height;
+                slider_AngleAnkle.Value = heelInfo.AnkleAnglef;
+                slider_AngleLeg.Value = heelInfo.LegAnglef;
+                slider_Height.Value = heelInfo.Heightf;
             }
         }
 
@@ -63,20 +63,20 @@ namespace Stiletto
 
         private static void RegisterStudioControls()
         {
-            var slider_AngleAnkle = CreateSlider("AngleAnkle", ctrl => ctrl.AnkleAngle, (ctrl, f) => ctrl.AnkleAngle = f, 0f, 60f);
-            var slider_AngleLeg = CreateSlider("AngleLeg", ctrl => ctrl.LegAngle, (ctrl, f) => ctrl.LegAngle = f, 0f, 60f);
-            var slider_Height = CreateSlider("Height", ctrl => ctrl.Height, (ctrl, f) => ctrl.Height = f, 0f, 0.5f);
+            var slider_AngleAnkle = CreateSlider("AngleAnkle", ctrl => ctrl.AnkleAnglef, (ctrl, f) => ctrl.AnkleAnglef = f, 0f, 60f);
+            var slider_AngleLeg = CreateSlider("AngleLeg", ctrl => ctrl.LegAnglef, (ctrl, f) => ctrl.LegAnglef = f, 0f, 60f);
+            var slider_Height = CreateSlider("Height", ctrl => ctrl.Heightf, (ctrl, f) => ctrl.Heightf = f, 0f, 0.5f);
 
             StudioAPI.GetOrCreateCurrentStateCategory("Stiletto").AddControls(slider_AngleAnkle, slider_AngleLeg, slider_Height);
 
-            CurrentStateCategorySlider CreateSlider(string name, Func<HeelInfoController, float> get, Action<HeelInfoController, float> set, float minValue, float maxValue)
+            CurrentStateCategorySlider CreateSlider(string name, Func<HeelInfo, float> get, Action<HeelInfo, float> set, float minValue, float maxValue)
             {
-                var slider = new CurrentStateCategorySlider(name, (chara) => get(chara.charInfo.GetComponent<HeelInfoController>()), minValue, maxValue);
-                slider.Value.Subscribe(Observer.Create((float x) =>
+                var slider = new CurrentStateCategorySlider(name, (chara) => get(chara.charInfo.GetComponent<HeelInfo>()), minValue, maxValue);
+                slider.Value.Subscribe(x =>
                 {
-                    foreach(var heelInfo in StudioAPI.GetSelectedControllers<HeelInfoController>())
+                    foreach(var heelInfo in StudioAPI.GetSelectedCharacters().Select(y => y.charInfo.gameObject.GetComponent<HeelInfo>()))
                         set(heelInfo, x);
-                }));
+                });
 
                 return slider;
             }

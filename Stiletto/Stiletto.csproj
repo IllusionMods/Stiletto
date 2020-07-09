@@ -69,8 +69,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConcurrentList.cs" />
     <Compile Include="HeelFlags.cs" />
-    <Compile Include="HeelInfoController.cs" />
+    <Compile Include="HeelInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShoeConfig.cs" />
     <Compile Include="Stiletto.cs" />
