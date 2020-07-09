@@ -9,7 +9,7 @@ using static ChaFileDefine;
 
 namespace Stiletto
 {
-    internal class HeelInfo : MonoBehaviour
+    public class HeelInfo : MonoBehaviour
     {
         public HeelFlags flags;
 
@@ -41,6 +41,28 @@ namespace Stiletto
         internal Quaternion AngleLeg
         {
             get => active && flags.ACTIVE ? angleLeg : Quaternion.identity;
+        }
+
+        public float AnkleAnglef
+        {
+            get => AngleA.eulerAngles.x;
+            set
+            {
+                angleA = Quaternion.Euler(value, 0f, 0f);
+                angleB = Quaternion.Euler(-value, 0f, 0f);
+            }
+        }
+
+        public float LegAnglef
+        {
+            get => angleLeg.eulerAngles.x;
+            set => angleLeg = Quaternion.Euler(value, 0f, 0f);
+        }
+
+        public float Heightf
+        {
+            get => Height.y;
+            set => height = new Vector3(0, value, 0);
         }
 
         void Awake()
@@ -105,6 +127,7 @@ namespace Stiletto
             angleA = Quaternion.Euler(angleAnkle, 0f, 0f);
             angleB = Quaternion.Euler(-angleAnkle, 0f, 0f);
             this.angleLeg = Quaternion.Euler(angleLeg, 0f, 0f);
+            StilettoGui.UpdateMakerValues(this);
         }
 
         internal void Setup(string heelName, int id, ChaControl chaControl, float height, float angleAnkle, float angleLeg)
