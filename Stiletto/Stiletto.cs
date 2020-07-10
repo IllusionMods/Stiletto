@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using Stiletto.Configurations;
 using Studio;
 using System.Collections.Generic;
 using System.IO;
@@ -15,8 +16,8 @@ namespace Stiletto
     [BepInPlugin(GUID, nameof(Stiletto), Version)]
     public class Stiletto : BaseUnityPlugin
     {
-        public const string GUID = "com.essu.stiletto";
-        public const string Version = "1.4.1";
+        public const string GUID = "com.essu.stiletto.custom";
+        public const string Version = "1.0.0";
 
         internal static new ManualLogSource Logger;
 
@@ -26,9 +27,7 @@ namespace Stiletto
         private static Dictionary<string, HeelFlags> dictAnimFlags = new Dictionary<string, HeelFlags>();
         private static ConcurrentList<HeelInfo> heelInfos = new ConcurrentList<HeelInfo>();
 
-        private static XmlSerializer xmlSerializer = new XmlSerializer(typeof(XMLContainer));
-        private static XmlSerializerNamespaces xmlSerializerNamespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
-        private static XmlWriterSettings xmlWriterSettings = new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true };
+        public static Stiletto Instance;
 
         private void Awake()
         {
@@ -44,14 +43,16 @@ namespace Stiletto
 
         private void Start()
         {
-            StilettoGui.Init(this);
+            Instance = this;
+            StilettoGui.Start();
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ActiveKinematicMode))]
         private static void OCIChar_ActiveKinematicModeHook()
         {
             if(heelInfos.Count == 0) return;
-            foreach(var cc in heelInfos.Select(x => x.cc).ToArray()) LoadHeelFile(cc);
+            foreach(var chaControl in heelInfos.Select(x => x.chaControl).ToArray()) 
+                LoadHeelFile(chaControl);
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.SetClothesState))]
@@ -98,16 +99,6 @@ namespace Stiletto
                 LoadHeelFile(__instance);
         }
 
-        private static void SaveHeelFile(HeelInfo hi)
-        {
-            var configFile = Path.Combine(CONFIG_PATH, $"{hi.heelName}.xml");
-            var shoeConfig = new XMLContainer(hi.id, hi.angleA.eulerAngles.x, hi.angleLeg.eulerAngles.x, hi.height.y);
-
-            using(var stream = new StreamWriter(configFile))
-            using(var writer = XmlWriter.Create(stream, xmlWriterSettings))
-                xmlSerializer.Serialize(writer, shoeConfig, xmlSerializerNamespaces);
-        }
-
         private static void LoadHeelFile(ChaControl __instance)
         {
             if(__instance == null) return;
@@ -123,55 +114,10 @@ namespace Stiletto
             var fileName = shoeListInfo?.Name;
             if(fileName == null) return;
 
-            float angleAnkle = 0f;
-            float angleLeg = 0f;
-            float height = 0f;
-            int id = -1;
-
-            var configFile = Path.Combine(CONFIG_PATH, $"{fileName}.xml");
-            if(File.Exists(configFile))
-            {
-                using(var fileStream = new FileStream(configFile, FileMode.Open))
-                {
-                    var shoeConfig = ((XMLContainer)xmlSerializer.Deserialize(fileStream)).ShoeConfig.First();
-                    angleAnkle = shoeConfig.AngleAnkle;
-                    angleLeg = shoeConfig.AngleLeg;
-                    height = shoeConfig.Height;
-                }
-            }
-            else
-            {
-                var resolveInfo = Sideloader.AutoResolver.UniversalAutoResolver.TryGetResolutionInfo(ChaListDefine.CategoryNo.co_shoes, shoeListInfo.Id);
-                if(resolveInfo != null)
-                {
-                    var stilettoXml = Sideloader.Sideloader.GetManifest(resolveInfo.GUID).manifestDocument.Root.Element("Stiletto");
-                    id = resolveInfo.Slot;
-
-                    if(stilettoXml != null)
-                    {
-                        using(var reader = new StringReader(stilettoXml.ToString()))
-                        {
-                            var xmlContainer = (XMLContainer)xmlSerializer.Deserialize(reader);
-                            var shoeConfig = xmlContainer.ShoeConfig.First(x => x.Id == resolveInfo.Slot);
-                            angleAnkle = shoeConfig.AngleAnkle;
-                            angleLeg = shoeConfig.AngleLeg;
-                            height = shoeConfig.Height;
-                        }
-                    }
-                }
-            }
+            var shoeConfig = HeelConfigProvider.LoadHeelFile(fileName);
 
             var heelInfo = __instance.gameObject.GetOrAddComponent<HeelInfo>();
-            heelInfo.Setup(fileName, id, __instance, height, angleAnkle, angleLeg);
-        }
-
-        internal static HeelFlags FetchFlags(string name)
-        {
-            if(dictAnimFlags.TryGetValue(name, out HeelFlags hf)) return hf;
-            hf = new HeelFlags();
-            dictAnimFlags[name] = hf;
-            SaveHeelFlags();
-            return hf;
+            heelInfo.Setup(fileName, __instance, shoeConfig.Height, shoeConfig.AngleAnkle, shoeConfig.AngleLeg);
         }
 
         private static void SaveHeelFlags()
