@@ -1,13 +1,9 @@
 ﻿using BepInEx;
-using BepInEx.Logging;
 using HarmonyLib;
 using Stiletto.Configurations;
 using Studio;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
-using System.Xml.Serialization;
 using UnityEngine;
 using static ChaFileDefine;
 
@@ -19,48 +15,45 @@ namespace Stiletto
         public const string GUID = "com.essu.stiletto.custom";
         public const string Version = "1.0.0";
 
-        internal static new ManualLogSource Logger;
-
         private static readonly string CONFIG_PATH = Path.Combine(Paths.ConfigPath, "Stiletto");
         private static readonly string FLAG_PATH = Path.Combine(CONFIG_PATH, "_flags.txt");
 
-        private static Dictionary<string, HeelFlags> dictAnimFlags = new Dictionary<string, HeelFlags>();
         private static ConcurrentList<HeelInfo> heelInfos = new ConcurrentList<HeelInfo>();
 
         public static Stiletto Instance;
 
         private void Awake()
         {
-            Logger = base.Logger;
-
             var di = new DirectoryInfo(CONFIG_PATH);
             if(!di.Exists) di.Create();
-
-            ReloadConfig();
-
             Harmony.CreateAndPatchAll(GetType());
         }
 
         private void Start()
         {
             Instance = this;
-            StilettoGui.Start();
+            StilettoMakerGUI.Start();
+            HeelFlagsProvider.ReloadHeelFlags();
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ActiveKinematicMode))]
         private static void OCIChar_ActiveKinematicModeHook()
         {
             if(heelInfos.Count == 0) return;
+            
             foreach(var chaControl in heelInfos.Select(x => x.chaControl).ToArray()) 
+            { 
                 LoadHeelFile(chaControl);
+            }
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.SetClothesState))]
         private static void ChaControl_SetClothesStateHook(ChaControl __instance, ref int clothesKind)
         {
             var ck = (ClothesKind)clothesKind;
-            if(ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
+            if (ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer) { 
                 LoadHeelFile(__instance);
+            }
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(YS_Assist), nameof(YS_Assist.SetActiveControl), new[] { typeof(GameObject), typeof(bool[]) })]
@@ -95,8 +88,10 @@ namespace Stiletto
         private static void ChangeCustomClothesHook(ChaControl __instance, ref int kind)
         {
             var ck = (ClothesKind)kind;
-            if(ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
+            if(ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer) 
+            { 
                 LoadHeelFile(__instance);
+            }
         }
 
         private static void LoadHeelFile(ChaControl __instance)
@@ -120,27 +115,6 @@ namespace Stiletto
             heelInfo.Setup(fileName, __instance, shoeConfig.Height, shoeConfig.AngleAnkle, shoeConfig.AngleLeg);
         }
 
-        private static void SaveHeelFlags()
-        {
-            File.WriteAllLines(FLAG_PATH, dictAnimFlags.Keys.OrderBy(x => x).Select(x => $"{x}={dictAnimFlags[x]}").ToArray());
-        }
-
-        private void ReloadConfig()
-        {
-            if(File.Exists(FLAG_PATH))
-            {
-                foreach(var l in File.ReadAllLines(FLAG_PATH).Where(x => !x.StartsWith(";")))
-                {
-                    var args = l.Split('=');
-                    if(args.Length == 2)
-                    {
-                        var name = args[0].Trim();
-                        var flags = args[1].Trim();
-                        dictAnimFlags[name] = HeelFlags.Parse(flags);
-                    }
-                }
-            }
-        }
 
         internal static void RegisterHeelInfo(HeelInfo hi)
         {

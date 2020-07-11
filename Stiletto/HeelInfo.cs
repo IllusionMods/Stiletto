@@ -12,7 +12,9 @@ namespace Stiletto
     {
         public HeelFlags flags;
         public string heelName = "-- NONE --";
-        public string animationKey = "-- NONE --";
+        public string animationName = "-- NONE --";
+        public string animationPath = "-- NONE --";
+
         public ChaControl chaControl;
 
         private Vector3 _height;
@@ -97,26 +99,28 @@ namespace Stiletto
             var currentShoes = (int)(chaControl.fileStatus.shoesType == 0 ? ClothesKind.shoes_inner : ClothesKind.shoes_outer);
             _active = chaControl.fileStatus.clothesState[currentShoes] == 0;
 
-            if(animBody == null) return;
-
-            var clipInfos = animBody.GetCurrentAnimatorClipInfo(0);
-            if(clipInfos.Length == 0) return;
-
-            var animationName = clipInfos[0].clip.name;
-            var pathName = animBody.runtimeAnimatorController.name;
-            
-            UpdateAnimationFlags($"{pathName}/{animationName}");
-        }
-
-        private void UpdateAnimationFlags(string key) 
-        {
-            if (animationKey != key)
+            if (animBody == null)
             {
-                flags = HeelFlagsProvider.GetFlags(key);
-                StilettoGui.UpdateFlagsValues(key, flags);
+                return;
             }
 
-            animationKey = key;
+            var clipInfos = animBody.GetCurrentAnimatorClipInfo(0);
+            if (clipInfos.Length == 0)
+            {
+                return;
+            }
+
+            var name = clipInfos[0].clip.name;
+            var path = animBody.runtimeAnimatorController.name;
+
+            if (name != animationName || path != animationPath)
+            {
+                flags = HeelFlagsProvider.GetFlags(path, name);
+                StilettoMakerGUI.UpdateFlagsValues(path, name, flags);
+            }
+
+            animationName = name;
+            animationPath = path;
         }
 
         private void UpdateValues(float height, float angleAnkle, float angleLeg)
@@ -126,7 +130,7 @@ namespace Stiletto
             _angleAnkleB = Quaternion.Euler(-angleAnkle, 0f, 0f);
             _angleLeg = Quaternion.Euler(angleLeg, 0f, 0f);
             
-            StilettoGui.UpdateMakerValues(this);
+            StilettoMakerGUI.UpdateMakerValues(this);
         }
 
         internal void Setup(string heelName, ChaControl chaControl, float height, float angleAnkle, float angleLeg)

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Stiletto
 {
-    internal static class StilettoGui
+    internal static class StilettoMakerGUI
     {
         private static MakerText text_heelName;
         private static MakerSlider slider_AngleAnkle;
@@ -25,7 +25,8 @@ namespace Stiletto
         private static MakerToggle toggle_AnkleRool;
         private static MakerToggle toggle_KneeBend;
         private static MakerButton button_FlagsSave;
-        private static MakerButton button_FlagsReload;
+
+        private static MakerButton button_Reload;
 
         internal static void Start()
         {
@@ -72,7 +73,6 @@ namespace Stiletto
             toggle_AnkleRool = e.AddControl(new MakerToggle(category, "AnkleRool", Stiletto.Instance));
             toggle_KneeBend = e.AddControl(new MakerToggle(category, "KeenBend", Stiletto.Instance));
             button_FlagsSave = e.AddControl(new MakerButton("Save", category, Stiletto.Instance));
-            button_FlagsReload = e.AddControl(new MakerButton("Reload", category, Stiletto.Instance));
 
             toggle_Active.ValueChanged.Subscribe(x => PoseValueChange(nameof(HeelFlags.ACTIVE), x));
             toggle_Height.ValueChanged.Subscribe(x => PoseValueChange(nameof(HeelFlags.HEIGHT), x));
@@ -80,7 +80,11 @@ namespace Stiletto
             toggle_AnkleRool.ValueChanged.Subscribe(x => PoseValueChange(nameof(HeelFlags.ANKLE_ROLL), x));
             toggle_KneeBend.ValueChanged.Subscribe(x => PoseValueChange(nameof(HeelFlags.KNEE_BEND), x));
             button_FlagsSave.OnClick.AddListener(SaveHeelFlags);
-            button_FlagsSave.OnClick.AddListener(ReloadHeelFlags);
+
+            e.AddControl(new MakerSeparator(category, Stiletto.Instance));
+
+            button_Reload = e.AddControl(new MakerButton("Reload Configuration Files", category, Stiletto.Instance));
+            button_Reload.OnClick.AddListener(ReloadConfiguration);
         }
 
         public static void UpdateMakerValues(HeelInfo heelInfo)
@@ -97,13 +101,13 @@ namespace Stiletto
             }
         }
 
-        public static void UpdateFlagsValues(string type, HeelFlags flags)
+        public static void UpdateFlagsValues(string path, string name, HeelFlags flags)
         {
             if (MakerAPI.InsideMaker)
             {
                 if (toggle_KneeBend != null)
                 {
-                    text_poseName.Text = type;
+                    text_poseName.Text = $"{path}/{name}";
                     toggle_Active.Value = flags.ACTIVE;
                     toggle_Height.Value = flags.HEIGHT;
                     toggle_ToeRool.Value = flags.TOE_ROLL;
@@ -182,11 +186,11 @@ namespace Stiletto
 
             if (heelInfo != null)
             {
-                HeelFlagsProvider.SaveFlags(heelInfo.animationKey, heelInfo.flags);
+                HeelFlagsProvider.SaveFlags(heelInfo.animationPath, heelInfo.animationName, heelInfo.flags);
             }
         }
 
-        private static void ReloadHeelFlags() 
+        private static void ReloadConfiguration() 
         {
             HeelFlagsProvider.ReloadHeelFlags();
         }

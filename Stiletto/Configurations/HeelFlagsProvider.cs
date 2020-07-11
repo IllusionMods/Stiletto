@@ -6,32 +6,62 @@ namespace Stiletto.Configurations
 {
     public static class HeelFlagsProvider
     {
-        private static Dictionary<string, HeelFlags> _dictionary;
+        private static HeelFlagsConfig _defaultConfig;
+        private static HeelFlagsConfig _dumpConfig;
+        private static List<HeelFlagsConfig> _configs;
+        private static Dictionary<string, HeelFlags> _cache;
+
         private static object locker = new object();
 
-        public static void SaveFlags(string name, HeelFlags flags) 
+        public static void SaveFlags(string path, string name, HeelFlags flags) 
         {
             lock(locker) 
-            { 
-                _dictionary[name] = flags;
-                File.WriteAllLines(ConfigPaths.FLAG_PATH, _dictionary.Keys.OrderBy(x => x).Select(x => $"{x}={_dictionary[x]}").ToArray());
+            {
+                foreach (var config in _configs)
+                {
+                    var existing = config.GetHeelFlags(path, name);
+                    if (existing != null)
+                    {
+                        config.SaveHeelFlags(path, name, flags);
+                        return;
+                    }
+                }
+
+                var cacheKey = GetCacheKey(path, name);
+                if (_cache.ContainsKey(cacheKey))
+                {
+                    _cache.Remove(cacheKey);
+                }
+
+                _defaultConfig.SaveHeelFlags(path, name, flags);
+                _dumpConfig.DeleteHeelFlags(path, name);
             }
         }
 
-        public static HeelFlags GetFlags(string name) 
+        public static HeelFlags GetFlags(string path, string name) 
         {
-            if (_dictionary == null) 
+            var cacheKey = GetCacheKey(path, name);
+
+            if (_cache.ContainsKey(cacheKey))
             {
-                ReloadHeelFlags();
+                return _cache[cacheKey];
             }
 
-            if (_dictionary.TryGetValue(name, out var flags))
+            foreach (var config in _configs)
             {
-                return flags;
+                var flags = config.GetHeelFlags(path, name);
+                if (flags != null)
+                {
+                    _cache[cacheKey] = flags.Value;
+                    return flags.Value;
+                }
             }
-            else {
-                flags = new HeelFlags();
-                SaveFlags(name, flags);
+
+            lock (locker)
+            {
+                var flags = new HeelFlags();
+                _cache[cacheKey] = flags;
+                _dumpConfig.SaveHeelFlags(path, name, flags);
                 return flags;
             }
         }
@@ -40,29 +70,22 @@ namespace Stiletto.Configurations
         {
             lock (locker)
             {
-                _dictionary = LoadHeelFlags();
+                var flagsFiles = Directory.GetFiles(ConfigPaths.FLAGS_PATH, "*.txt", SearchOption.AllDirectories);
+                _configs = flagsFiles.OrderBy(x => x).Select(x => new HeelFlagsConfig(x)).ToList();
+
+                _defaultConfig = new HeelFlagsConfig(ConfigPaths.FLAG_DEFAULT_PATH);
+                _dumpConfig = new HeelFlagsConfig(ConfigPaths.FLAG_DUMP_PATH);
+
+                _configs.Add(_defaultConfig);
+                _configs.Add(_dumpConfig);
+
+                _cache = new Dictionary<string, HeelFlags>();
             }
         }
 
-        private static Dictionary<string, HeelFlags> LoadHeelFlags()
+        public static string GetCacheKey(string path, string name) 
         {
-            var dictionary = new Dictionary<string, HeelFlags>();
-
-            if (File.Exists(ConfigPaths.FLAG_PATH))
-            {
-                foreach (var l in File.ReadAllLines(ConfigPaths.FLAG_PATH).Where(x => !x.StartsWith(";")))
-                {
-                    var args = l.Split('=');
-                    if (args.Length == 2)
-                    {
-                        var name = args[0].Trim();
-                        var flags = args[1].Trim();
-                        dictionary[name] = HeelFlags.Parse(flags);
-                    }
-                }
-            }
-
-            return dictionary;
+            return $"{path}/{name}";
         }
     }
 }
