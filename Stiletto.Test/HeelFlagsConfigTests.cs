@@ -1,6 +1,7 @@
 using Stiletto.Configurations;
 using System;
 using System.IO;
+using System.Text;
 using Xunit;
 
 namespace Stiletto.Test
@@ -13,7 +14,6 @@ namespace Stiletto.Test
             var file = GetResourcesFile("02_hsense.txt");
             var config = new HeelFlagsConfig(file);
             var flags = config.GetHeelFlags("kha_f_00", "S_Idle");
-
         }
 
         private string GetResourcesFile(string fileName) 

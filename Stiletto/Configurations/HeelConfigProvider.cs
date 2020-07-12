@@ -1,21 +1,18 @@
-﻿using BepInEx;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 
 namespace Stiletto.Configurations
 {
     public static class HeelConfigProvider
     {
-        private const string ANGLE_ANKLE = "angleAnkle";
-        private const string ANGLE_LEG = "angleLeg";
+        private const string ANKLE_ANGLE = "angleAnkle";
+        private const string LEG_ANGLE = "angleLeg";
         private const string HEIGHT = "height";
 
         public static void SaveHeelFile(string name, HeelConfig config)
         {
             var lines = new string[] {
-                $"{ANGLE_ANKLE}={config.AngleAnkle}",
-                $"{ANGLE_LEG}={config.AngleLeg}",
+                $"{ANKLE_ANGLE}={config.AnkleAngle}",
+                $"{LEG_ANGLE}={config.LegAngle}",
                 $"{HEIGHT}={config.Height}"
             };
             File.WriteAllLines(GetHeelConfigPath(name), lines);
@@ -25,10 +22,13 @@ namespace Stiletto.Configurations
         {
             var config = new HeelConfig
             {
-                AngleAnkle = 0,
-                AngleLeg = 0,
+                AnkleAngle = 0,
+                LegAngle = 0,
                 Height = 0
             };
+
+            if (string.IsNullOrEmpty(name)) 
+                return config;
 
             var configFile = GetHeelConfigPath(name);
             if (File.Exists(configFile))
@@ -39,11 +39,11 @@ namespace Stiletto.Configurations
                     if (parts.Length > 1) 
                     {
                         switch (parts[0]) {
-                            case ANGLE_ANKLE:
-                                config.AngleAnkle = float.Parse(parts[1]);
+                            case ANKLE_ANGLE:
+                                config.AnkleAngle = float.Parse(parts[1]);
                                 break;
-                            case ANGLE_LEG:
-                                config.AngleLeg = float.Parse(parts[1]);
+                            case LEG_ANGLE:
+                                config.LegAngle = float.Parse(parts[1]);
                                 break;
                             case HEIGHT:
                                 config.Height = float.Parse(parts[1]);

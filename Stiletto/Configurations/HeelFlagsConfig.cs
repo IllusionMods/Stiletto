@@ -64,11 +64,11 @@ namespace Stiletto.Configurations
             {
                 _lock.EnterWriteLock();
 
-                var isNameFlags = path == null;
+                var isPathFlags = string.IsNullOrEmpty(name);
 
-                var key = isNameFlags ? $"p:{name}" : GetFlagKey(path, name);
+                var key = isPathFlags ? $"p:{path}" : GetFlagKey(path, name);
 
-                if (isNameFlags)
+                if (isPathFlags)
                 {
                     PathFlags[path] = flags;
                 }

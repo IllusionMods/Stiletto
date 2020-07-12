@@ -80,9 +80,12 @@
     <Compile Include="Configurations\HeelConfigProvider.cs" />
     <Compile Include="Configurations\HeelFlags.cs" />
     <Compile Include="HeelInfo.cs" />
+    <Compile Include="HeelInfoContext.cs" />
+    <Compile Include="HeelInfoModifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Configurations\HeelConfig.cs" />
     <Compile Include="Stiletto.cs" />
+    <Compile Include="StilettoGameGUI.cs" />
     <Compile Include="StilettoMakerGUI.cs" />
   </ItemGroup>
   <ItemGroup>

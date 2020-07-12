@@ -13,77 +13,100 @@ namespace Stiletto
     internal static class StilettoMakerGUI
     {
         private static MakerText text_heelName;
-        private static MakerSlider slider_AngleAnkle;
-        private static MakerSlider slider_AngleLeg;
+        private static MakerSlider slider_AnkleAngle;
+        private static MakerSlider slider_LegAngle;
         private static MakerSlider slider_Height;
         private static MakerButton button_HeelSave;
 
         private static MakerText text_poseName;
         private static MakerToggle toggle_Active;
         private static MakerToggle toggle_Height;
-        private static MakerToggle toggle_ToeRool;
-        private static MakerToggle toggle_AnkleRool;
+        private static MakerToggle toggle_ToeRoll;
+        private static MakerToggle toggle_AnkleRoll;
         private static MakerToggle toggle_KneeBend;
         private static MakerButton button_FlagsSave;
 
         private static MakerButton button_Reload;
 
-        internal static void Start()
+        internal static void Start(Stiletto plugin)
         {
-            if(StudioAPI.InsideStudio) 
-            { 
+            if (StudioAPI.InsideStudio)
+            {
                 RegisterStudioControls();
             }
-            else 
-            { 
-                MakerAPI.RegisterCustomSubCategories += RegisterMakerControls;
+            else
+            {
+                MakerAPI.RegisterCustomSubCategories += (_, e) => RegisterMakerControls(plugin, e);
             }
         }
 
-        private static void RegisterMakerControls(object _, RegisterSubCategoriesEvent e)
+        private static void RegisterMakerControls(Stiletto plugin, RegisterSubCategoriesEvent e)
         {
             var shoesCategory = MakerConstants.Clothes.OuterShoes;
             var category = new MakerCategory(shoesCategory.CategoryName, "stiletto", shoesCategory.Position + 1, "Stiletto");
             e.AddSubCategory(category);
 
-            text_heelName = e.AddControl(new MakerText("<heel_name>", category, Stiletto.Instance));
-            slider_AngleAnkle = e.AddControl(new MakerSlider(category, "AngleAnkle", 0f, 60f, 0f, Stiletto.Instance) { 
-                StringToValue = CreateStringToValueFunc(10f), ValueToString = CreateValueToStringFunc(10f), 
+            text_heelName = e.AddControl(new MakerText("<heel_name>", category, plugin));
+            slider_AnkleAngle = e.AddControl(new MakerSlider(category, "Ankle Angle", 0f, 60f, 0f, plugin) {
+                StringToValue = CreateStringToValueFunc(10f), ValueToString = CreateValueToStringFunc(10f),
             });
-            slider_AngleLeg = e.AddControl(new MakerSlider(category, "AngleLeg", 0f, 60f, 0f, Stiletto.Instance) { 
-                StringToValue = CreateStringToValueFunc(10f), ValueToString = CreateValueToStringFunc(10f) 
+            slider_LegAngle = e.AddControl(new MakerSlider(category, "Leg Angle", 0f, 60f, 0f, plugin) {
+                StringToValue = CreateStringToValueFunc(10f), ValueToString = CreateValueToStringFunc(10f)
             });
-            slider_Height = e.AddControl(new MakerSlider(category, "Height", 0f, 0.5f, 0f, Stiletto.Instance) { 
-                StringToValue = CreateStringToValueFunc(1000f), ValueToString = CreateValueToStringFunc(1000f) 
+            slider_Height = e.AddControl(new MakerSlider(category, "Height", 0f, 0.5f, 0f, plugin) {
+                StringToValue = CreateStringToValueFunc(1000f), ValueToString = CreateValueToStringFunc(1000f)
             });
-            button_HeelSave = e.AddControl(new MakerButton("Save", category, Stiletto.Instance));
+            button_HeelSave = e.AddControl(new MakerButton("Save", category, plugin));
 
-            slider_AngleAnkle.ValueChanged.Subscribe(x => HeelValueChange(nameof(HeelConfig.AngleAnkle), x));
-            slider_AngleLeg.ValueChanged.Subscribe(x => HeelValueChange(nameof(HeelConfig.AngleLeg), x));
-            slider_Height.ValueChanged.Subscribe(x => HeelValueChange(nameof(HeelConfig.Height), x));
-            button_HeelSave.OnClick.AddListener(SaveHeelInfo);
+            slider_AnkleAngle.ValueChanged.Subscribe(value => 
+                MakerHeelInfoProcess(heel => HeelInfoModifier.UpdateHeelInfo(heel, HeelInfoType.AnkleAngle, value))
+            );
 
-            e.AddControl(new MakerSeparator(category, Stiletto.Instance));
+            slider_LegAngle.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => HeelInfoModifier.UpdateHeelInfo(heel, HeelInfoType.LegAngle, value))
+            );
 
-            text_poseName = e.AddControl(new MakerText("<pose_name>", category, Stiletto.Instance));
-            
-            toggle_Active = e.AddControl(new MakerToggle(category, "Active", Stiletto.Instance));
-            toggle_Height = e.AddControl(new MakerToggle(category, "Height", Stiletto.Instance));
-            toggle_ToeRool = e.AddControl(new MakerToggle(category, "ToeRool", Stiletto.Instance));
-            toggle_AnkleRool = e.AddControl(new MakerToggle(category, "AnkleRool", Stiletto.Instance));
-            toggle_KneeBend = e.AddControl(new MakerToggle(category, "KeenBend", Stiletto.Instance));
-            button_FlagsSave = e.AddControl(new MakerButton("Save", category, Stiletto.Instance));
+            slider_Height.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => HeelInfoModifier.UpdateHeelInfo(heel, HeelInfoType.Height, value))
+            );
 
-            toggle_Active.ValueChanged.Subscribe(x => PoseValueChange(nameof(HeelFlags.ACTIVE), x));
-            toggle_Height.ValueChanged.Subscribe(x => PoseValueChange(nameof(HeelFlags.HEIGHT), x));
-            toggle_ToeRool.ValueChanged.Subscribe(x => PoseValueChange(nameof(HeelFlags.TOE_ROLL), x));
-            toggle_AnkleRool.ValueChanged.Subscribe(x => PoseValueChange(nameof(HeelFlags.ANKLE_ROLL), x));
-            toggle_KneeBend.ValueChanged.Subscribe(x => PoseValueChange(nameof(HeelFlags.KNEE_BEND), x));
-            button_FlagsSave.OnClick.AddListener(SaveHeelFlags);
+            button_HeelSave.OnClick.AddListener(() =>
+                MakerHeelInfoProcess(heel => HeelInfoModifier.SaveHeelInfo(heel))
+            );
 
-            e.AddControl(new MakerSeparator(category, Stiletto.Instance));
+            e.AddControl(new MakerSeparator(category, plugin));
 
-            button_Reload = e.AddControl(new MakerButton("Reload Configuration Files", category, Stiletto.Instance));
+            text_poseName = e.AddControl(new MakerText("<pose_name>", category, plugin));
+
+            toggle_Active = e.AddControl(new MakerToggle(category, "Active", plugin));
+            toggle_Height = e.AddControl(new MakerToggle(category, "Height", plugin));
+            toggle_ToeRoll = e.AddControl(new MakerToggle(category, "Toe Roll", plugin));
+            toggle_AnkleRoll = e.AddControl(new MakerToggle(category, "Ankle Roll", plugin));
+            toggle_KneeBend = e.AddControl(new MakerToggle(category, "Keen Bend", plugin));
+            button_FlagsSave = e.AddControl(new MakerButton("Save", category, plugin));
+
+            toggle_Active.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => HeelInfoModifier.UpdateHeelFlags(heel, HeelFLagsType.Active, value))
+            );
+            toggle_Height.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => HeelInfoModifier.UpdateHeelFlags(heel, HeelFLagsType.Height, value))
+            );
+            toggle_ToeRoll.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => HeelInfoModifier.UpdateHeelFlags(heel, HeelFLagsType.ToeRoll, value))
+            );
+            toggle_AnkleRoll.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => HeelInfoModifier.UpdateHeelFlags(heel, HeelFLagsType.AnkleRoll, value))
+            );
+            toggle_KneeBend.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => HeelInfoModifier.UpdateHeelFlags(heel, HeelFLagsType.KneeBend, value))
+            );
+            button_FlagsSave.OnClick.AddListener(() => 
+                MakerHeelInfoProcess(heel => HeelInfoModifier.SaveHeelFlags(heel))
+            );
+
+            e.AddControl(new MakerSeparator(category, plugin));
+
+            button_Reload = e.AddControl(new MakerButton("Reload Configuration Files", category, plugin));
             button_Reload.OnClick.AddListener(ReloadConfiguration);
         }
 
@@ -91,11 +114,11 @@ namespace Stiletto
         {
             if (MakerAPI.InsideMaker && heelInfo != null)
             {
-                if (slider_Height != null) 
-                { 
+                if (slider_Height != null)
+                {
                     text_heelName.Text = heelInfo.heelName;
-                    slider_AngleAnkle.Value = heelInfo.AngleAnkle;
-                    slider_AngleLeg.Value = heelInfo.AngleLeg;
+                    slider_AnkleAngle.Value = heelInfo.AnkleAngle;
+                    slider_LegAngle.Value = heelInfo.LegAngle;
                     slider_Height.Value = heelInfo.Height;
                 }
             }
@@ -110,88 +133,23 @@ namespace Stiletto
                     text_poseName.Text = $"{path}/{name}";
                     toggle_Active.Value = flags.ACTIVE;
                     toggle_Height.Value = flags.HEIGHT;
-                    toggle_ToeRool.Value = flags.TOE_ROLL;
-                    toggle_AnkleRool.Value = flags.ANKLE_ROLL;
+                    toggle_ToeRoll.Value = flags.TOE_ROLL;
+                    toggle_AnkleRoll.Value = flags.ANKLE_ROLL;
                     toggle_KneeBend.Value = flags.KNEE_BEND;
                 }
             }
         }
 
-        private static void PoseValueChange(string type, bool value)
+        public static void MakerHeelInfoProcess(Action<HeelInfo> action) 
         {
             var heelInfo = MakerAPI.GetCharacterControl().GetComponent<HeelInfo>();
-
-            if (heelInfo != null)
-            {
-                switch (type)
-                {
-                    case nameof(HeelFlags.ACTIVE):
-                        heelInfo.SafeProc(x => x.flags.ACTIVE = value);
-                        break;
-                    case nameof(HeelFlags.ANKLE_ROLL):
-                        heelInfo.SafeProc(x => x.flags.ANKLE_ROLL = value);
-                        break;
-                    case nameof(HeelFlags.TOE_ROLL):
-                        heelInfo.SafeProc(x => x.flags.TOE_ROLL = value);
-                        break;
-                    case nameof(HeelFlags.HEIGHT):
-                        heelInfo.SafeProc(x => x.flags.HEIGHT = value);
-                        break;
-                    case nameof(HeelFlags.KNEE_BEND):
-                        heelInfo.SafeProc(x => x.flags.KNEE_BEND = value);
-                        break;
-                }
-            }
-        }
-
-        private static void HeelValueChange(string type, float value) 
-        {
-            var heelInfo = MakerAPI.GetCharacterControl().GetComponent<HeelInfo>();
-
-            if (heelInfo != null) 
-            {
-                switch (type)
-                {
-                    case nameof(HeelConfig.AngleAnkle):
-                        heelInfo.SafeProc(x => x.AngleAnkle = value);
-                        break;
-                    case nameof(HeelConfig.AngleLeg):
-                        heelInfo.SafeProc(x => x.AngleLeg = value);
-                        break;
-                    case nameof(HeelConfig.Height):
-                        heelInfo.SafeProc(x => x.Height = value);
-                        break;
-                }
-            }
-        }
-
-        private static void SaveHeelInfo()
-        {
-            var heelInfo = MakerAPI.GetCharacterControl().GetComponent<HeelInfo>();
-
-            if (heelInfo != null) 
-            {
-                HeelConfigProvider.SaveHeelFile(heelInfo.heelName, new HeelConfig
-                {
-                    AngleAnkle = heelInfo.AngleAnkle, 
-                    AngleLeg = heelInfo.AngleLeg, 
-                    Height = heelInfo.Height,
-                });
-            }
-        }
-
-        private static void SaveHeelFlags()
-        {
-            var heelInfo = MakerAPI.GetCharacterControl().GetComponent<HeelInfo>();
-
-            if (heelInfo != null)
-            {
-                HeelFlagsProvider.SaveFlags(heelInfo.animationPath, heelInfo.animationName, heelInfo.flags);
-            }
+            action(heelInfo);
         }
 
         private static void ReloadConfiguration() 
         {
+            var heelInfo = MakerAPI.GetCharacterControl().GetComponent<HeelInfo>();
+            HeelInfoModifier.UpdateHeelInfo(heelInfo, HeelConfigProvider.LoadHeelFile(heelInfo?.heelName));
             HeelFlagsProvider.ReloadHeelFlags();
         }
 
@@ -207,8 +165,8 @@ namespace Stiletto
 
         private static void RegisterStudioControls()
         {
-            var slider_AngleAnkle = CreateSlider("AngleAnkle", ctrl => ctrl.AngleAnkle, (ctrl, f) => ctrl.AngleAnkle = f, 0f, 60f);
-            var slider_AngleLeg = CreateSlider("AngleLeg", ctrl => ctrl.AngleLeg, (ctrl, f) => ctrl.AngleLeg = f, 0f, 60f);
+            var slider_AngleAnkle = CreateSlider("AngleAnkle", ctrl => ctrl.AnkleAngle, (ctrl, f) => ctrl.AnkleAngle = f, 0f, 60f);
+            var slider_AngleLeg = CreateSlider("AngleLeg", ctrl => ctrl.LegAngle, (ctrl, f) => ctrl.LegAngle = f, 0f, 60f);
             var slider_Height = CreateSlider("Height", ctrl => ctrl.Height, (ctrl, f) => ctrl.Height = f, 0f, 0.5f);
 
             StudioAPI.GetOrCreateCurrentStateCategory("Stiletto").AddControls(slider_AngleAnkle, slider_AngleLeg, slider_Height);

@@ -18,44 +18,44 @@ namespace Stiletto
         public ChaControl chaControl;
 
         private Vector3 _height;
-        private Quaternion _angleAnkleA;
-        private Quaternion _angleAnkleB;
-        private Quaternion _angleLeg;
+        private Quaternion _ankleAngleA;
+        private Quaternion _ankleAngleB;
+        private Quaternion _legAngle;
         private bool _active;
 
         private Vector3 GetHeight() { 
             return _active && flags.ACTIVE && flags.HEIGHT ? _height : Vector3.zero;
         }
 
-        private Quaternion GetAngleAnkleA() 
+        private Quaternion GetAnkleAngleA() 
         {
-            return _active && flags.ACTIVE && flags.ANKLE_ROLL ? _angleAnkleA : Quaternion.identity;
+            return _active && flags.ACTIVE && flags.ANKLE_ROLL ? _ankleAngleA : Quaternion.identity;
         }
 
-        private Quaternion GetAngleAnkleB()
+        private Quaternion GetAnkleAngleB()
         {
-            return _active && flags.ACTIVE && flags.TOE_ROLL ? _angleAnkleB : Quaternion.identity;
+            return _active && flags.ACTIVE && flags.TOE_ROLL ? _ankleAngleB : Quaternion.identity;
         }
 
-        private Quaternion GetAngleLeg() 
+        private Quaternion GetLegAngle() 
         {
-            return _active && flags.ACTIVE ? _angleLeg : Quaternion.identity;
+            return _active && flags.ACTIVE ? _legAngle : Quaternion.identity;
         }
 
-        public float AngleAnkle
+        public float AnkleAngle
         {
-            get => _angleAnkleA.eulerAngles.x;
+            get => _ankleAngleA.eulerAngles.x;
             set
             {
-                _angleAnkleA = Quaternion.Euler(value, 0f, 0f);
-                _angleAnkleB = Quaternion.Euler(-value, 0f, 0f);
+                _ankleAngleA = Quaternion.Euler(value, 0f, 0f);
+                _ankleAngleB = Quaternion.Euler(-value, 0f, 0f);
             }
         }
 
-        public float AngleLeg
+        public float LegAngle
         {
-            get => _angleLeg.eulerAngles.x;
-            set => _angleLeg = Quaternion.Euler(value, 0f, 0f);
+            get => _legAngle.eulerAngles.x;
+            set => _legAngle = Quaternion.Euler(value, 0f, 0f);
         }
 
         public float Height
@@ -63,6 +63,8 @@ namespace Stiletto
             get => _height.y;
             set => _height = new Vector3(0, value, 0);
         }
+
+        public bool HasAnimation => animBody != null;
 
         private void Awake()
         {
@@ -85,13 +87,13 @@ namespace Stiletto
             //npc = Singleton<Manager.Game>.Instance.actScene.npcList.FirstOrDefault(x => x.chaCtrl.chaID == cc.chaID);
             //if (!npc)
             //TODO: cry
-            Stiletto.RegisterHeelInfo(this);
+            HeelInfoContext.RegisterHeelInfo(this);
         }
 
         private void OnDestroy()
         {
             //Console.WriteLine("ONDESTROY - " + cc.fileParam.fullname);
-            Stiletto.UnregisterHeelInfo(this);
+            HeelInfoContext.UnregisterHeelInfo(this);
         }
 
         private void Update()
@@ -126,9 +128,9 @@ namespace Stiletto
         private void UpdateValues(float height, float angleAnkle, float angleLeg)
         {
             _height = new Vector3(0, height, 0);
-            _angleAnkleA = Quaternion.Euler(angleAnkle, 0f, 0f);
-            _angleAnkleB = Quaternion.Euler(-angleAnkle, 0f, 0f);
-            _angleLeg = Quaternion.Euler(angleLeg, 0f, 0f);
+            _ankleAngleA = Quaternion.Euler(angleAnkle, 0f, 0f);
+            _ankleAngleB = Quaternion.Euler(-angleAnkle, 0f, 0f);
+            _legAngle = Quaternion.Euler(angleLeg, 0f, 0f);
             
             StilettoMakerGUI.UpdateMakerValues(this);
         }
@@ -187,9 +189,9 @@ namespace Stiletto
                 body.localPosition = height;
             }
 
-            var angleAnkleA = GetAngleAnkleA();
-            var angleAnkleB = GetAngleAnkleB();
-            var angleLeg = GetAngleLeg();
+            var angleAnkleA = GetAnkleAngleA();
+            var angleAnkleB = GetAnkleAngleB();
+            var angleLeg = GetLegAngle();
 
             footL.localRotation *= angleAnkleA;
             footR.localRotation *= angleAnkleA;
