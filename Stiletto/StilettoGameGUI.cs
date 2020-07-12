@@ -69,8 +69,6 @@ namespace Stiletto
                         HeelFlagsProvider.ReloadHeelFlags();
                     }
 
-                    GUILayout.EndHorizontal();
-
                 } 
                 else 
                 {
@@ -216,8 +214,10 @@ namespace Stiletto
             int w = Screen.width, h = Screen.height;
             _screenRect = new Rect(ScreenOffset, ScreenOffset, w - ScreenOffset * 2, h - ScreenOffset * 2);
 
-            const int windowHeight = 310;
-            _windowRect = new Rect(_screenRect.xMin, _screenRect.yMax - windowHeight, 270, windowHeight);
+            var windowHeight = 340;
+            var windowWidth = 270;
+
+            _windowRect = new Rect(_screenRect.xMin, _screenRect.yMax - windowHeight, windowWidth, windowHeight);
         }
 
         private Heroine[] GetCurrentVisibleGirls()
