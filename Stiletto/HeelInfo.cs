@@ -70,29 +70,15 @@ namespace Stiletto
         {
             flags = new HeelFlags();
             chaControl = gameObject.GetComponent<ChaControl>();
-
-            //Stiletto.RegisterHeelInfo(this);
         }
-
-        //void OnDisable()
-        //{
-        //    //Stiletto.UnregisterHeelInfo(this);
-        //}
-
-        //private bool registered = false;
-        //private NPC npc = null;
 
         private void Start()
         {
-            //npc = Singleton<Manager.Game>.Instance.actScene.npcList.FirstOrDefault(x => x.chaCtrl.chaID == cc.chaID);
-            //if (!npc)
-            //TODO: cry
             HeelInfoContext.RegisterHeelInfo(this);
         }
 
         private void OnDestroy()
         {
-            //Console.WriteLine("ONDESTROY - " + cc.fileParam.fullname);
             HeelInfoContext.UnregisterHeelInfo(this);
         }
 
@@ -179,9 +165,15 @@ namespace Stiletto
 
             if (flags.KNEE_BEND && solver != null)
             {
-                solver.rightFootEffector.target.position += height;
-                solver.leftFootEffector.target.position += height;
-                solver.bodyEffector.positionOffset = -height;
+                solver.bodyEffector.positionOffset -= height;
+                solver.bodyEffector.positionWeight = 0f;
+
+                solver.rightFootEffector.positionOffset += height;
+                solver.rightFootEffector.positionWeight = 0f;
+
+                solver.leftFootEffector.positionOffset += height;
+                solver.leftFootEffector.positionWeight = 0f;
+
                 body.localPosition = Vector3.zero;
             }
             else 
@@ -213,24 +205,11 @@ namespace Stiletto
             {
                 if(!StudioAPI.InsideStudio)
                 {
-                    var currentSceneName = fbbik.gameObject.scene.name;
-                    if(!new[] { SceneNames.CustomScene, SceneNames.H, SceneNames.MyRoom }.Contains(currentSceneName))
-                    {
-                        //Disable arm weights, we only affect feet/knees.
-                        fbbik.GetIKSolver().Initiate(fbbik.transform);
-                        fbbik.solver.leftHandEffector.positionWeight = 0f;
-                        fbbik.solver.rightHandEffector.positionWeight = 0f;
-                        fbbik.solver.leftArmChain.bendConstraint.weight = 0f;
-                        fbbik.solver.rightArmChain.bendConstraint.weight = 0f;
-                        fbbik.solver.leftFootEffector.rotationWeight = 0f;
-                        fbbik.solver.rightFootEffector.rotationWeight = 0f;
-                    }
                     solver.IKPositionWeight = 1f;
                     fbbik.enabled = true;
                 }
                 solver.OnPostUpdate = PostUpdate;
             }
-#warning Detect overworld and adjust weights?
 
             if(StudioAPI.InsideStudio)
             {
