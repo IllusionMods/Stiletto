@@ -16,7 +16,7 @@ namespace Stiletto
     public class Stiletto : BaseUnityPlugin
     {
         public const string GUID = "com.essu.stiletto.custom";
-        public const string Version = "1.2.0";
+        public const string Version = "1.3.0";
         public const int WindowId = 670;
 
         private StilettoGameGUI _gameWindow;
@@ -49,7 +49,10 @@ namespace Stiletto
 
         private void OnGUI()
         {
-            _gameWindow?.DisplayWindow(WindowId);
+            if (_gameWindow != null) 
+            {
+                _gameWindow?.DisplayWindow(WindowId);
+            }
         }
 
         private void Update() 
@@ -60,12 +63,16 @@ namespace Stiletto
 
                 if (_showWindow)
                 {
-                    _gameWindow = new StilettoGameGUI();
-                    _gameWindow.Start(this);
+                    if (_gameWindow == null)
+                    {
+                        _gameWindow = new StilettoGameGUI();
+                    }
+
+                    _gameWindow.Show = true;
                 }
                 else 
                 {
-                    _gameWindow = null;
+                    _gameWindow.Show = false;
                 }
             }
         }
