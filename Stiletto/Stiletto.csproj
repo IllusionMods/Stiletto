@@ -79,6 +79,7 @@
     <Compile Include="ConcurrentList.cs" />
     <Compile Include="Configurations\HeelConfigProvider.cs" />
     <Compile Include="Configurations\HeelFlags.cs" />
+    <Compile Include="Configurations\DisplaySettings.cs" />
     <Compile Include="HeelInfo.cs" />
     <Compile Include="HeelInfoContext.cs" />
     <Compile Include="HeelInfoModifier.cs" />

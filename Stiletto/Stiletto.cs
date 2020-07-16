@@ -16,7 +16,7 @@ namespace Stiletto
     public class Stiletto : BaseUnityPlugin
     {
         public const string GUID = "com.essu.stiletto.custom";
-        public const string Version = "1.3.0";
+        public const string Version = "1.4.0";
         public const int WindowId = 670;
 
         private StilettoGameGUI _gameWindow;
@@ -78,7 +78,7 @@ namespace Stiletto
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ActiveKinematicMode))]
-        private void OCIChar_ActiveKinematicModeHook()
+        private static void OCIChar_ActiveKinematicModeHook()
         {
             if (HeelInfoContext.Count == 0) return;
 
@@ -91,48 +91,75 @@ namespace Stiletto
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.SetClothesState))]
-        private void ChaControl_SetClothesStateHook(ChaControl __instance, ref int clothesKind)
+        private static void ChaControl_SetClothesStateHook(ChaControl __instance, ref int clothesKind)
         {
-            var ck = (ClothesKind)clothesKind;
+            HookChaControlClothes(__instance, clothesKind);
+        }
 
-            if (ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
+        [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.ChangeCustomClothes))]
+        private static void ChaControl_ChangeCustomClothesHook(ChaControl __instance, ref int kind)
+        {
+            HookChaControlClothes(__instance, kind);
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(ChaFileStatus), nameof(ChaFileStatus.shoesType), MethodType.Setter)]
+        private static void ChaFileStatus_Set_ShoesTypeHook(ChaFileStatus __instance)
+        {
+            var chaControl = FindObjectsOfType<ChaControl>().Where(x => x?.chaFile?.status == __instance).FirstOrDefault();
+            if (chaControl == null)
             {
-                LoadHeelFile(__instance);
+                return;
+            }
+
+            if (chaControl.fileStatus.shoesType == 0)
+            {
+                HookChaControlClothes(chaControl, (int)ClothesKind.shoes_outer);
+            }
+            else 
+            {
+                HookChaControlClothes(chaControl, (int)ClothesKind.shoes_inner);
             }
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(YS_Assist), nameof(YS_Assist.SetActiveControl), new[] { typeof(GameObject), typeof(bool[]) })]
-        private void YS_Assist_SetActiveControl(ref bool __result, ref GameObject obj, ref bool[] flags)
+        private static void YS_Assist_SetActiveControl(ref bool __result, ref GameObject obj, ref bool[] flags)
         {
-            if (__result)
-                if (obj && obj.activeSelf)
-                    if (flags != null && flags.Length > 1 && flags[2])
+            if (!__result)
+                return;
+
+            if (!obj || !obj.activeSelf)
+                return;
+
+            if (flags != null && flags.Length > 1 && flags[2])
+            {
+                var clothesKind = -1;
+                if (obj.name == "ct_shoes_inner")
+                {
+                    clothesKind = (int)ClothesKind.shoes_inner;
+                }
+
+                if (obj.name == "ct_shoes_outer")
+                {
+                    clothesKind = (int)ClothesKind.shoes_outer;
+                }
+
+                if (clothesKind != -1)
+                {
+                    var obj_nonRef = obj;
+                    var ccs = FindObjectsOfType<ChaControl>().Where(x => x.objClothes[clothesKind] == obj_nonRef);
+
+                    if (ccs.Any())
                     {
-                        var ind = -1;
-                        if (obj.name == "ct_shoes_inner") ind = (int)ClothesKind.shoes_inner;
-                        if (obj.name == "ct_shoes_outer") ind = (int)ClothesKind.shoes_outer;
-                        if (ind != -1)
-                        {
-                            var obj_nonRef = obj;
-                            var ccs = FindObjectsOfType<ChaControl>().Where(x => x.objClothes[ind] == obj_nonRef);
-                            if (ccs.Any()) ChangeCustomClothesHook(ccs.First(), ref ind);
-                        }
+                        HookChaControlClothes(ccs.First(), clothesKind);
                     }
+                }
+            }
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(ChaFileStatus), nameof(ChaFileStatus.shoesType), MethodType.Setter)]
-        private static void ChaFileStatus_set_shoesTypeHook(ChaFileStatus __instance)
+        private static void HookChaControlClothes(ChaControl __instance, int clothesKind) 
         {
-            var cc = FindObjectsOfType<ChaControl>().Where(x => x?.chaFile?.status == __instance).FirstOrDefault();
-            if (cc == null) return;
-            var ind = cc.fileStatus.shoesType == 0 ? 8 : 7;
-            ChangeCustomClothesHook(cc, ref ind);
-        }
+            var ck = (ClothesKind)clothesKind;
 
-        [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.ChangeCustomClothes))]
-        private static void ChangeCustomClothesHook(ChaControl __instance, ref int kind)
-        {
-            var ck = (ClothesKind)kind;
             if (ck == ClothesKind.shoes_inner || ck == ClothesKind.shoes_outer)
             {
                 LoadHeelFile(__instance);
@@ -148,16 +175,33 @@ namespace Stiletto
 
             var currentShoes = (int)(fs.shoesType == 0 ? ClothesKind.shoes_inner : ClothesKind.shoes_outer);
             var ic = __instance.infoClothes;
-            if (ic == null || currentShoes > ic.Length) return;
+            
+            if (ic == null || __instance.infoClothes.ElementAtOrDefault(currentShoes) == null)
+            {
+                UnloadHeelFile(__instance);
+                return;
+            }
 
             var shoeListInfo = ic[currentShoes];
             var fileName = shoeListInfo?.Name;
-            if (fileName == null) return;
+            if (fileName == null)
+            {
+                UnloadHeelFile(__instance);
+                return;
+            }
 
             var shoeConfig = HeelConfigProvider.LoadHeelFile(fileName);
-
             var heelInfo = __instance.gameObject.GetOrAddComponent<HeelInfo>();
             heelInfo.Setup(fileName, __instance, shoeConfig.Height, shoeConfig.AnkleAngle, shoeConfig.LegAngle);
+        }
+
+        private static void UnloadHeelFile(ChaControl __instance)
+        {
+            var heelInfo = __instance.gameObject.GetComponent<HeelInfo>();
+            if (heelInfo != null)
+            {
+                heelInfo.Setup(DisplaySettings.NONE_PLACEHOLDER, __instance, 0, 0, 0);
+            }
         }
     }
 }

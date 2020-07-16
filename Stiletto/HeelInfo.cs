@@ -11,9 +11,9 @@ namespace Stiletto
     public class HeelInfo : MonoBehaviour
     {
         public HeelFlags flags;
-        public string heelName = "-- NONE --";
-        public string animationName = "-- NONE --";
-        public string animationPath = "-- NONE --";
+        public string heelName = DisplaySettings.NONE_PLACEHOLDER;
+        public string animationName = DisplaySettings.NONE_PLACEHOLDER;
+        public string animationPath = DisplaySettings.NONE_PLACEHOLDER;
 
         public ChaControl chaControl;
 
@@ -22,6 +22,7 @@ namespace Stiletto
         private Quaternion _ankleAngleB;
         private Quaternion _legAngle;
         private bool _active;
+        private bool _hookedIK;
 
         private Vector3 GetHeight() { 
             return _active && flags.ACTIVE && flags.HEIGHT ? _height : Vector3.zero;
@@ -80,6 +81,11 @@ namespace Stiletto
         private void OnDestroy()
         {
             HeelInfoContext.UnregisterHeelInfo(this);
+
+            if (solver != null)
+            {
+                solver.OnPostUpdate -= PostUpdate;
+            }
         }
 
         private void Update()
@@ -143,7 +149,7 @@ namespace Stiletto
             footR = leg_R.Find("cf_j_foot_R");
             toesR = footR.Find("cf_j_toes_R");
 
-            SetFBBIK(animBody.GetComponent<FullBodyBipedIK>());
+            HookFBBIK();
         }
 
         private IKSolverFullBodyBiped solver;
@@ -195,8 +201,13 @@ namespace Stiletto
             leg_R.localRotation *= angleLeg;
         }
 
-        private void SetFBBIK(FullBodyBipedIK fbbik)
+        private void HookFBBIK()
         {
+            if (_hookedIK == true)
+                return;
+
+            var fbbik = animBody.GetComponent<FullBodyBipedIK>();
+
             if (fbbik != null) {
                 solver = fbbik.solver;
             }
@@ -208,7 +219,8 @@ namespace Stiletto
                     solver.IKPositionWeight = 1f;
                     fbbik.enabled = true;
                 }
-                solver.OnPostUpdate = PostUpdate;
+                solver.OnPostUpdate += PostUpdate;
+                _hookedIK = true;
             }
 
             if(StudioAPI.InsideStudio)
