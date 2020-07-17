@@ -83,6 +83,7 @@
     <Compile Include="HeelInfo.cs" />
     <Compile Include="HeelInfoContext.cs" />
     <Compile Include="HeelInfoModifier.cs" />
+    <Compile Include="Models\CharaDisplayData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Configurations\HeelConfig.cs" />
     <Compile Include="Stiletto.cs" />

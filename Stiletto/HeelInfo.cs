@@ -1,7 +1,6 @@
 ﻿using KKAPI.Studio;
 using RootMotion.FinalIK;
 using Stiletto.Configurations;
-using System;
 using System.Linq;
 using UnityEngine;
 using static ChaFileDefine;
@@ -22,7 +21,6 @@ namespace Stiletto
         private Quaternion _ankleAngleB;
         private Quaternion _legAngle;
         private bool _active;
-        private bool _hookedIK;
 
         private Vector3 GetHeight() { 
             return _active && flags.ACTIVE && flags.HEIGHT ? _height : Vector3.zero;
@@ -81,11 +79,6 @@ namespace Stiletto
         private void OnDestroy()
         {
             HeelInfoContext.UnregisterHeelInfo(this);
-
-            if (solver != null)
-            {
-                solver.OnPostUpdate -= PostUpdate;
-            }
         }
 
         private void Update()
@@ -203,9 +196,6 @@ namespace Stiletto
 
         private void HookFBBIK()
         {
-            if (_hookedIK == true)
-                return;
-
             var fbbik = animBody.GetComponent<FullBodyBipedIK>();
 
             if (fbbik != null) {
@@ -216,11 +206,25 @@ namespace Stiletto
             {
                 if(!StudioAPI.InsideStudio)
                 {
+                    var currentSceneName = fbbik.gameObject.scene.name;
+
+                    if (!new[] { SceneNames.CustomScene, SceneNames.H, SceneNames.MyRoom }.Contains(currentSceneName))
+                    {
+                        //Disable arm weights, we only affect feet/knees.
+                        fbbik.GetIKSolver().Initiate(fbbik.transform);
+                        fbbik.solver.leftHandEffector.positionWeight = 0f;
+                        fbbik.solver.rightHandEffector.positionWeight = 0f;
+                        fbbik.solver.leftArmChain.bendConstraint.weight = 0f;
+                        fbbik.solver.rightArmChain.bendConstraint.weight = 0f;
+                        fbbik.solver.leftFootEffector.rotationWeight = 0f;
+                        fbbik.solver.rightFootEffector.rotationWeight = 0f;
+                    }
+
                     solver.IKPositionWeight = 1f;
                     fbbik.enabled = true;
                 }
-                solver.OnPostUpdate += PostUpdate;
-                _hookedIK = true;
+
+                solver.OnPostUpdate = PostUpdate;
             }
 
             if(StudioAPI.InsideStudio)

@@ -1,10 +1,10 @@
 ﻿using Illusion.Extensions;
 using Manager;
 using Stiletto.Configurations;
-using System.Collections.Generic;
+using Stiletto.Models;
+using System;
 using System.Linq;
 using UnityEngine;
-using static SaveData;
 
 namespace Stiletto
 {
@@ -13,12 +13,11 @@ namespace Stiletto
         private const int ScreenOffset = 20;
         private Rect _windowRect;
         private Rect _screenRect;
-        private CharaData[] _currentCharacters = new CharaData[0];
-
-        private HeelInfo selectedHeelInfo;
-        private CharaData selectedCharacter;
+        private CharaDisplayData[] _currentCharacters = new CharaDisplayData[0];
+        private CharaDisplayData selectedCharacter;
         private int selectedIndex = -1;
         private bool _show;
+        private DateTime? _lastCharaRefersh;
 
         public bool Show
         {
@@ -54,55 +53,60 @@ namespace Stiletto
                 {
                     if (selectedCharacter == null)
                     {
-                        SelectHeelInfo(0);
+                        SelectCharacter(0);
                     }
                     else if (updatedHeroines)
                     {
                         selectedIndex = _currentCharacters.ElementAtOrDefault(selectedIndex) == null ? 0 : selectedIndex;
-                        SelectHeelInfo(selectedIndex);
+                        SelectCharacter(selectedIndex);
                     }
                     else
                     {
-                        SelectHeelInfo(selectedIndex);
+                        SelectCharacter(selectedIndex);
                     }
 
-                    if (selectedCharacter != null && selectedHeelInfo != null) 
+                    if (selectedCharacter != null) 
                     {
-                        CreateCurrentHeroineContent();
-
+                        CreateCurrentCharacterContent();
                         GUILayout.Space(10);
+                    }
+                    // GUILayout.Space(10);
+                    // CreateHeelSettingsContent();
 
+                    if (selectedCharacter != null && selectedCharacter.HeelInfo != null)
+                    {
                         CreateAnimationSettingsContent();
-
-                        // GUILayout.Space(10);
-                        // CreateHeelSettingsContent();
-
                         GUILayout.Space(10);
+                    }
 
-                        if (GUILayout.Button("Reload Configuration"))
-                        {
-                            HeelFlagsProvider.ReloadHeelFlags();
-                        }
+                    if (GUILayout.Button("Reload Configuration"))
+                    {
+                        HeelFlagsProvider.ReloadHeelFlags();
                     }
                 }
                 else
                 {
-                    SelectHeelInfo(-1);
+                    SelectCharacter(-1);
                 }
             }
             GUILayout.EndVertical();
             GUI.DragWindow();
         }
 
-        private void CreateCurrentHeroineContent()
+        public void UpdateCharacterList() 
+        { 
+            
+        }
+
+        private void CreateCurrentCharacterContent()
         {
             GUILayout.BeginVertical();
             {
                 GUILayout.Label("Current Character");
                 CreateDisplayLabel("Name:", selectedCharacter.Name);
-                CreateDisplayLabel("Heel:", selectedHeelInfo.heelName);
-                CreateDisplayLabel("Anim Path:", selectedHeelInfo.animationPath);
-                CreateDisplayLabel("Anim Name:", selectedHeelInfo.animationName);
+                CreateDisplayLabel("Heel:", selectedCharacter.HeelName);
+                CreateDisplayLabel("Anim Path:", selectedCharacter.AnimationPath);
+                CreateDisplayLabel("Anim Name:", selectedCharacter.AnimationName);
 
                 GUILayout.BeginHorizontal();
                 {
@@ -112,13 +116,13 @@ namespace Stiletto
 
                     if (GUILayout.Button("Privous", GUILayout.Width(80)))
                     {
-                        SelectHeelInfo(selectedIndex == 0 ? lastIndex : selectedIndex - 1);
+                        SelectCharacter(selectedIndex == 0 ? lastIndex : selectedIndex - 1);
                     }
                     GUILayout.Space(10);
 
                     if (GUILayout.Button("Next", GUILayout.Width(80)))
                     {
-                        SelectHeelInfo(selectedIndex == lastIndex ? 0 : selectedIndex + 1);
+                        SelectCharacter(selectedIndex == lastIndex ? 0 : selectedIndex + 1);
                     }
                 }
                 GUILayout.EndHorizontal();
@@ -134,21 +138,21 @@ namespace Stiletto
 
                 GUILayout.BeginHorizontal();
                 {
-                    selectedHeelInfo.flags.ACTIVE = GUILayout.Toggle(selectedHeelInfo.flags.ACTIVE, " Active");
+                    selectedCharacter.HeelInfo.flags.ACTIVE = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.ACTIVE, " Active");
                 }
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 {
-                    selectedHeelInfo.flags.TOE_ROLL = GUILayout.Toggle(selectedHeelInfo.flags.TOE_ROLL, " Toe Roll", GUILayout.Width(120));
-                    selectedHeelInfo.flags.ANKLE_ROLL = GUILayout.Toggle(selectedHeelInfo.flags.ANKLE_ROLL, " Ankle Roll", GUILayout.Width(120));
+                    selectedCharacter.HeelInfo.flags.TOE_ROLL = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.TOE_ROLL, " Toe Roll", GUILayout.Width(120));
+                    selectedCharacter.HeelInfo.flags.ANKLE_ROLL = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.ANKLE_ROLL, " Ankle Roll", GUILayout.Width(120));
                 }
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 {
-                    selectedHeelInfo.flags.HEIGHT = GUILayout.Toggle(selectedHeelInfo.flags.HEIGHT, " Height", GUILayout.Width(120));
-                    selectedHeelInfo.flags.KNEE_BEND = GUILayout.Toggle(selectedHeelInfo.flags.KNEE_BEND, " Keen Bend", GUILayout.Width(120));
+                    selectedCharacter.HeelInfo.flags.HEIGHT = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.HEIGHT, " Height", GUILayout.Width(120));
+                    selectedCharacter.HeelInfo.flags.KNEE_BEND = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.KNEE_BEND, " Keen Bend", GUILayout.Width(120));
                 }
                 GUILayout.EndHorizontal();
 
@@ -156,12 +160,12 @@ namespace Stiletto
                 {
                     if (GUILayout.Button("Save PathOnly", GUILayout.Width(115)))
                     {
-                        HeelFlagsProvider.SaveFlags(selectedHeelInfo.animationPath, null, selectedHeelInfo.flags);
+                        HeelFlagsProvider.SaveFlags(selectedCharacter.AnimationPath, null, selectedCharacter.HeelInfo.flags);
                     }
                     GUILayout.Space(10);
                     if (GUILayout.Button("Save Path+Name", GUILayout.Width(115)))
                     {
-                        HeelFlagsProvider.SaveFlags(selectedHeelInfo.animationPath, selectedHeelInfo.animationName, selectedHeelInfo.flags);
+                        HeelFlagsProvider.SaveFlags(selectedCharacter.AnimationPath, selectedCharacter.AnimationName, selectedCharacter.HeelInfo.flags);
                     }
                 }
                 GUILayout.EndHorizontal();
@@ -178,21 +182,21 @@ namespace Stiletto
                 GUILayout.BeginHorizontal();
                 {
                     GUILayout.Label("Ankle Angle", GUILayout.Width(80));
-                    selectedHeelInfo.AnkleAngle = GUILayout.HorizontalSlider(selectedHeelInfo.AnkleAngle, 0f, 60f);
+                    selectedCharacter.HeelInfo.AnkleAngle = GUILayout.HorizontalSlider(selectedCharacter.HeelInfo.AnkleAngle, 0f, 60f);
                 }
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 {
                     GUILayout.Label("Leg Angle", GUILayout.Width(80));
-                    selectedHeelInfo.LegAngle = GUILayout.HorizontalSlider(selectedHeelInfo.LegAngle, 0f, 60f);
+                    selectedCharacter.HeelInfo.LegAngle = GUILayout.HorizontalSlider(selectedCharacter.HeelInfo.LegAngle, 0f, 60f);
                 }
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 {
                     GUILayout.Label("Height", GUILayout.Width(80));
-                    selectedHeelInfo.Height = GUILayout.HorizontalSlider(selectedHeelInfo.Height, 0f, 0.5f);
+                    selectedCharacter.HeelInfo.Height = GUILayout.HorizontalSlider(selectedCharacter.HeelInfo.Height, 0f, 0.5f);
                 }
                 GUILayout.EndHorizontal();
             }
@@ -209,19 +213,10 @@ namespace Stiletto
             GUILayout.EndHorizontal();
         }
 
-        private void SelectHeelInfo(int index)
+        private void SelectCharacter(int index)
         {
             selectedCharacter = _currentCharacters.ElementAtOrDefault(index);
             selectedIndex = index;
-
-            if (selectedCharacter != null)
-            {
-                selectedHeelInfo = HeelInfoContext.HeelInfos.FirstOrDefault(x => x.chaControl == selectedCharacter.chaCtrl);
-            }
-            else
-            {
-                selectedHeelInfo = null;
-            }
         }
 
         private void SetWindowSizes()
@@ -235,17 +230,30 @@ namespace Stiletto
             _windowRect = new Rect(_screenRect.xMin, _screenRect.yMax - windowHeight, windowWidth, windowHeight);
         }
 
-        private CharaData[] GetCurrentVisibleCharacters()
+        private CharaDisplayData[] GetCurrentVisibleCharacters()
         {
-            var result = Object.FindObjectOfType<TalkScene>()?.targetHeroine;
-            if (result != null) return new[] { result };
+            if (_lastCharaRefersh != null && DateTime.Now - _lastCharaRefersh < TimeSpan.FromSeconds(2))
+            {
+                return _currentCharacters;
+            }
+            else 
+            {
+                _lastCharaRefersh = DateTime.Now;
+            }
 
-            var hHeroines = Object.FindObjectOfType<HFlag>()?.lstHeroine;
+
+            var result = UnityEngine.Object.FindObjectOfType<TalkScene>()?.targetHeroine;
+            if (result != null)
+            {
+                return new[] { new CharaDisplayData(result) };
+            }
+
+            var hflags = UnityEngine.Object.FindObjectOfType<HFlag>();
+            var hHeroines = hflags?.lstHeroine;
             if (hHeroines != null && hHeroines.Count > 0)
             {
-                var characters = hHeroines.Cast<CharaData>().ToList();
-                characters.Push(Game.Instance.Player);
-
+                var characters = hHeroines.Select(x => new CharaDisplayData(x)).ToList();
+                characters.Push(new CharaDisplayData(hflags.player));
                 return characters.ToArray();
             }
 
@@ -256,26 +264,32 @@ namespace Stiletto
                 var advScene = Game.Instance.actScene.AdvScene;
                 if (advScene.Scenario?.currentHeroine != null)
                 {
-                    return new CharaData[] { advScene.Scenario.currentHeroine, Game.Instance.Player };
+                    return new CharaDisplayData[] { 
+                        new CharaDisplayData(advScene.Scenario.currentHeroine),
+                        new CharaDisplayData(advScene.Scenario.player) 
+                    };
                 }
 
                 if (advScene.nowScene is TalkScene s && s.targetHeroine != null)
                 {
-                    return new CharaData[] { s.targetHeroine, Game.Instance.Player };
+                    return new CharaDisplayData[] {
+                        new CharaDisplayData(s.targetHeroine),
+                        new CharaDisplayData(Game.Instance.Player)
+                    };
                 }
             }
 
-            return new CharaData[] { Game.Instance.Player };
+            return HeelInfoContext.HeelInfos.Select(x => new CharaDisplayData(x)).ToArray();
         }
 
-        private bool CompareCharaData(CharaData[] first, CharaData[] second)
+        private bool CompareCharaData(CharaDisplayData[] first, CharaDisplayData[] second)
         {
             if (first.Length != second.Length)
                 return false;
 
             for (var i = 0; i < first.Length; i++)
             {
-                if (first[i].chaCtrl != second[i].chaCtrl)
+                if (first[i].ChaControl != second[i].ChaControl)
                     return false;
             }
 
