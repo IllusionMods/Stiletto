@@ -145,6 +145,7 @@ namespace Stiletto
             HookFBBIK();
         }
 
+        private FullBodyBipedIK fbbik;
         private IKSolverFullBodyBiped solver;
         private Transform body = null;
 
@@ -194,9 +195,17 @@ namespace Stiletto
             leg_R.localRotation *= angleLeg;
         }
 
+        private void LateUpdate()
+        {
+            if (solver == null || !fbbik.enabled)
+            {
+                PostUpdate();
+            }
+        }
+
         private void HookFBBIK()
         {
-            var fbbik = animBody.GetComponent<FullBodyBipedIK>();
+            fbbik = animBody.GetComponent<FullBodyBipedIK>();
 
             if (fbbik != null) {
                 solver = fbbik.solver;
@@ -221,7 +230,6 @@ namespace Stiletto
                     }
 
                     solver.IKPositionWeight = 1f;
-                    fbbik.enabled = true;
                 }
 
                 solver.OnPostUpdate = PostUpdate;
