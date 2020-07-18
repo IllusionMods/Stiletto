@@ -16,6 +16,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Resources\Chunky Maryjanes.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Flags\01_basic.txt" />
+    <Content Include="Resources\Flags\02_hsense.txt" />
+    <Content Include="Resources\Flags\03_regular.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />

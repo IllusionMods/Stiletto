@@ -1,5 +1,6 @@
 ﻿using KKAPI.Studio;
-using Stiletto.Configurations;
+using Sirenix.OdinInspector.Demos;
+using Stiletto.Models;
 using UnityEngine;
 using static ChaFileDefine;
 
@@ -7,10 +8,10 @@ namespace Stiletto
 {
     public class HeelInfo : MonoBehaviour
     {
-        public HeelFlags flags;
-        public string heelName = DisplaySettings.NONE_PLACEHOLDER;
-        public string animationName = DisplaySettings.NONE_PLACEHOLDER;
-        public string animationPath = DisplaySettings.NONE_PLACEHOLDER;
+        public AnimationFlags flags;
+        public string heelName = RootSettings.NONE_PLACEHOLDER;
+        public string animationName = RootSettings.NONE_PLACEHOLDER;
+        public string animationPath = RootSettings.NONE_PLACEHOLDER;
         public ChaControl chaControl;
 
         private Vector3 _height;
@@ -20,7 +21,7 @@ namespace Stiletto
         public CustomPose _customPose;
         private bool _active;
 
-        private HeelInfoAnimation _animation = new HeelInfoAnimation();
+        private HeelInfoAnimation _animation;
 
         public float AnkleAngle
         {
@@ -46,22 +47,34 @@ namespace Stiletto
 
         public CustomPose CustomPose => _customPose;
 
-        internal void Setup(string heelName, ChaControl chaControl, float height, float ankleAngle, float legAngle)
+        public void Setup(ChaControl chaControl, string heelName)
         {
             this.chaControl = chaControl;
-            this.heelName = heelName;
             _animation = new HeelInfoAnimation(chaControl);
 
-            Height = height;
-            AnkleAngle = ankleAngle;
-            LegAngle = legAngle;
+            if (!string.IsNullOrEmpty(heelName))
+            {
+                this.heelName = heelName;
+                var customHeel = StilettoContext.CustomHeelProvider.Load(heelName);
+                Height = customHeel.Height;
+                AnkleAngle = customHeel.AnkleAngle;
+                LegAngle = customHeel.LegAngle;
+            }
+            else 
+            {
+                this.heelName = RootSettings.NONE_PLACEHOLDER;
+                Height = 0;
+                AnkleAngle = 0;
+                LegAngle = 0;
+            }
 
-            StilettoMakerGUI.UpdateMakerValues(this);
 
             if (_animation.FullBodyBipedSolver != null)
             {
                 _animation.FullBodyBipedSolver.OnPostUpdate = PostUpdate;
             }
+
+            StilettoContext.NotifyHeelInfoUpdate(this);
 
             if (StudioAPI.InsideStudio)
             {
@@ -70,23 +83,32 @@ namespace Stiletto
             }
         }
 
+        public void Reload() 
+        {
+            if (!string.IsNullOrEmpty(heelName) && heelName != RootSettings.NONE_PLACEHOLDER) 
+            {
+                Setup(chaControl, heelName);
+                animationPath = null;
+                animationName = null;
+            }
+        }
+
         private void Awake()
         {
-            flags = new HeelFlags();
+            flags = new AnimationFlags();
             chaControl = gameObject.GetComponent<ChaControl>();
             _customPose = new CustomPose();
         }
 
         private void Start()
         {
-            HeelInfoContext.RegisterHeelInfo(this);
+            StilettoContext.RegisterHeelInfo(this);
         }
 
         private void OnDestroy()
         {
-            HeelInfoContext.UnregisterHeelInfo(this);
+            StilettoContext.UnregisterHeelInfo(this);
         }
-
 
         private void Update()
         {
@@ -95,16 +117,22 @@ namespace Stiletto
 
             var path = _animation.AnimationPath;
             var name = _animation.AnimationName;
+            var animationChange = false;
 
             if (path != animationPath || name != animationName)
             {
-                flags = HeelFlagsProvider.GetFlags(path, name);
-                _customPose = CustomPoseProvider.LoadCustomPose(animationPath);
-                StilettoMakerGUI.UpdateFlagsValues(path, name, flags);
+                flags = StilettoContext.AnimationFlagsProvider.Load(path, name);
+                _customPose = StilettoContext.CustomPoseProvider.Load(animationPath);
+                animationChange = true;
             }
 
             animationPath = path;
             animationName = name;
+
+            if (animationChange) 
+            {
+                StilettoContext.NotifyHeelInfoUpdate(this);
+            }
         }
 
         private void PostUpdate()
@@ -114,11 +142,8 @@ namespace Stiletto
             var toeAngle = _active && flags.ACTIVE && flags.TOE_ROLL ? _toeAngle : Quaternion.identity;
             var legAngle = _active && flags.ACTIVE ? _legAngle : Quaternion.identity;
             var customPose = _active && flags.ACTIVE && flags.CUSTOM_POSE ? _customPose : new CustomPose();
-
-            if (_active && flags.ACTIVE) 
-            { 
-                _animation.Update(flags, height, ankleAngle, toeAngle, legAngle, customPose);
-            }
+            
+            _animation?.Update(flags, height, ankleAngle, toeAngle, legAngle, customPose);
         }
 
         private void LateUpdate()

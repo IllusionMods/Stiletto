@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 
-namespace Stiletto.Configurations
+namespace Stiletto.Models
 {
-    public struct HeelFlags
+    public class AnimationFlags
     {
         public bool ACTIVE { get; set; }
         public bool HEIGHT { get; set; }
@@ -18,10 +18,10 @@ namespace Stiletto.Configurations
             }.Select(x => x ? "1" : "0").ToArray());
         }
 
-        public static HeelFlags Parse(string s)
+        public static AnimationFlags Parse(string s)
         {
             var args = s.Split(',').Select(x => x.Trim() == "1").ToArray();
-            var hf = new HeelFlags();
+            var hf = new AnimationFlags();
 
             if (args.Length <= 0) return hf;
 

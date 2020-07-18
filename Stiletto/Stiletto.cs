@@ -1,7 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
-using Stiletto.Configurations;
 using Studio;
 using System.Linq;
 using UnityEngine;
@@ -13,25 +12,27 @@ namespace Stiletto
     public class Stiletto : BaseUnityPlugin
     {
         public const string GUID = "com.essu.stiletto.custom";
-        public const string Version = "1.7.0";
+        public const string Version = "1.8.0";
         public const int WindowId = 670;
 
         private StilettoGameGUI _gameWindow;
+        private StilettoMakerGUI _makerWindow;
+
         private ConfigEntry<KeyboardShortcut> _showWindowKey;
         private bool _showWindow;
 
         private void Awake()
         {
-            ConfigPaths.Initalize();
             Harmony.CreateAndPatchAll(GetType());
         }
 
         private void Start()
         {
-            HeelFlagsProvider.ReloadHeelFlags();
-            _showWindowKey = Config.Bind("Hotkeys", "Toggle stiletto window", new KeyboardShortcut(KeyCode.RightShift));
+            StilettoContext.Initalize();
 
-            StilettoMakerGUI.Start(this);
+            _makerWindow = new StilettoMakerGUI(this);
+            _gameWindow = new StilettoGameGUI();
+            _showWindowKey = Config.Bind("Hotkeys", "Toggle stiletto window", new KeyboardShortcut(KeyCode.RightShift));
         }
 
         private void OnGUI()
@@ -44,32 +45,19 @@ namespace Stiletto
 
         private void Update() 
         {
-            if (_showWindowKey.Value.IsDown())
+            if (_showWindowKey?.Value.IsDown() ?? false)
             {
                 _showWindow = !_showWindow;
-
-                if (_showWindow)
-                {
-                    if (_gameWindow == null)
-                    {
-                        _gameWindow = new StilettoGameGUI();
-                    }
-
-                    _gameWindow.Show = true;
-                }
-                else 
-                {
-                    _gameWindow.Show = false;
-                }
+                _gameWindow.Show = _showWindow;
             }
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ActiveKinematicMode))]
         private static void OCIChar_ActiveKinematicModeHook()
         {
-            if (HeelInfoContext.Count == 0) return;
+            if (StilettoContext.Count == 0) return;
 
-            var chaControls = HeelInfoContext.HeelInfos.Select(x => x.chaControl).ToArray();
+            var chaControls = StilettoContext.HeelInfos.Select(x => x.chaControl).ToArray();
 
             foreach (var chaControl in chaControls)
             {
@@ -177,9 +165,8 @@ namespace Stiletto
                 return;
             }
 
-            var shoeConfig = HeelConfigProvider.LoadHeelFile(fileName);
             var heelInfo = __instance.gameObject.GetOrAddComponent<HeelInfo>();
-            heelInfo.Setup(fileName, __instance, shoeConfig.Height, shoeConfig.AnkleAngle, shoeConfig.LegAngle);
+            heelInfo.Setup(__instance, fileName);
         }
 
         private static void UnloadHeelFile(ChaControl __instance)
@@ -187,7 +174,7 @@ namespace Stiletto
             var heelInfo = __instance.gameObject.GetComponent<HeelInfo>();
             if (heelInfo != null)
             {
-                heelInfo.Setup(DisplaySettings.NONE_PLACEHOLDER, __instance, 0, 0, 0);
+                heelInfo.Setup(__instance, null);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using KKAPI.Studio;
 using RootMotion.FinalIK;
 using Stiletto.Configurations;
+using Stiletto.Models;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -82,7 +83,7 @@ namespace Stiletto
             }
         }
 
-        public void Update(HeelFlags flags, Vector3 height, Quaternion ankle, Quaternion toe, Quaternion leg, CustomPose customPose)
+        public void Update(AnimationFlags flags, Vector3 height, Quaternion ankle, Quaternion toe, Quaternion leg, CustomPose customPose)
         {
             if (flags.CUSTOM_POSE) 
             {
@@ -122,26 +123,13 @@ namespace Stiletto
             else
             {
                 _body.localPosition = height;
+                
+                if (FullBodyBipedEnabled) 
+                {
+                    FullBodyBipedSolver.rightFootEffector.positionWeight = 1f;
+                    FullBodyBipedSolver.leftFootEffector.positionWeight = 1f;
+                }
             }
-
-            //else if (flags.KNEE_BEND && !FullBodyBipedEnabled)
-            //{
-            //    var rightAngle = Vector3.Angle(height * 2 + _rightLowLeg.position, _rightLowLeg.position);
-            //    var leftAngle = Vector3.Angle(height * 2 + _leftLowLeg.position, _leftLowLeg.position);
-
-            //    Console.WriteLine($"Angles: {rightAngle}, {leftAngle}");
-
-            //    _rightThigh.localRotation *= Quaternion.Euler(-rightAngle, 0, 0);
-            //    _leftThigh.localRotation *= Quaternion.Euler(-leftAngle, 0, 0);
-
-            //    _rightHighLeg.localRotation *= Quaternion.Euler(rightAngle * 2, 0, 0);
-            //    _leftHighLeg.localRotation *= Quaternion.Euler(leftAngle * 2, 0, 0);
-
-            //    _rightLowLeg.localRotation *= Quaternion.Euler(-rightAngle, 0, 0);
-            //    _leftLowLeg.localRotation *= Quaternion.Euler(-leftAngle, 0, 0);
-
-            //    _body.localPosition = Vector3.zero;
-            //}
 
             _leftFoot.localRotation *= ankle;
             _rightFoot.localRotation *= ankle;

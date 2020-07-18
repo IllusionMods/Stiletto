@@ -1,6 +1,4 @@
-﻿using KKAPI.MainGame;
-using Stiletto.Configurations;
-using System.Linq;
+﻿using System.Linq;
 using static SaveData;
 
 namespace Stiletto.Models
@@ -18,7 +16,7 @@ namespace Stiletto.Models
         {
             Name = charaData.Name;
             ChaControl = charaData.chaCtrl;
-            HeelInfo = HeelInfoContext.HeelInfos.FirstOrDefault(x => x.chaControl == ChaControl);
+            HeelInfo = StilettoContext.HeelInfos.FirstOrDefault(x => x.chaControl == ChaControl);
         }
 
         public string Name { get; }
