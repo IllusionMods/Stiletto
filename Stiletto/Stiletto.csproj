@@ -73,10 +73,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\ConcurrentDictionary.cs" />
+    <Compile Include="Models\ConcurrentEnumerator.cs" />
+    <Compile Include="Configurations\CustomPose.cs" />
+    <Compile Include="Configurations\CustomPoseProvider.cs" />
+    <Compile Include="HeelInfoAnimation.cs" />
     <Compile Include="Configurations\ConfigPaths.cs" />
     <Compile Include="Configurations\HeelFlagsConfig.cs" />
     <Compile Include="Configurations\HeelFlagsProvider.cs" />
-    <Compile Include="ConcurrentList.cs" />
+    <Compile Include="Models\ConcurrentList.cs" />
     <Compile Include="Configurations\HeelConfigProvider.cs" />
     <Compile Include="Configurations\HeelFlags.cs" />
     <Compile Include="Configurations\DisplaySettings.cs" />

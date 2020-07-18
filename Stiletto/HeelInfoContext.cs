@@ -1,4 +1,4 @@
-﻿using Stiletto.Configurations;
+﻿using Stiletto.Models;
 
 namespace Stiletto
 {

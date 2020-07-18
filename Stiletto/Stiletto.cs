@@ -3,10 +3,7 @@ using BepInEx.Configuration;
 using HarmonyLib;
 using Stiletto.Configurations;
 using Studio;
-using System;
-using System.IO;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using static ChaFileDefine;
 
@@ -16,7 +13,7 @@ namespace Stiletto
     public class Stiletto : BaseUnityPlugin
     {
         public const string GUID = "com.essu.stiletto.custom";
-        public const string Version = "1.6.0";
+        public const string Version = "1.7.0";
         public const int WindowId = 670;
 
         private StilettoGameGUI _gameWindow;
@@ -25,17 +22,7 @@ namespace Stiletto
 
         private void Awake()
         {
-            var directories = new DirectoryInfo[] {
-                new DirectoryInfo(ConfigPaths.CONFIG_PATH),
-                new DirectoryInfo(ConfigPaths.HEEL_PATH),
-                new DirectoryInfo(ConfigPaths.FLAGS_PATH),
-            };
-
-            foreach (var directory in directories)
-            {
-                if (!directory.Exists) directory.Create();
-            }
-
+            ConfigPaths.Initalize();
             Harmony.CreateAndPatchAll(GetType());
         }
 
