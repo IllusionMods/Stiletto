@@ -74,18 +74,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\FilePropertyAttribute.cs" />
-    <Compile Include="Configurations\AnimationFlagsValue.cs" />
+    <Compile Include="Configurations\AnimationSettingsCollection.cs" />
+    <Compile Include="Configurations\CustomPoseProvider.cs" />
     <Compile Include="Configurations\DynamicProvider.cs" />
-    <Compile Include="Models\AnimationRegexFlags.cs" />
+    <Compile Include="Configurations\AnimationSettingsValue.cs" />
+    <Compile Include="Models\RegexMatcher.cs" />
     <Compile Include="Models\ConcurrentDictionary.cs" />
     <Compile Include="Models\ConcurrentEnumerator.cs" />
     <Compile Include="Models\CustomPose.cs" />
     <Compile Include="HeelInfoAnimation.cs" />
-    <Compile Include="Configurations\AnimationFlagsConfig.cs" />
     <Compile Include="Configurations\AnimationFlagsProvider.cs" />
     <Compile Include="Models\ConcurrentList.cs" />
     <Compile Include="Models\AnimationFlags.cs" />
     <Compile Include="HeelInfoEventArgs.cs" />
+    <Compile Include="Models\TextSerializer.cs" />
     <Compile Include="RootSettings.cs" />
     <Compile Include="HeelInfo.cs" />
     <Compile Include="StilettoContext.cs" />

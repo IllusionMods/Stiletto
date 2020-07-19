@@ -7,19 +7,20 @@ namespace Stiletto.Configurations
 {
     public class AnimationFlagsProvider
     {
-        private AnimationFlagsConfig _defaultConfig;
-        private AnimationFlagsConfig _dumpConfig;
-        private List<AnimationFlagsConfig> _configs;
+        private AnimationSettingsCollection<AnimationFlags> _defaultSetting;
+        private AnimationSettingsCollection<AnimationFlags> _dumpSetting;
+        private List<AnimationSettingsCollection<AnimationFlags>> _settings;
         private ConcurrentDictionary<string, AnimationFlags> _cache = new ConcurrentDictionary<string, AnimationFlags>();
-        private readonly string _rootDir;
+
+        private readonly string _rootDirectory;
         private readonly string _defaultFile;
         private readonly string _dumpFile;
 
         private static object locker = new object();
 
-        public AnimationFlagsProvider(string rootDir, string defaultFile, string dumpFile) 
+        public AnimationFlagsProvider(string rootDirectory, string defaultFile, string dumpFile) 
         {
-            _rootDir = rootDir;
+            _rootDirectory = rootDirectory;
             _defaultFile = defaultFile;
             _dumpFile = dumpFile;
             Reload();
@@ -29,12 +30,12 @@ namespace Stiletto.Configurations
         {
             lock(locker) 
             {
-                foreach (var config in _configs)
+                foreach (var config in _settings)
                 {
-                    var existing = config.GetAnimationFlags(path, name);
+                    var existing = config.Load(path, name);
                     if (existing != null)
                     {
-                        config.SaveHeelFlags(path, name, flags);
+                        config.Save(path, name, flags);
                         return;
                     }
                 }
@@ -45,8 +46,8 @@ namespace Stiletto.Configurations
                     _cache.Remove(cacheKey);
                 }
 
-                _defaultConfig.SaveHeelFlags(path, name, flags);
-                _dumpConfig.DeleteHeelFlags(path, name);
+                _defaultSetting.Save(path, name, flags);
+                _dumpSetting.Delete(path, name);
             }
         }
 
@@ -59,9 +60,9 @@ namespace Stiletto.Configurations
                 return _cache[cacheKey];
             }
 
-            foreach (var config in _configs)
+            foreach (var config in _settings)
             {
-                var flags = config.GetAnimationFlags(path, name);
+                var flags = config.Load(path, name);
                 if (flags != null)
                 {
                     _cache[cacheKey] = flags;
@@ -73,7 +74,7 @@ namespace Stiletto.Configurations
             {
                 var flags = new AnimationFlags();
                 _cache[cacheKey] = flags;
-                _dumpConfig.SaveHeelFlags(path, name, flags);
+                _dumpSetting.Save(path, name, flags);
                 return flags;
             }
         }
@@ -82,16 +83,16 @@ namespace Stiletto.Configurations
         {
             lock (locker)
             {
-                _configs = Directory.GetFiles(_rootDir, "*.txt", SearchOption.AllDirectories)
+                _settings = Directory.GetFiles(_rootDirectory, "*.txt", SearchOption.AllDirectories)
                     .OrderBy(x => x)
-                    .Select(x => new AnimationFlagsConfig(x))
+                    .Select(x => new AnimationSettingsCollection<AnimationFlags>(x))
                     .ToList();
 
-                _defaultConfig = new AnimationFlagsConfig(_defaultFile);
-                _dumpConfig = new AnimationFlagsConfig(_dumpFile);
+                _defaultSetting = new AnimationSettingsCollection<AnimationFlags>(_defaultFile);
+                _dumpSetting = new AnimationSettingsCollection<AnimationFlags>(_dumpFile);
 
-                _configs.Add(_defaultConfig);
-                _configs.Add(_dumpConfig);
+                _settings.Add(_defaultSetting);
+                _settings.Add(_dumpSetting);
 
                 _cache.Clear();
             }

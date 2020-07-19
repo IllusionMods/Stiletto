@@ -89,19 +89,19 @@ namespace Stiletto
             {
                 var heelHeight = (float)Math.Pow(height.y * 100, 0.75);
 
-                _lowWaist.localRotation *= Quaternion.Euler(customPose.WaistAngle * heelHeight, 0, 0);
+                _lowWaist.localRotation *= Quaternion.Euler(-customPose.WaistAngle * heelHeight, 0, 0);
 
-                _rightThigh.localRotation *= Quaternion.Euler(-customPose.ThighAngle * heelHeight, 0, 0);
-                _leftThigh.localRotation *= Quaternion.Euler(-customPose.ThighAngle * heelHeight, 0, 0);
+                _rightThigh.localRotation *= Quaternion.Euler(-customPose.RightThighAngle * heelHeight, 0, 0);
+                _leftThigh.localRotation *= Quaternion.Euler(-customPose.LeftThighAngle * heelHeight, 0, 0);
 
-                _rightHighLeg.localRotation *= Quaternion.Euler((customPose.ThighAngle + customPose.LegAngle) * heelHeight, 0, 0);
-                _leftHighLeg.localRotation *= Quaternion.Euler((customPose.ThighAngle + customPose.LegAngle) * heelHeight, 0, 0);
+                _rightHighLeg.localRotation *= Quaternion.Euler((customPose.RightThighAngle + customPose.RightLegAngle) * heelHeight, 0, 0);
+                _leftHighLeg.localRotation *= Quaternion.Euler((customPose.LeftThighAngle + customPose.LeftLegAngle) * heelHeight, 0, 0);
 
-                _rightLowLeg.localRotation *= Quaternion.Euler(-customPose.LegAngle * heelHeight, 0, 0);
-                _leftLowLeg.localRotation *= Quaternion.Euler(-customPose.LegAngle * heelHeight, 0, 0);
+                _rightLowLeg.localRotation *= Quaternion.Euler(-customPose.RightLegAngle * heelHeight, 0, 0);
+                _leftLowLeg.localRotation *= Quaternion.Euler(-customPose.LeftLegAngle * heelHeight, 0, 0);
 
-                _leftFoot.localRotation *= Quaternion.Euler(customPose.AnkleAngle, 0, 0);
-                _rightFoot.localRotation *= Quaternion.Euler(customPose.AnkleAngle, 0, 0);
+                _rightFoot.localRotation *= Quaternion.Euler(customPose.RightAnkleAngle, 0, 0);
+                _leftFoot.localRotation *= Quaternion.Euler(customPose.LeftAnkleAngle, 0, 0);
 
                 _body.localPosition = Vector3.zero;
             }
@@ -123,12 +123,6 @@ namespace Stiletto
             else
             {
                 _body.localPosition = height;
-                
-                if (FullBodyBipedEnabled) 
-                {
-                    FullBodyBipedSolver.rightFootEffector.positionWeight = 1f;
-                    FullBodyBipedSolver.leftFootEffector.positionWeight = 1f;
-                }
             }
 
             _leftFoot.localRotation *= ankle;

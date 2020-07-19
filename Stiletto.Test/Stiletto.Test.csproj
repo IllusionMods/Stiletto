@@ -7,22 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Resources\*">
+    <Content Include="Resources\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Resources\*">
+    <None Include="Resources\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Resources\Chunky Maryjanes.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Resources\Flags\01_basic.txt" />
-    <Content Include="Resources\Flags\02_hsense.txt" />
-    <Content Include="Resources\Flags\03_regular.txt" />
   </ItemGroup>
 
   <ItemGroup>

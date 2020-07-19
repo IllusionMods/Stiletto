@@ -16,8 +16,10 @@ namespace Stiletto
         private CharaDisplayData selectedCharacter;
         private int selectedIndex = -1;
         private bool _show;
+
         private DateTime? _lastCharaRefersh;
         private int _selectedTab;
+        private int _selectedPoseSide;
 
         public bool Show
         {
@@ -75,7 +77,7 @@ namespace Stiletto
                         "Settings", "Advanced", "Heel"
                     }, GUILayout.Width(250));
 
-                    GUILayout.BeginVertical(GUILayout.Height(120));
+                    GUILayout.BeginVertical(GUILayout.Height(160));
                     {
                         if (_selectedTab == 0 && selectedCharacter != null && selectedCharacter.HeelInfo != null)
                         {
@@ -185,6 +187,8 @@ namespace Stiletto
             GUILayout.EndVertical();
         }
 
+        private string[] customPoseSideOptions = new string[] { "Right", "Left" };
+
         private void CreateCustomPoseSettingsContent()
         {
             GUILayout.BeginVertical();
@@ -193,24 +197,69 @@ namespace Stiletto
 
                 GUILayout.BeginHorizontal();
                 {
-                    selectedCharacter.HeelInfo.CustomPose.ThighAngle = CreateNumberTextField("Thigh Angle", selectedCharacter.HeelInfo.CustomPose.ThighAngle, 10);
+                    selectedCharacter.HeelInfo.CustomPose.WaistAngle = CreateNumberTextField("Waist Angle", selectedCharacter.HeelInfo.CustomPose.WaistAngle, 10);
                     GUILayout.Space(10);
-                    selectedCharacter.HeelInfo.CustomPose.LegAngle = CreateNumberTextField("Leg Angle", selectedCharacter.HeelInfo.CustomPose.LegAngle, 10);
+                    selectedCharacter.HeelInfo.CustomPose.Split = !GUILayout.Toggle(!selectedCharacter.HeelInfo.CustomPose.Split, " Both Legs", GUILayout.Width(120));
                 }
                 GUILayout.EndHorizontal();
+                
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label("Leg Pose Settings: ", GUILayout.Width(120));
+                    if (selectedCharacter.HeelInfo.CustomPose.Split)
+                    {
+                        GUILayout.Space(10);
+                        _selectedPoseSide = GUILayout.SelectionGrid(_selectedPoseSide, customPoseSideOptions, customPoseSideOptions.Length, GUI.skin.toggle, GUILayout.Width(120));
+                    }
+                }
+                GUILayout.EndHorizontal();
+
+                if (!selectedCharacter.HeelInfo.CustomPose.Split || _selectedPoseSide == 0)
+                {
+                    GUILayout.BeginHorizontal();
+                    {
+                        selectedCharacter.HeelInfo.CustomPose.RightThighAngle = CreateNumberTextField("Thigh Angle", selectedCharacter.HeelInfo.CustomPose.RightThighAngle, 10);
+                        GUILayout.Space(10);
+                        selectedCharacter.HeelInfo.CustomPose.RightLegAngle = CreateNumberTextField("Leg Angle", selectedCharacter.HeelInfo.CustomPose.RightLegAngle, 10);
+                    }
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    {
+                        selectedCharacter.HeelInfo.CustomPose.RightAnkleAngle = CreateNumberTextField("Ankle Angle", selectedCharacter.HeelInfo.CustomPose.RightAnkleAngle, 10);
+                    }
+                    GUILayout.EndHorizontal();
+                }
+                else
+                {
+                    GUILayout.BeginHorizontal();
+                    {
+                        selectedCharacter.HeelInfo.CustomPose.LeftThighAngle = CreateNumberTextField("Thigh Angle", selectedCharacter.HeelInfo.CustomPose.LeftThighAngle, 10);
+                        GUILayout.Space(10);
+                        selectedCharacter.HeelInfo.CustomPose.LeftLegAngle = CreateNumberTextField("Leg Angle", selectedCharacter.HeelInfo.CustomPose.LeftLegAngle, 10);
+                    }
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    {
+                        selectedCharacter.HeelInfo.CustomPose.LeftAnkleAngle = CreateNumberTextField("Ankle Angle", selectedCharacter.HeelInfo.CustomPose.LeftAnkleAngle, 10);
+                    }
+                    GUILayout.EndHorizontal();
+                }
 
                 GUILayout.BeginHorizontal();
                 {
-                    selectedCharacter.HeelInfo.CustomPose.WaistAngle = CreateNumberTextField("Waist Angle", selectedCharacter.HeelInfo.CustomPose.WaistAngle, 10);
+                    if (GUILayout.Button("Save PathOnly", GUILayout.Width(115)))
+                    {
+                        StilettoContext.CustomPoseProvider.Save(selectedCharacter.AnimationPath, null, selectedCharacter.HeelInfo.CustomPose);
+                    }
                     GUILayout.Space(10);
-                    selectedCharacter.HeelInfo.CustomPose.AnkleAngle = CreateNumberTextField("Ankle Angle", selectedCharacter.HeelInfo.CustomPose.AnkleAngle, 10);
+                    if (GUILayout.Button("Save Path+Name", GUILayout.Width(115)))
+                    {
+                        StilettoContext.CustomPoseProvider.Save(selectedCharacter.AnimationPath, selectedCharacter.AnimationName, selectedCharacter.HeelInfo.CustomPose);
+                    }
                 }
                 GUILayout.EndHorizontal();
-
-                if (GUILayout.Button("Save Custom Pose"))
-                {
-                    StilettoContext.CustomPoseProvider.Save(selectedCharacter.AnimationPath, selectedCharacter.HeelInfo.CustomPose);
-                }
             }
             GUILayout.EndVertical();
         }
@@ -280,7 +329,7 @@ namespace Stiletto
             int w = Screen.width, h = Screen.height;
             _screenRect = new Rect(ScreenOffset, ScreenOffset, w - ScreenOffset * 2, h - ScreenOffset * 2);
 
-            var windowHeight = 360;
+            var windowHeight = 390;
             var windowWidth = 270;
 
             _windowRect = new Rect(_screenRect.xMin, _screenRect.yMax - windowHeight, windowWidth, windowHeight);

@@ -7,8 +7,9 @@ namespace Stiletto
 {
     public static class StilettoContext
     {
-        public static DynamicProvider<CustomPose> _customPoseProvider = new DynamicProvider<CustomPose>(RootSettings.CUSTOM_POSE_PATH);
         public static DynamicProvider<CustomHeel> _customHeelProvider = new DynamicProvider<CustomHeel>(RootSettings.CUSTOM_HEEL_PATH);
+
+        public static CustomPoseProvider _customPoseProvider = new CustomPoseProvider(RootSettings.CUSTOM_POSE_PATH);
         public static AnimationFlagsProvider _animationFlagsProvider = new AnimationFlagsProvider(RootSettings.ANIMATION_FLAGS_PATH, RootSettings.FLAG_DEFAULT_PATH, RootSettings.FLAG_DUMP_PATH);
 
         public static void RegisterHeelInfo(HeelInfo heelInfo)
@@ -21,7 +22,7 @@ namespace Stiletto
             HeelInfos.Remove(heelInfo);
         }
 
-        public static DynamicProvider<CustomPose> CustomPoseProvider => _customPoseProvider;
+        public static CustomPoseProvider CustomPoseProvider => _customPoseProvider;
 
         public static DynamicProvider<CustomHeel> CustomHeelProvider => _customHeelProvider;
 

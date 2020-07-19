@@ -2,9 +2,9 @@
 
 namespace Stiletto.Models
 {
-    public class AnimationRegexFlags
+    public class RegexMatcher<T>
     {
-        public AnimationRegexFlags(string matcher, AnimationFlags value)
+        public RegexMatcher(string matcher, T value)
         {
             Matcher = new Regex(matcher);
             Value = value;
@@ -12,6 +12,6 @@ namespace Stiletto.Models
 
         public Regex Matcher { get; }
 
-        public AnimationFlags Value { get; }
+        public T Value { get; }
     }
 }

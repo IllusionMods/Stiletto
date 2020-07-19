@@ -122,7 +122,7 @@ namespace Stiletto
             if (path != animationPath || name != animationName)
             {
                 flags = StilettoContext.AnimationFlagsProvider.Load(path, name);
-                _customPose = StilettoContext.CustomPoseProvider.Load(animationPath);
+                _customPose = StilettoContext.CustomPoseProvider.Load(path, name);
                 animationChange = true;
             }
 
