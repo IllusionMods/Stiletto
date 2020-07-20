@@ -27,7 +27,7 @@ namespace Stiletto.Configurations
         {
             lock (locker)
             {
-                GetSettingsCollection(path).Save(path, name, pose);
+                GetSettingsCollection(path)?.Save(path, name, pose);
             }
         }
 

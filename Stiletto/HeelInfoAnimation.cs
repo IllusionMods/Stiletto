@@ -30,11 +30,13 @@ namespace Stiletto
         private FullBodyBipedIK _fullBodyBiped;
         private IKSolverFullBody _backupSolver;
 
-        public HeelInfoAnimation() { }
+        private GeneralSettings _generalSetting;
 
         public HeelInfoAnimation(ChaControl chaControl)
         {
+            _generalSetting = StilettoContext._generalSettingsProvider.Value;
             _animationBody = chaControl.animBody;
+
             _body = chaControl.objBodyBone.transform.parent;
 
             _highWaist = _body.Find("cf_j_root/cf_n_height/cf_j_hips/cf_j_waist01");
@@ -85,20 +87,46 @@ namespace Stiletto
 
         public void Update(AnimationFlags flags, Vector3 height, Quaternion ankle, Quaternion toe, Quaternion leg, CustomPose customPose)
         {
-            if (flags.CUSTOM_POSE) 
+            _generalSetting = StilettoContext._generalSettingsProvider.Value;
+
+            if (flags.CUSTOM_POSE)
             {
-                var heelHeight = (float)Math.Pow(height.y * 100, 0.75);
+                // Get Leg Heights
+                var rightThighLength = Vector3.Distance(_lowWaist.position, _rightHighLeg.position);
+                var leftThighLength = Vector3.Distance(_lowWaist.position, _leftHighLeg.position);
+                var rightLegLength = Vector3.Distance(_rightHighLeg.position, _rightLowLeg.position);
+                var leftLegLength = Vector3.Distance(_leftHighLeg.position, _leftLowLeg.position);
 
-                _lowWaist.localRotation *= Quaternion.Euler(-customPose.WaistAngle * heelHeight, 0, 0);
+                // Calculate Deltas
+                var heelHeightDelta = GetHeelHeightDelta(height.y);
+                var rightThighDelta = GetBodyLengthDelta(rightThighLength);
+                var leftThighDelta = GetBodyLengthDelta(leftThighLength);
+                var rightLegDelta = GetBodyLengthDelta(rightLegLength);
+                var leftLegDelta = GetBodyLengthDelta(leftLegLength);
+                
+                // Calcuate adjustment angles
+                var waistAngle = customPose.WaistAngle * heelHeightDelta;
 
-                _rightThigh.localRotation *= Quaternion.Euler(-customPose.RightThighAngle * heelHeight, 0, 0);
-                _leftThigh.localRotation *= Quaternion.Euler(-customPose.LeftThighAngle * heelHeight, 0, 0);
+                var rightThighAngle = customPose.RightThighAngle * heelHeightDelta * rightThighDelta;
+                var leftThighAngle = customPose.LeftThighAngle * heelHeightDelta * leftThighDelta;
 
-                _rightHighLeg.localRotation *= Quaternion.Euler((customPose.RightThighAngle + customPose.RightLegAngle) * heelHeight, 0, 0);
-                _leftHighLeg.localRotation *= Quaternion.Euler((customPose.LeftThighAngle + customPose.LeftLegAngle) * heelHeight, 0, 0);
+                var rightLowLegAngle = customPose.RightLegAngle * heelHeightDelta * rightLegDelta;
+                var leftLowLegAngle = customPose.LeftLegAngle * heelHeightDelta * leftLegDelta;
 
-                _rightLowLeg.localRotation *= Quaternion.Euler(-customPose.RightLegAngle * heelHeight, 0, 0);
-                _leftLowLeg.localRotation *= Quaternion.Euler(-customPose.LeftLegAngle * heelHeight, 0, 0);
+                var rightHighLegAngle = rightThighAngle + rightLowLegAngle;
+                var leftHighLegAngle = leftThighAngle + leftLowLegAngle;
+
+                // Apply adjustments
+                _lowWaist.localRotation *= Quaternion.Euler(-waistAngle, 0, 0);
+
+                _rightThigh.localRotation *= Quaternion.Euler(-rightThighAngle, 0, 0);
+                _leftThigh.localRotation *= Quaternion.Euler(-leftThighAngle, 0, 0);
+
+                _rightHighLeg.localRotation *= Quaternion.Euler(rightHighLegAngle, 0, 0);
+                _leftHighLeg.localRotation *= Quaternion.Euler(leftHighLegAngle, 0, 0);
+
+                _rightLowLeg.localRotation *= Quaternion.Euler(-rightLowLegAngle, 0, 0);
+                _leftLowLeg.localRotation *= Quaternion.Euler(-leftLowLegAngle, 0, 0);
 
                 _rightFoot.localRotation *= Quaternion.Euler(customPose.RightAnkleAngle, 0, 0);
                 _leftFoot.localRotation *= Quaternion.Euler(customPose.LeftAnkleAngle, 0, 0);
@@ -133,6 +161,16 @@ namespace Stiletto
 
             _leftLowLeg.localRotation *= leg;
             _rightLowLeg.localRotation *= leg;
+        }
+
+        private float GetBodyLengthDelta(float length)
+        { 
+            return (float)Math.Pow(length, _generalSetting.CustomPose_BodyLengthPower) * _generalSetting.CustomPose_BodyLengthMultiplier;
+        }
+
+        private float GetHeelHeightDelta(float height)
+        { 
+            return (float)Math.Pow(height, _generalSetting.CustomPose_HeelHeightPower) * _generalSetting.CustomPose_HeelHeightMultiplier;
         }
 
         private void SetupMotionWeights() 

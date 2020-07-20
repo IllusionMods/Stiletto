@@ -8,6 +8,7 @@ namespace Stiletto
     public static class StilettoContext
     {
         public static DynamicProvider<CustomHeel> _customHeelProvider = new DynamicProvider<CustomHeel>(RootSettings.CUSTOM_HEEL_PATH);
+        public static DynamicFileProvider<GeneralSettings> _generalSettingsProvider = new DynamicFileProvider<GeneralSettings>(RootSettings.GENERAL_SETTINGS_PATH);
 
         public static CustomPoseProvider _customPoseProvider = new CustomPoseProvider(RootSettings.CUSTOM_POSE_PATH);
         public static AnimationFlagsProvider _animationFlagsProvider = new AnimationFlagsProvider(RootSettings.ANIMATION_FLAGS_PATH, RootSettings.FLAG_DEFAULT_PATH, RootSettings.FLAG_DUMP_PATH);
@@ -57,6 +58,7 @@ namespace Stiletto
             _animationFlagsProvider.Reload();
             _customPoseProvider.Reload();
             _customHeelProvider.Reload();
+            _generalSettingsProvider.Reload();
 
             foreach (var heelInfo in HeelInfos)
             {

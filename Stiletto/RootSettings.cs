@@ -14,6 +14,6 @@ namespace Stiletto
 
         public static readonly string FLAG_DEFAULT_PATH = Path.Combine(CONFIG_PATH, "_flags.txt");
         public static readonly string FLAG_DUMP_PATH = Path.Combine(CONFIG_PATH, "_dumps.txt");
-
+        public static readonly string GENERAL_SETTINGS_PATH = Path.Combine(CONFIG_PATH, "_settings.txt");
     }
 }

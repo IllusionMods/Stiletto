@@ -76,8 +76,12 @@
     <Compile Include="Attributes\FilePropertyAttribute.cs" />
     <Compile Include="Configurations\AnimationSettingsCollection.cs" />
     <Compile Include="Configurations\CustomPoseProvider.cs" />
+    <Compile Include="Configurations\DynamicFileProvider.cs" />
     <Compile Include="Configurations\DynamicProvider.cs" />
     <Compile Include="Configurations\AnimationSettingsValue.cs" />
+    <Compile Include="Configurations\FilePropertyResolver.cs" />
+    <Compile Include="Configurations\StringHelper.cs" />
+    <Compile Include="Models\GeneralSettings.cs" />
     <Compile Include="Models\RegexMatcher.cs" />
     <Compile Include="Models\ConcurrentDictionary.cs" />
     <Compile Include="Models\ConcurrentEnumerator.cs" />

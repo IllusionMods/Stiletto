@@ -74,7 +74,7 @@ namespace Stiletto
                     }
 
                     _selectedTab = GUILayout.Toolbar(_selectedTab, new string[] {
-                        "Settings", "Advanced", "Heel"
+                        "Animation", "Custom", "Heel"
                     }, GUILayout.Width(250));
 
                     GUILayout.BeginVertical(GUILayout.Height(160));
