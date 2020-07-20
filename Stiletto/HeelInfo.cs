@@ -1,6 +1,6 @@
 ﻿using KKAPI.Studio;
-using Sirenix.OdinInspector.Demos;
 using Stiletto.Models;
+using Stiletto.Settings;
 using UnityEngine;
 using static ChaFileDefine;
 
@@ -9,9 +9,9 @@ namespace Stiletto
     public class HeelInfo : MonoBehaviour
     {
         public AnimationFlags flags;
-        public string heelName = RootSettings.NONE_PLACEHOLDER;
-        public string animationName = RootSettings.NONE_PLACEHOLDER;
-        public string animationPath = RootSettings.NONE_PLACEHOLDER;
+        public string heelName;
+        public string animationName;
+        public string animationPath;
         public ChaControl chaControl;
 
         private Vector3 _height;
@@ -62,7 +62,7 @@ namespace Stiletto
             }
             else 
             {
-                this.heelName = RootSettings.NONE_PLACEHOLDER;
+                this.heelName = null;
                 Height = 0;
                 AnkleAngle = 0;
                 LegAngle = 0;
@@ -85,12 +85,13 @@ namespace Stiletto
 
         public void Reload() 
         {
-            if (!string.IsNullOrEmpty(heelName) && heelName != RootSettings.NONE_PLACEHOLDER) 
+            if (!string.IsNullOrEmpty(heelName)) 
             {
                 Setup(chaControl, heelName);
-                animationPath = null;
-                animationName = null;
             }
+
+            animationPath = null;
+            animationName = null;
         }
 
         private void Awake()

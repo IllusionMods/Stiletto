@@ -1,12 +1,10 @@
 ﻿using BepInEx;
 using System.IO;
 
-namespace Stiletto
+namespace Stiletto.Settings
 {
-    public static class RootSettings
+    public static class FilePathSettings
     {
-        public static readonly string NONE_PLACEHOLDER = "-- NONE --";
-
         public static readonly string CONFIG_PATH = Path.Combine(Paths.ConfigPath, "Stiletto");
         public static readonly string CUSTOM_HEEL_PATH = Path.Combine(CONFIG_PATH, "Heels");
         public static readonly string CUSTOM_POSE_PATH = Path.Combine(CONFIG_PATH, "Poses");

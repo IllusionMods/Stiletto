@@ -6,8 +6,8 @@ namespace Stiletto.Configurations
 {
     public class DynamicFileProvider<T> where T : class, new()
     {
-        private readonly string _filePath;
         private readonly FilePropertyResolver<T> _filePropertyResolver;
+        private string _filePath;
 
         private object _lock = new object();
 
@@ -21,6 +21,14 @@ namespace Stiletto.Configurations
             Value = Read();
         }
 
+        public void Initalize() 
+        {
+            if (!File.Exists(_filePath)) 
+            {
+                Save(Value);
+            }
+        }
+
         public void Save(T item)
         {
             var lines = _filePropertyResolver.PropertyMap
@@ -32,6 +40,12 @@ namespace Stiletto.Configurations
                 Value = item;
                 File.WriteAllLines(_filePath, lines);
             }
+        }
+
+        public void Reload(string filePath)
+        {
+            _filePath = filePath;
+            Reload();
         }
 
         public void Reload()

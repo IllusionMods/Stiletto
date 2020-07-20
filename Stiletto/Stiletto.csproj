@@ -81,7 +81,8 @@
     <Compile Include="Configurations\AnimationSettingsValue.cs" />
     <Compile Include="Configurations\FilePropertyResolver.cs" />
     <Compile Include="Configurations\StringHelper.cs" />
-    <Compile Include="Models\GeneralSettings.cs" />
+    <Compile Include="Settings\DisplaySettings.cs" />
+    <Compile Include="Settings\GeneralSettings.cs" />
     <Compile Include="Models\RegexMatcher.cs" />
     <Compile Include="Models\ConcurrentDictionary.cs" />
     <Compile Include="Models\ConcurrentEnumerator.cs" />
@@ -92,7 +93,7 @@
     <Compile Include="Models\AnimationFlags.cs" />
     <Compile Include="HeelInfoEventArgs.cs" />
     <Compile Include="Models\TextSerializer.cs" />
-    <Compile Include="RootSettings.cs" />
+    <Compile Include="Settings\FilePathSettings.cs" />
     <Compile Include="HeelInfo.cs" />
     <Compile Include="StilettoContext.cs" />
     <Compile Include="Models\CharaDisplayData.cs" />

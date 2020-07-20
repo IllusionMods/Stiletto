@@ -39,13 +39,7 @@ namespace Stiletto.Configurations
                         return;
                     }
                 }
-
-                var cacheKey = GetCacheKey(path, name);
-                if (_cache.ContainsKey(cacheKey))
-                {
-                    _cache.Remove(cacheKey);
-                }
-
+                _cache.Clear();
                 _defaultSetting.Save(path, name, flags);
                 _dumpSetting.Delete(path, name);
             }
@@ -53,7 +47,7 @@ namespace Stiletto.Configurations
 
         public AnimationFlags Load(string path, string name) 
         {
-            var cacheKey = GetCacheKey(path, name);
+            var cacheKey = $"{path}/{name}";
 
             if (_cache.ContainsKey(cacheKey))
             {
@@ -96,11 +90,6 @@ namespace Stiletto.Configurations
 
                 _cache.Clear();
             }
-        }
-
-        private string GetCacheKey(string path, string name) 
-        {
-            return $"{path}/{name}";
         }
     }
 }

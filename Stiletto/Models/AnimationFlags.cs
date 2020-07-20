@@ -4,16 +4,62 @@ namespace Stiletto.Models
 {
     public class AnimationFlags : TextSerializer
     {
+        private bool _customPose;
+        private bool _kneeBend;
+        private bool _height;
+
         public AnimationFlags() { }
 
         public AnimationFlags(string value) : base(value) { }
 
         public bool ACTIVE { get; set; }
-        public bool HEIGHT { get; set; }
+
         public bool TOE_ROLL { get; set; }
+
         public bool ANKLE_ROLL { get; set; }
-        public bool KNEE_BEND { get; set; }
-        public bool CUSTOM_POSE { get; set; }
+
+        public bool HEIGHT
+        {
+            get => _height;
+            set
+            {
+                _height = value;
+
+                if (!value)
+                {
+                    _kneeBend = false;
+                    _customPose = false;
+                }
+            }
+        }
+
+        public bool KNEE_BEND
+        {
+            get => _kneeBend;
+            set
+            {
+                _kneeBend = value;
+                if (value)
+                {
+                    _height = true;
+                    _customPose = false;
+                }
+            }
+        }
+
+        public bool CUSTOM_POSE
+        {
+            get => _customPose;
+            set
+            {
+                _customPose = value;
+                if (value)
+                {
+                    _height = true;
+                    _kneeBend = false;
+                }
+            }
+        }
 
         public override string Serialize()
         {

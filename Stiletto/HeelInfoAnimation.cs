@@ -1,7 +1,7 @@
 ﻿using KKAPI.Studio;
 using RootMotion.FinalIK;
-using Stiletto.Configurations;
 using Stiletto.Models;
+using Stiletto.Settings;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -85,7 +85,7 @@ namespace Stiletto
             }
         }
 
-        public void Update(AnimationFlags flags, Vector3 height, Quaternion ankle, Quaternion toe, Quaternion leg, CustomPose customPose)
+        public void Update(AnimationFlags flags, Vector3 height, Quaternion ankleAngle, Quaternion toeAngle, Quaternion legAngle, CustomPose customPose)
         {
             _generalSetting = StilettoContext._generalSettingsProvider.Value;
 
@@ -153,14 +153,14 @@ namespace Stiletto
                 _body.localPosition = height;
             }
 
-            _leftFoot.localRotation *= ankle;
-            _rightFoot.localRotation *= ankle;
+            _leftFoot.localRotation *= ankleAngle;
+            _rightFoot.localRotation *= ankleAngle;
 
-            _leftToe.localRotation *= toe;
-            _rightToe.localRotation *= toe;
+            _leftToe.localRotation *= toeAngle;
+            _rightToe.localRotation *= toeAngle;
 
-            _leftLowLeg.localRotation *= leg;
-            _rightLowLeg.localRotation *= leg;
+            _leftLowLeg.localRotation *= legAngle;
+            _rightLowLeg.localRotation *= legAngle;
         }
 
         private float GetBodyLengthDelta(float length)

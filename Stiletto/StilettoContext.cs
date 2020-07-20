@@ -1,5 +1,6 @@
 ﻿using Stiletto.Configurations;
 using Stiletto.Models;
+using Stiletto.Settings;
 using System;
 using System.IO;
 
@@ -7,11 +8,12 @@ namespace Stiletto
 {
     public static class StilettoContext
     {
-        public static DynamicProvider<CustomHeel> _customHeelProvider = new DynamicProvider<CustomHeel>(RootSettings.CUSTOM_HEEL_PATH);
-        public static DynamicFileProvider<GeneralSettings> _generalSettingsProvider = new DynamicFileProvider<GeneralSettings>(RootSettings.GENERAL_SETTINGS_PATH);
+        public static DynamicProvider<CustomHeel> _customHeelProvider = new DynamicProvider<CustomHeel>(FilePathSettings.CUSTOM_HEEL_PATH);
+        public static DynamicFileProvider<GeneralSettings> _generalSettingsProvider = new DynamicFileProvider<GeneralSettings>(FilePathSettings.GENERAL_SETTINGS_PATH);
+        public static DynamicFileProvider<DisplaySettings> _displaySettingsProvider = new DynamicFileProvider<DisplaySettings>(GetDisplaySettingsFilePath());
 
-        public static CustomPoseProvider _customPoseProvider = new CustomPoseProvider(RootSettings.CUSTOM_POSE_PATH);
-        public static AnimationFlagsProvider _animationFlagsProvider = new AnimationFlagsProvider(RootSettings.ANIMATION_FLAGS_PATH, RootSettings.FLAG_DEFAULT_PATH, RootSettings.FLAG_DUMP_PATH);
+        public static CustomPoseProvider _customPoseProvider = new CustomPoseProvider(FilePathSettings.CUSTOM_POSE_PATH);
+        public static AnimationFlagsProvider _animationFlagsProvider = new AnimationFlagsProvider(FilePathSettings.ANIMATION_FLAGS_PATH, FilePathSettings.FLAG_DEFAULT_PATH, FilePathSettings.FLAG_DUMP_PATH);
 
         public static void RegisterHeelInfo(HeelInfo heelInfo)
         {
@@ -39,10 +41,10 @@ namespace Stiletto
         {
             var directories = new DirectoryInfo[]
             {
-                new DirectoryInfo(RootSettings.CONFIG_PATH),
-                new DirectoryInfo(RootSettings.CUSTOM_HEEL_PATH),
-                new DirectoryInfo(RootSettings.ANIMATION_FLAGS_PATH),
-                new DirectoryInfo(RootSettings.CUSTOM_POSE_PATH)
+                new DirectoryInfo(FilePathSettings.CONFIG_PATH),
+                new DirectoryInfo(FilePathSettings.CUSTOM_HEEL_PATH),
+                new DirectoryInfo(FilePathSettings.ANIMATION_FLAGS_PATH),
+                new DirectoryInfo(FilePathSettings.CUSTOM_POSE_PATH)
             };
 
             foreach (var directory in directories)
@@ -50,15 +52,19 @@ namespace Stiletto
                 if (!directory.Exists) directory.Create();
             }
 
+            _generalSettingsProvider.Initalize();
+            _displaySettingsProvider.Initalize();
+
             ReloadConfigurations();
         }
 
         public static void ReloadConfigurations()
         {
+            _generalSettingsProvider.Reload();
+            _displaySettingsProvider.Reload(GetDisplaySettingsFilePath());
             _animationFlagsProvider.Reload();
             _customPoseProvider.Reload();
             _customHeelProvider.Reload();
-            _generalSettingsProvider.Reload();
 
             foreach (var heelInfo in HeelInfos)
             {
@@ -66,9 +72,14 @@ namespace Stiletto
             }
         }
 
+        private static string GetDisplaySettingsFilePath()
+        {
+            return Path.Combine(FilePathSettings.CONFIG_PATH, _generalSettingsProvider.Value.DisplaySettingsFilePath);
+        }
+
         public static void NotifyHeelInfoUpdate(HeelInfo heelInfo)
         {
-            if (heelInfo != null) 
+            if (heelInfo != null)
             {
                 OnHeelInfoUpdate(null, new HeelInfoEventArgs(heelInfo));
             }
