@@ -166,32 +166,32 @@ namespace Stiletto
                             $" {_display.Active}", GUILayout.Width(120)
                         );
 
-                        selectedCharacter.HeelInfo.flags.CUSTOM_POSE = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.CUSTOM_POSE,
-                            $" {_display.Custom_Pose}", GUILayout.Width(120)
-                        );
-                    }
-                    GUILayout.EndHorizontal();
-
-                    GUILayout.BeginHorizontal();
-                    {
-                        selectedCharacter.HeelInfo.flags.ANKLE_ROLL = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.ANKLE_ROLL,
-                            $" {_display.Ankle_Roll}", GUILayout.Width(120)
-                        );
-
-                        selectedCharacter.HeelInfo.flags.TOE_ROLL = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.TOE_ROLL,
-                            $" {_display.Toe_Roll}", GUILayout.Width(120)
-                        );
-                    }
-                    GUILayout.EndHorizontal();
-
-                    GUILayout.BeginHorizontal();
-                    {
                         selectedCharacter.HeelInfo.flags.HEIGHT = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.HEIGHT,
                             $" {_display.Height}", GUILayout.Width(120)
                         );
+                    }
+                    GUILayout.EndHorizontal();
 
+                    GUILayout.BeginHorizontal();
+                    {
+                        selectedCharacter.HeelInfo.flags.TOE_ROLL = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.TOE_ROLL,
+                            $" {_display.Toe_Roll}", GUILayout.Width(120)
+                        );
+
+                        selectedCharacter.HeelInfo.flags.ANKLE_ROLL = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.ANKLE_ROLL,
+                            $" {_display.Ankle_Roll}", GUILayout.Width(120)
+                        );
+                    }
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    {
                         selectedCharacter.HeelInfo.flags.KNEE_BEND = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.KNEE_BEND,
                             $" {_display.Knee_Bend}", GUILayout.Width(120)
+                        );
+
+                        selectedCharacter.HeelInfo.flags.CUSTOM_POSE = GUILayout.Toggle(selectedCharacter.HeelInfo.flags.CUSTOM_POSE,
+                            $" {_display.Custom_Pose}", GUILayout.Width(120)
                         );
                     }
                     GUILayout.EndHorizontal();

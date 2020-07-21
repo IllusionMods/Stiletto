@@ -17,6 +17,9 @@ namespace Stiletto.Settings
         public float CustomPose_HeelHeightMultiplier { get; set; } = 32f;
 
         [FileProperty]
+        public float KneeBend_HeelHeightMultiplier { get; set; } = 1f;
+
+        [FileProperty]
         public string DisplaySettingsFilePath { get; set; } = "_display.txt";
     }
 }
