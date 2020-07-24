@@ -47,6 +47,8 @@ namespace Stiletto
 
         public CustomPose CustomPose => _customPose;
 
+        public bool HasAnimation => _animation.AnimationPath != null && _animation.AnimationName != null;
+
         public void Setup(ChaControl chaControl, string heelName)
         {
             this.chaControl = chaControl;

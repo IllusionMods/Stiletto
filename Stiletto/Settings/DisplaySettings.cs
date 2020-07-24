@@ -68,7 +68,13 @@ namespace Stiletto.Settings
         public string Custom_Pose_Compatibility { get; set; } = "Custom Pose (Compatibility)";
 
         [FileProperty]
-        public string Current_Character { get; set; } = "Current Character";
+        public string Current_Characters { get; set; } = "Current Characters";
+
+        [FileProperty]
+        public string All_Characters { get; set; } = "All Characters";
+
+        [FileProperty]
+        public string Switch_Characters { get; set; } = "Switch";
 
         [FileProperty]
         public string Name { get; set; } = "Name";

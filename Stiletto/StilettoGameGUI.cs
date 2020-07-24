@@ -13,7 +13,7 @@ namespace Stiletto
         private const int ScreenOffset = 20;
         private Rect _windowRect;
         private Rect _screenRect;
-        private CharaDisplayData[] _currentCharacters = new CharaDisplayData[0];
+        private CharaDisplayData[] _characters = new CharaDisplayData[0];
         private CharaDisplayData selectedCharacter;
         private int selectedIndex = -1;
         private bool _show;
@@ -21,6 +21,7 @@ namespace Stiletto
         private DateTime? _lastCharaRefersh;
         private int _selectedTab;
         private int _selectedPoseSide;
+        private bool _allCharacters = true;
 
         private DisplaySettings _display;
 
@@ -57,12 +58,23 @@ namespace Stiletto
 
             GUILayout.BeginVertical();
             {
-                var currentCharacters = GetCurrentVisibleCharacters();
-                var updatedHeroines = !CompareCharaData(currentCharacters, _currentCharacters);
+                GUILayout.BeginHorizontal();
+                {
+                    var buttonDisplay = _allCharacters ? _display.All_Characters : _display.Current_Characters;
+                    GUILayout.Label(buttonDisplay, GUILayout.Width(160));
+                    if (GUILayout.Button(_display.Switch_Characters, GUILayout.Width(80)))
+                    {
+                        _allCharacters = !_allCharacters;
+                    }
+                }
+                GUILayout.EndHorizontal();
 
-                _currentCharacters = currentCharacters;
+                var characters = GetCharacters();
+                var updatedHeroines = !CompareCharaData(characters, _characters);
 
-                if (_currentCharacters.Length > 0)
+                _characters = characters;
+
+                if (_characters.Length > 0)
                 {
                     if (selectedCharacter == null)
                     {
@@ -70,7 +82,7 @@ namespace Stiletto
                     }
                     else if (updatedHeroines)
                     {
-                        selectedIndex = _currentCharacters.ElementAtOrDefault(selectedIndex) == null ? 0 : selectedIndex;
+                        selectedIndex = _characters.ElementAtOrDefault(selectedIndex) == null ? 0 : selectedIndex;
                         SelectCharacter(selectedIndex);
                     }
                     else
@@ -124,7 +136,6 @@ namespace Stiletto
         {
             GUILayout.BeginVertical();
             {
-                GUILayout.Label(_display.Current_Character);
                 CreateDisplayLabel($"{_display.Name}:", selectedCharacter.Name ?? _display.None_Placeholder);
                 CreateDisplayLabel($"{_display.Heel}:", selectedCharacter.HeelName ?? _display.None_Placeholder);
                 CreateDisplayLabel($"{_display.Anim_Path}:", selectedCharacter.AnimationPath ?? _display.None_Placeholder);
@@ -132,9 +143,9 @@ namespace Stiletto
 
                 GUILayout.BeginHorizontal();
                 {
-                    GUILayout.Label($"{_display.Total}: {_currentCharacters.Length}", GUILayout.Width(70));
+                    GUILayout.Label($"{_display.Total}: {_characters.Length}", GUILayout.Width(70));
 
-                    var lastIndex = _currentCharacters.Length - 1;
+                    var lastIndex = _characters.Length - 1;
 
                     if (GUILayout.Button(_display.Previous, GUILayout.Width(80)))
                     {
@@ -357,7 +368,7 @@ namespace Stiletto
 
         private void SelectCharacter(int index)
         {
-            selectedCharacter = _currentCharacters.ElementAtOrDefault(index);
+            selectedCharacter = _characters.ElementAtOrDefault(index);
             selectedIndex = index;
         }
 
@@ -372,11 +383,25 @@ namespace Stiletto
             _windowRect = new Rect(_screenRect.xMin, _screenRect.yMax - windowHeight, windowWidth, windowHeight);
         }
 
-        private CharaDisplayData[] GetCurrentVisibleCharacters()
+        private CharaDisplayData[] GetCharacters()
+        {
+            if (_allCharacters) 
+            {
+                return GetAllCharacters();
+            }
+            return GetCurrentCharacters();
+        }
+
+        private CharaDisplayData[] GetAllCharacters() 
+        {
+            return StilettoContext.HeelInfos.Where(x => x.HasAnimation).Select(x => new CharaDisplayData(x)).ToArray();
+        }
+
+        private CharaDisplayData[] GetCurrentCharacters()
         {
             if (_lastCharaRefersh != null && DateTime.Now - _lastCharaRefersh < TimeSpan.FromSeconds(2))
             {
-                return _currentCharacters;
+                return _characters;
             }
             else
             {

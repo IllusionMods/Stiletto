@@ -12,7 +12,7 @@ namespace Stiletto
     public class Stiletto : BaseUnityPlugin
     {
         public const string GUID = "com.essu.stiletto.custom";
-        public const string Version = "2.2.0";
+        public const string Version = "2.3.1";
         public const int WindowId = 670;
 
         private StilettoGameGUI _gameWindow;

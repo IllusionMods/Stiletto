@@ -28,13 +28,13 @@ namespace Stiletto
 
         private Animator _animationBody;
         private FullBodyBipedIK _fullBodyBiped;
-        private IKSolverFullBody _backupSolver;
-
         private GeneralSettings _generalSetting;
 
         private float _bodyPositionWeight;
         private float _leftFootPositionWeight;
         private float _rightFootPositionWeight;
+
+        private bool _reset = true;
 
         public HeelInfoAnimation(ChaControl chaControl)
         {
@@ -61,13 +61,7 @@ namespace Stiletto
             _rightToe = _rightFoot.Find("cf_j_toes_R");
 
             _fullBodyBiped = _animationBody.GetComponent<FullBodyBipedIK>();
-
-            if (FullBodyBipedSolver != null)
-            {
-                _bodyPositionWeight = FullBodyBipedSolver.bodyEffector.positionWeight;
-                _leftFootPositionWeight = FullBodyBipedSolver.leftFootEffector.positionWeight;
-                _rightFootPositionWeight = FullBodyBipedSolver.rightFootEffector.positionWeight;
-            }
+            _reset = true;
         }
 
         public IKSolverFullBodyBiped FullBodyBipedSolver => _fullBodyBiped?.solver;
@@ -97,9 +91,18 @@ namespace Stiletto
             // Reset position weight
             if (FullBodyBipedSolver != null)
             {
-                FullBodyBipedSolver.bodyEffector.positionWeight = _bodyPositionWeight;
-                FullBodyBipedSolver.rightFootEffector.positionWeight = _rightFootPositionWeight;
-                FullBodyBipedSolver.leftFootEffector.positionWeight = _leftFootPositionWeight;
+                if (_reset)
+                {
+                    _bodyPositionWeight = FullBodyBipedSolver.bodyEffector.positionWeight;
+                    _leftFootPositionWeight = FullBodyBipedSolver.leftFootEffector.positionWeight;
+                    _rightFootPositionWeight = FullBodyBipedSolver.rightFootEffector.positionWeight;
+                }
+                else
+                {
+                    FullBodyBipedSolver.bodyEffector.positionWeight = _bodyPositionWeight;
+                    FullBodyBipedSolver.rightFootEffector.positionWeight = _rightFootPositionWeight;
+                    FullBodyBipedSolver.leftFootEffector.positionWeight = _leftFootPositionWeight;
+                }
             }
 
             if (flags.CUSTOM_POSE)
@@ -116,7 +119,7 @@ namespace Stiletto
                 var leftThighDelta = GetBodyLengthDelta(leftThighLength);
                 var rightLegDelta = GetBodyLengthDelta(rightLegLength);
                 var leftLegDelta = GetBodyLengthDelta(leftLegLength);
-                
+
                 // Calcuate adjustment angles
                 var waistAngle = customPose.WaistAngle * heelHeightDelta;
 
@@ -177,12 +180,12 @@ namespace Stiletto
         }
 
         private float GetBodyLengthDelta(float length)
-        { 
+        {
             return (float)Math.Pow(length, _generalSetting.CustomPose_BodyLengthPower) * _generalSetting.CustomPose_BodyLengthMultiplier;
         }
 
         private float GetHeelHeightDelta(float height)
-        { 
+        {
             return (float)Math.Pow(height, _generalSetting.CustomPose_HeelHeightPower) * _generalSetting.CustomPose_HeelHeightMultiplier;
         }
     }
