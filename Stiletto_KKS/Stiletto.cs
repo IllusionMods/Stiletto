@@ -27,6 +27,7 @@ namespace Stiletto
 
         private Rect windowRect = new Rect(200, 200, 220, 120);
         private GUILayoutOption glo_width20 = GUILayout.Width(20);
+        private GUILayoutOption glo_width40 = GUILayout.Width(40);
 
         internal static bool GUI_ACTIVE = false;
 
@@ -71,7 +72,7 @@ namespace Stiletto
 
             ReloadConfig();
 
-            Config.Bind(new ConfigDefinition("Hotkeys", "GUI Toggle"), new KeyboardShortcut(KeyCode.RightShift), new ConfigDescription("Toggles stiletto UI"));
+            toggleGuiKey = Config.Bind(new ConfigDefinition("Keyboard Shortcuts", "GUI Toggle"), new KeyboardShortcut(KeyCode.RightShift), new ConfigDescription("Toggles stiletto UI"));
 
             hi = new Harmony(nameof(Stiletto));
             hi.PatchAll(typeof(Stiletto));
@@ -414,14 +415,14 @@ namespace Stiletto
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Angle Ankle:");
+            GUILayout.Label("Ankle + Toes:");
             if (GUILayout.RepeatButton("-", glo_width20))
             {
                 var newAngleAnkle = selected.angleA.eulerAngles.x - 0.1f;
                 selected.UpdateValues(selected.height.y, newAngleAnkle, selected.angleLeg.eulerAngles.x, selected.aughStuff);
                 ignoreChanges = true;
             }
-            var angleA = GUILayout.TextField(selected.angleA.eulerAngles.x.ToString("F0"));
+            var angleA = GUILayout.TextField(selected.angleA.eulerAngles.x.ToString("F0"), glo_width40);
             if (GUILayout.RepeatButton("+", glo_width20))
             {
                 var newAngleAnkle = selected.angleA.eulerAngles.x + 0.1f;
@@ -432,14 +433,19 @@ namespace Stiletto
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Angle Leg:");
+            GUILayout.Label("Lock ankle:");
+            var b_aughStuff = GUILayout.Toggle(selected.aughStuff, "");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Whole feet:");
             if (GUILayout.RepeatButton("-", glo_width20))
             {
                 var newAngleLeg = selected.angleLeg.eulerAngles.x - 0.1f;
                 selected.UpdateValues(selected.height.y, selected.angleA.eulerAngles.x, newAngleLeg, selected.aughStuff);
                 ignoreChanges = true;
             }
-            var angleLeg = GUILayout.TextField(selected.angleLeg.eulerAngles.x.ToString("F0"));
+            var angleLeg = GUILayout.TextField(selected.angleLeg.eulerAngles.x.ToString("F0"), glo_width40);
             if (GUILayout.RepeatButton("+", glo_width20))
             {
                 var newAngleLeg = selected.angleLeg.eulerAngles.x + 0.1f;
@@ -457,7 +463,7 @@ namespace Stiletto
                 heightBuffer = selected.height.y.ToString("F3");
                 ignoreChanges = true;
             }
-            heightBuffer = GUILayout.TextField(heightBuffer);
+            heightBuffer = GUILayout.TextField(heightBuffer, glo_width40);
             if (GUILayout.RepeatButton("+", glo_width20))
             {
                 var newHeight = selected.height.y + 0.001f;
@@ -465,11 +471,6 @@ namespace Stiletto
                 heightBuffer = selected.height.y.ToString("F3");
                 ignoreChanges = true;
             }
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Augh:");
-            var b_aughStuff = GUILayout.Toggle(selected.aughStuff, "");
             GUILayout.EndHorizontal();
 
             if (GUI.changed && !ignoreChanges)
