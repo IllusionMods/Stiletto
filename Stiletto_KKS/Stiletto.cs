@@ -16,30 +16,30 @@ namespace Stiletto
     [BepInPlugin(GUID, nameof(Stiletto), Version)]
     public class Stiletto : BaseUnityPlugin
     {
+        public const string Version = "1.5";
+
+        internal static bool GUI_ACTIVE = false;
+        internal static readonly bool InStudio = Paths.ProcessName == "CharaStudio";
+
         private const string CONFIG_PATH = "BepInEx/Stiletto";
         private const string FLAG_PATH = CONFIG_PATH + "/_flags.txt";
         private const string GUID = "com.essu.stiletto";
-        public const string Version = "1.5";
+        private readonly List<string> defaultScene = new List<string> { "All" };
+
+        private Rect windowRect = new Rect(200, 200, 300, 120);
+        private readonly GUILayoutOption _width20 = GUILayout.Width(20);
+        private readonly GUILayoutOption _width40 = GUILayout.Width(40);
+
         private static int GUID_HASH = GUID.GetHashCode();
-
+        private static string heightBuffer = "";
         private static Harmony hi;
-        private ConfigEntry<KeyboardShortcut> toggleGuiKey { get; set; }
 
-        private Rect windowRect = new Rect(200, 200, 220, 120);
-        private GUILayoutOption glo_width20 = GUILayout.Width(20);
-        private GUILayoutOption glo_width40 = GUILayout.Width(40);
+        private readonly ConfigEntry<KeyboardShortcut> toggleGuiKey;
+        private static readonly Dictionary<string, HeelFlags> dictAnimFlags = new Dictionary<string, HeelFlags>();
+        private static readonly ConcurrentList<HeelInfo> heelInfos = new ConcurrentList<HeelInfo>();
+        private static readonly ConcurrentList<HeelInfo> currentSceneHeelInfos = new ConcurrentList<HeelInfo>();
 
-        internal static bool GUI_ACTIVE = false;
-
-        internal static readonly bool InStudio = Paths.ProcessName == "CharaStudio";
-
-        private static Dictionary<string, HeelFlags> dictAnimFlags = new Dictionary<string, HeelFlags>();
-        private static ConcurrentList<HeelInfo> heelInfos = new ConcurrentList<HeelInfo>();
-        private static ConcurrentList<HeelInfo> currentSceneHeelInfos = new ConcurrentList<HeelInfo>();
-        private static int _heelIndex = -1;
-        private static int _sceneFilterIndex = -1;
-
-        private static int heelIndex
+        private static int HeelIndex
         {
             get => _heelIndex;
             set
@@ -52,7 +52,9 @@ namespace Stiletto
             }
         }
 
-        private static int sceneFilterIndex
+        private static int _heelIndex = -1;
+
+        private static int SceneFilterIndex
         {
             get => _sceneFilterIndex;
             set
@@ -60,10 +62,12 @@ namespace Stiletto
                 if (_sceneFilterIndex != value)
                 {
                     _sceneFilterIndex = value;
-                    heelIndex = heelInfos.Count == 0 ? -1 : 0;
+                    HeelIndex = heelInfos.Count == 0 ? -1 : 0;
                 }
             }
         }
+
+        private static int _sceneFilterIndex = -1;
 
         internal Stiletto()
         {
@@ -89,11 +93,13 @@ namespace Stiletto
             }
         }
 
+        #region Hooks
+
         [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), "ActiveKinematicMode")]
         public static void OCIChar_ActiveKinematicModeHook(OCIChar __instance)
         {
-            if (heelIndex == -1 || heelInfos.Count == 0) return;
-            foreach (var cc in heelInfos.Select(x => x.cc).ToArray()) LoadHeelFile(cc);
+            if (HeelIndex == -1 || heelInfos.Count == 0) return;
+            foreach (var cc in heelInfos.Select(x => x.ChaControl).ToArray()) LoadHeelFile(cc);
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), "SetClothesState")]
@@ -140,10 +146,41 @@ namespace Stiletto
                 LoadHeelFile(__instance);
         }
 
+        #endregion Hooks
+
+        #region Unity
+
+        private void OnDestroy()
+        {
+            // For hot reload.
+            foreach (var cc in GameObject.FindObjectsOfType<ChaControl>())
+                GameObject.DestroyImmediate(cc.GetComponent<HeelInfo>());
+
+            hi.UnpatchAll(nameof(Stiletto));
+        }
+
+        internal void Update()
+        {
+            if (toggleGuiKey.Value.IsDown())
+                GUI_ACTIVE = !GUI_ACTIVE;
+        }
+
+        internal void OnGUI()
+        {
+            if (GUI_ACTIVE)
+            {
+                windowRect = GUILayout.Window(GUID_HASH, windowRect, Window, "Stiletto");
+            }
+        }
+
+        #endregion Unity
+
+        #region Save/Load
+
         internal static void SaveHeelFile(HeelInfo hi)
         {
-            var configFile = $"{CONFIG_PATH}/{hi.heelName}.txt";
-            File.WriteAllText(configFile, $"angleAnkle={hi.angleA.eulerAngles.x}\r\nangleLeg={hi.angleLeg.eulerAngles.x}\r\nheight={hi.height.y}\r\naughStuff={(hi.aughStuff ? 1 : 0)}\r\n");
+            var configFile = $"{CONFIG_PATH}/{hi.HeelName}.txt";
+            File.WriteAllText(configFile, $"angleAnkle={hi.AngleAnkleValue.eulerAngles.x}\r\nangleLeg={hi.AngleLegValue.eulerAngles.x}\r\nheight={hi.HeightValue.y}\r\naughStuff={(hi.LockAnkle ? 1 : 0)}\r\n");
         }
 
         internal static void LoadHeelFile(ChaControl __instance)
@@ -169,6 +206,7 @@ namespace Stiletto
             {
                 File.WriteAllText(configFile, $"{nameof(angleAnkle)}=0\r\n{nameof(angleLeg)}=0\r\n{nameof(height)}=0\r\n");
             }
+
             var lines = File.ReadAllLines(configFile).Select(x => x.Split('='));
             foreach (var line in lines)
             {
@@ -199,33 +237,9 @@ namespace Stiletto
             heightBuffer = height.ToString("F3");
         }
 
-        internal static HeelFlags FetchFlags(string name)
-        {
-            if (dictAnimFlags.TryGetValue(name, out HeelFlags hf)) return hf;
-            hf = new HeelFlags();
-            dictAnimFlags[name] = hf;
-            SaveHeelFlags();
-            return hf;
-        }
-
         internal static void SaveHeelFlags()
         {
             File.WriteAllLines(FLAG_PATH, dictAnimFlags.Keys.OrderBy(x => x).Select(x => $"{x}={dictAnimFlags[x]}").ToArray());
-        }
-
-        private void OnDestroy()
-        {
-            // For hot reload.
-            foreach (var cc in GameObject.FindObjectsOfType<ChaControl>())
-                GameObject.DestroyImmediate(cc.GetComponent<HeelInfo>());
-
-            hi.UnpatchAll(nameof(Stiletto));
-        }
-
-        internal void Update()
-        {
-            if (toggleGuiKey.Value.IsDown())
-                GUI_ACTIVE = !GUI_ACTIVE;
         }
 
         internal void ReloadConfig()
@@ -245,35 +259,38 @@ namespace Stiletto
             }
         }
 
+        #endregion Save/Load
+
+        #region Static Methods
+
         internal static void RegisterHeelInfo(HeelInfo hi)
         {
             heelInfos.Add(hi);
-            if (heelIndex == -1) heelIndex = 0;
+            if (HeelIndex == -1) HeelIndex = 0;
         }
 
         internal static void UnregisterHeelInfo(HeelInfo hi)
         {
             heelInfos.Remove(hi);
-            if (heelInfos.Count == 0) heelIndex = -1;
+            if (heelInfos.Count == 0) HeelIndex = -1;
         }
 
-        internal void OnGUI()
+        internal static HeelFlags FetchFlags(string name)
         {
-            if (GUI_ACTIVE)
-            {
-                windowRect = GUILayout.Window(GUID_HASH, windowRect, Window, "Stiletto");
-            }
+            if (dictAnimFlags.TryGetValue(name, out HeelFlags hf)) return hf;
+            hf = new HeelFlags();
+            dictAnimFlags[name] = hf;
+            SaveHeelFlags();
+            return hf;
         }
-
-        private static string heightBuffer = "";
 
         private static void HeelIndexChanged()
         {
-            if (heelIndex == -1 || heelInfos.Count == 0) heightBuffer = "0.000";
+            if (HeelIndex == -1 || heelInfos.Count == 0) heightBuffer = "0.000";
             else
             {
-                var heelInfo = GetHeelInfoFromCurrentSceneIndex(heelIndex);
-                heightBuffer = heelInfo?.height.y.ToString("F3") ?? "0.000";
+                var heelInfo = GetHeelInfoFromCurrentSceneIndex(HeelIndex);
+                heightBuffer = heelInfo?.HeightValue.y.ToString("F3") ?? "0.000";
             }
         }
 
@@ -281,8 +298,8 @@ namespace Stiletto
         {
             if (index >= 0 && index < currentSceneHeelInfos.Count)
             {
-                ChaControl cc = currentSceneHeelInfos[index].cc;
-                return heelInfos.FirstOrDefault(hi => hi.cc.gameObject == cc);
+                ChaControl cc = currentSceneHeelInfos[index].ChaControl;
+                return heelInfos.FirstOrDefault(hi => hi.ChaControl.gameObject == cc);
             }
             else
             {
@@ -290,7 +307,7 @@ namespace Stiletto
             }
         }
 
-        private static IEnumerable<string> RefreshSceneNames()
+        private IEnumerable<string> RefreshSceneNames()
         {
             HashSet<string> uniqueScenes = new HashSet<string>();
             foreach (var heelInfo in heelInfos)
@@ -301,58 +318,68 @@ namespace Stiletto
             return uniqueScenes;
         }
 
+        #endregion Static Methods
+
+        #region GUI
+
         internal void Window(int id)
         {
-            var sceneNames = RefreshSceneNames();
-            if (sceneFilterIndex == -1) sceneFilterIndex = 0;
-            if (sceneFilterIndex >= sceneNames.Count()) sceneFilterIndex = sceneNames.Count() - 1;
+            var sceneNames = InStudio ? defaultScene : RefreshSceneNames();
 
             currentSceneHeelInfos.Clear();
-            foreach (var heelInfo in heelInfos)
+            if (sceneNames.Count() == 1)
             {
-                if (sceneNames.Count() == 0 || sceneFilterIndex == -1)
-                {
-                    currentSceneHeelInfos.Add(heelInfo);
-                    continue;
-                }
-
-                var characterScene = heelInfo.gameObject.scene.name;
-                string currentScene = sceneNames.ElementAt(sceneFilterIndex);
-                if (characterScene.Equals(currentScene))
+                sceneNames = defaultScene;
+                foreach (var heelInfo in heelInfos)
                 {
                     currentSceneHeelInfos.Add(heelInfo);
                 }
             }
+            else
+            {
+                foreach (var heelInfo in heelInfos)
+                {
+                    var characterScene = heelInfo.gameObject.scene.name;
+                    string currentScene = sceneNames.ElementAt(SceneFilterIndex);
+                    if (characterScene.Equals(currentScene))
+                    {
+                        currentSceneHeelInfos.Add(heelInfo);
+                    }
+                }
+            }
 
-            bool ignoreChanges = false;
+            if (SceneFilterIndex == -1) SceneFilterIndex = 0;
+            if (SceneFilterIndex >= sceneNames.Count()) SceneFilterIndex = sceneNames.Count() - 1;
+
             int count;
-            if (heelIndex == -1 || (count = currentSceneHeelInfos.Count) == 0)
+            if (HeelIndex == -1 || (count = currentSceneHeelInfos.Count) == 0)
             {
                 GUILayout.Label("No characters detected.");
                 GUI.DragWindow();
                 return;
             }
 
-            var selected = currentSceneHeelInfos[heelIndex];
+            var selected = currentSceneHeelInfos[HeelIndex];
             GUILayout.BeginVertical();
 
             // Scene Filter
             GUILayout.BeginHorizontal();
             GUILayout.Label("Scene filter: ");
-            GUI.enabled = sceneFilterIndex > 0;
-            if (GUILayout.Button("<", glo_width20))
+            GUI.enabled = SceneFilterIndex > 0;
+            if (GUILayout.Button("<", _width20))
             {
-                sceneFilterIndex = Math.Max(0, sceneFilterIndex - 1);
+                SceneFilterIndex = Math.Max(0, SceneFilterIndex - 1);
                 GUI.changed = false;
             }
 
             GUI.enabled = true;
-            GUILayout.Label(sceneNames.ElementAt(sceneFilterIndex));
+            var currentSceneName = currentSceneHeelInfos.Count > 0 ? sceneNames.ElementAt(SceneFilterIndex) : "-";
+            GUILayout.Label(currentSceneName);
 
-            GUI.enabled = sceneFilterIndex < sceneNames.Count() - 1;
-            if (GUILayout.Button(">", glo_width20))
+            GUI.enabled = SceneFilterIndex < sceneNames.Count() - 1;
+            if (GUILayout.Button(">", _width20))
             {
-                sceneFilterIndex = Math.Min(sceneFilterIndex + 1, sceneNames.Count() - 1);
+                SceneFilterIndex = Math.Min(SceneFilterIndex + 1, sceneNames.Count() - 1);
                 GUI.changed = false;
             }
             GUI.enabled = true;
@@ -361,20 +388,20 @@ namespace Stiletto
             // Character selector
             GUILayout.BeginHorizontal();
             GUILayout.Label("Character: ");
-            GUI.enabled = heelIndex > 0;
-            if (GUILayout.Button("<", glo_width20))
+            GUI.enabled = HeelIndex > 0;
+            if (GUILayout.Button("<", _width20))
             {
-                heelIndex = Math.Max(0, heelIndex - 1);
+                HeelIndex = Math.Max(0, HeelIndex - 1);
                 GUI.changed = false;
             }
             GUI.enabled = true;
 
-            GUILayout.Label(selected.cc.fileParam.fullname);
+            GUILayout.Label(selected.ChaControl.fileParam.fullname);
 
-            GUI.enabled = heelIndex < count - 1;
-            if (GUILayout.Button(">", glo_width20))
+            GUI.enabled = HeelIndex < count - 1;
+            if (GUILayout.Button(">", _width20))
             {
-                heelIndex = Math.Min(heelIndex + 1, count - 1);
+                HeelIndex = Math.Min(HeelIndex + 1, count - 1);
                 GUI.changed = false;
             }
             GUI.enabled = true;
@@ -383,19 +410,19 @@ namespace Stiletto
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Path:");
-            GUILayout.Label(selected.pathName);
+            GUILayout.Label(selected.PathName);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Anim:");
-            GUILayout.Label(selected.animationName);
+            GUILayout.Label(selected.AnimationName);
             GUILayout.EndHorizontal();
 
-            selected.flags.ACTIVE = GUILayout.Toggle(selected.flags.ACTIVE, "Active");
-            selected.flags.HEIGHT = GUILayout.Toggle(selected.flags.HEIGHT, "Adjust Height");
-            selected.flags.TOE_ROLL = GUILayout.Toggle(selected.flags.TOE_ROLL, "Toe Roll");
-            selected.flags.ANKLE_ROLL = GUILayout.Toggle(selected.flags.ANKLE_ROLL, "Ankle Roll");
-            selected.flags.KNEE_BEND = GUILayout.Toggle(selected.flags.KNEE_BEND, "Knee Bend");
+            selected.Flags.ACTIVE = GUILayout.Toggle(selected.Flags.ACTIVE, "Active");
+            selected.Flags.HEIGHT = GUILayout.Toggle(selected.Flags.HEIGHT, "Adjust Height");
+            selected.Flags.TOE_ROLL = GUILayout.Toggle(selected.Flags.TOE_ROLL, "Toe Roll");
+            selected.Flags.ANKLE_ROLL = GUILayout.Toggle(selected.Flags.ANKLE_ROLL, "Ankle Roll");
+            selected.Flags.KNEE_BEND = GUILayout.Toggle(selected.Flags.KNEE_BEND, "Knee Bend");
 
             if (GUILayout.Button("Save Flags"))
             {
@@ -405,75 +432,75 @@ namespace Stiletto
 
             if (GUI.changed)
             {
-                dictAnimFlags[selected.key] = selected.flags;
+                dictAnimFlags[selected.Key] = selected.Flags;
             }
             GUI.changed = false;
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Shoes:");
-            GUILayout.Label(selected.heelName);
+            GUILayout.Label(selected.HeelName);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Ankle + Toes:");
-            if (GUILayout.RepeatButton("-", glo_width20))
+            if (GUILayout.RepeatButton("-", _width20))
             {
-                var newAngleAnkle = selected.angleA.eulerAngles.x - 0.1f;
-                selected.UpdateValues(selected.height.y, newAngleAnkle, selected.angleLeg.eulerAngles.x, selected.aughStuff);
-                ignoreChanges = true;
+                var newAngleAnkle = selected.AngleAnkleValue.eulerAngles.x - 0.1f;
+                selected.UpdateValues(selected.HeightValue.y, newAngleAnkle, selected.AngleLegValue.eulerAngles.x, selected.LockAnkle);
+                GUI.changed = false;
             }
-            var angleA = GUILayout.TextField(selected.angleA.eulerAngles.x.ToString("F0"), glo_width40);
-            if (GUILayout.RepeatButton("+", glo_width20))
+            var angleA = GUILayout.TextField(selected.AngleAnkleValue.eulerAngles.x.ToString("F0"), _width40);
+            if (GUILayout.RepeatButton("+", _width20))
             {
-                var newAngleAnkle = selected.angleA.eulerAngles.x + 0.1f;
-                selected.UpdateValues(selected.height.y, newAngleAnkle, selected.angleLeg.eulerAngles.x, selected.aughStuff);
-                ignoreChanges = true;
+                var newAngleAnkle = selected.AngleAnkleValue.eulerAngles.x + 0.1f;
+                selected.UpdateValues(selected.HeightValue.y, newAngleAnkle, selected.AngleLegValue.eulerAngles.x, selected.LockAnkle);
+                GUI.changed = false;
             }
 
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Lock ankle:");
-            var b_aughStuff = GUILayout.Toggle(selected.aughStuff, "");
+            var b_aughStuff = GUILayout.Toggle(selected.LockAnkle, "");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Whole feet:");
-            if (GUILayout.RepeatButton("-", glo_width20))
+            if (GUILayout.RepeatButton("-", _width20))
             {
-                var newAngleLeg = selected.angleLeg.eulerAngles.x - 0.1f;
-                selected.UpdateValues(selected.height.y, selected.angleA.eulerAngles.x, newAngleLeg, selected.aughStuff);
-                ignoreChanges = true;
+                var newAngleLeg = selected.AngleLegValue.eulerAngles.x - 0.1f;
+                selected.UpdateValues(selected.HeightValue.y, selected.AngleAnkleValue.eulerAngles.x, newAngleLeg, selected.LockAnkle);
+                GUI.changed = false;
             }
-            var angleLeg = GUILayout.TextField(selected.angleLeg.eulerAngles.x.ToString("F0"), glo_width40);
-            if (GUILayout.RepeatButton("+", glo_width20))
+            var angleLeg = GUILayout.TextField(selected.AngleLegValue.eulerAngles.x.ToString("F0"), _width40);
+            if (GUILayout.RepeatButton("+", _width20))
             {
-                var newAngleLeg = selected.angleLeg.eulerAngles.x + 0.1f;
-                selected.UpdateValues(selected.height.y, selected.angleA.eulerAngles.x, newAngleLeg, selected.aughStuff);
-                ignoreChanges = true;
+                var newAngleLeg = selected.AngleLegValue.eulerAngles.x + 0.1f;
+                selected.UpdateValues(selected.HeightValue.y, selected.AngleAnkleValue.eulerAngles.x, newAngleLeg, selected.LockAnkle);
+                GUI.changed = false;
             }
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Height:");
-            if (GUILayout.RepeatButton("-", glo_width20))
+            if (GUILayout.RepeatButton("-", _width20))
             {
-                var newHeight = selected.height.y - 0.001f;
-                selected.UpdateValues(newHeight, selected.angleA.eulerAngles.x, selected.angleLeg.eulerAngles.x, selected.aughStuff);
-                heightBuffer = selected.height.y.ToString("F3");
-                ignoreChanges = true;
+                var newHeight = selected.HeightValue.y - 0.001f;
+                selected.UpdateValues(newHeight, selected.AngleAnkleValue.eulerAngles.x, selected.AngleLegValue.eulerAngles.x, selected.LockAnkle);
+                heightBuffer = selected.HeightValue.y.ToString("F3");
+                GUI.changed = false;
             }
-            heightBuffer = GUILayout.TextField(heightBuffer, glo_width40);
-            if (GUILayout.RepeatButton("+", glo_width20))
+            heightBuffer = GUILayout.TextField(heightBuffer, _width40);
+            if (GUILayout.RepeatButton("+", _width20))
             {
-                var newHeight = selected.height.y + 0.001f;
-                selected.UpdateValues(newHeight, selected.angleA.eulerAngles.x, selected.angleLeg.eulerAngles.x, selected.aughStuff);
-                heightBuffer = selected.height.y.ToString("F3");
-                ignoreChanges = true;
+                var newHeight = selected.HeightValue.y + 0.001f;
+                selected.UpdateValues(newHeight, selected.AngleAnkleValue.eulerAngles.x, selected.AngleLegValue.eulerAngles.x, selected.LockAnkle);
+                heightBuffer = selected.HeightValue.y.ToString("F3");
+                GUI.changed = false;
             }
             GUILayout.EndHorizontal();
 
-            if (GUI.changed && !ignoreChanges)
+            if (GUI.changed)
             {
                 if (angleA.Length == 0) angleA = "0";
                 if (angleLeg.Length == 0) angleLeg = "0";
@@ -491,12 +518,14 @@ namespace Stiletto
             if (GUILayout.Button("Save Preset"))
             {
                 SaveHeelFile(selected);
-                foreach (var cc in heelInfos.Select(x => x.cc)) LoadHeelFile(cc);
+                foreach (var cc in heelInfos.Select(x => x.ChaControl)) LoadHeelFile(cc);
             }
 
             GUILayout.EndVertical();
 
             GUI.DragWindow();
         }
+
+        #endregion GUI
     }
 }
