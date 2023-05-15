@@ -104,6 +104,9 @@ namespace Stiletto.Settings
         public string Custom_Pose { get; set; } = "Custom Pose";
 
         [FileProperty]
+        public string Save_For_All { get; set; } = "Save Wildcard";
+
+        [FileProperty]
         public string Save_For_Animation_Group { get; set; } = "Save PathOnly";
 
         [FileProperty]

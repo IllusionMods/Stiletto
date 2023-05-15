@@ -51,7 +51,7 @@ namespace Stiletto.Configurations
             if (KeyFlags.ContainsKey(key))
                 return KeyFlags[key];
 
-            if (PathFlags.ContainsKey(path))
+            if (path != null && PathFlags.ContainsKey(path))
                 return PathFlags[path];
 
             var match = RegexFlags.FirstOrDefault(x => x.Matcher.IsMatch(key));
