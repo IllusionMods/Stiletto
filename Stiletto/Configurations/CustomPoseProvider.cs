@@ -15,6 +15,7 @@ namespace Stiletto.Configurations
         {
             _settings = new ConcurrentDictionary<string, AnimationSettingsCollection<CustomPose>>();
             _rootDirectory = rootDirectory;
+            Directory.CreateDirectory(_rootDirectory);
             Reload();
         }
 

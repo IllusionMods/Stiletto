@@ -23,6 +23,7 @@ namespace Stiletto.Configurations
             _rootDirectory = rootDirectory;
             _defaultFile = defaultFile;
             _dumpFile = dumpFile;
+            Directory.CreateDirectory(_rootDirectory);
             Reload();
         }
 
