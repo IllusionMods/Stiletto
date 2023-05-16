@@ -17,6 +17,17 @@ namespace Stiletto
         private MakerSlider slider_AnkleAngle;
         private MakerSlider slider_LegAngle;
         private MakerSlider slider_Height;
+
+        private MakerText text_shoeWarp;
+        private MakerSlider slider_ShoeAngle;
+        private MakerSlider slider_ShoeScaleX;
+        private MakerSlider slider_ShoeScaleY;
+        private MakerSlider slider_ShoeScaleZ;
+        private MakerSlider slider_ShoeTranslateY;
+        private MakerSlider slider_ShoeTranslateZ;
+        private MakerSlider slider_ShoeShearY;
+        private MakerSlider slider_ShoeShearZ;
+
         private MakerButton button_HeelSave;
         private MakerButton button_Reload;
 
@@ -63,6 +74,50 @@ namespace Stiletto
                 StringToValue = CreateStringToValueFunc(1000f),
                 ValueToString = CreateValueToStringFunc(1000f)
             });
+
+            text_shoeWarp = e.AddControl(new MakerText(displaySettings.Shoe_Warp, category, plugin));
+            slider_ShoeAngle = e.AddControl(new MakerSlider(category, displaySettings.Shoe_Angle, -60f, 60f, 0f, plugin)
+            {
+                StringToValue = CreateStringToValueFunc(10f),
+                ValueToString = CreateValueToStringFunc(10f)
+            });
+            slider_ShoeScaleX = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ScaleX, 0.1f, 10f, 1f, plugin)
+            {
+                StringToValue = CreateStringToValueFunc(1000f),
+                ValueToString = CreateValueToStringFunc(1000f)
+            });
+            slider_ShoeScaleY = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ScaleY, 0.1f, 10f, 1f, plugin)
+            {
+                StringToValue = CreateStringToValueFunc(1000f),
+                ValueToString = CreateValueToStringFunc(1000f)
+            });
+            slider_ShoeScaleZ = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ScaleZ, 0.1f, 10f, 1f, plugin)
+            {
+                StringToValue = CreateStringToValueFunc(1000f),
+                ValueToString = CreateValueToStringFunc(1000f)
+            });
+            slider_ShoeTranslateY = e.AddControl(new MakerSlider(category, displaySettings.Shoe_TranslateY, -0.5f, 0.5f, 0f, plugin)
+            {
+                StringToValue = CreateStringToValueFunc(1000f),
+                ValueToString = CreateValueToStringFunc(1000f)
+            });
+            slider_ShoeTranslateZ = e.AddControl(new MakerSlider(category, displaySettings.Shoe_TranslateZ, -0.5f, 0.5f, 0f, plugin)
+            {
+                StringToValue = CreateStringToValueFunc(1000f),
+                ValueToString = CreateValueToStringFunc(1000f)
+            });
+            slider_ShoeShearY = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ShearY, -60f, 60f, 0f, plugin)
+            {
+                StringToValue = CreateStringToValueFunc(10f),
+                ValueToString = CreateValueToStringFunc(10f)
+            });
+            slider_ShoeShearZ = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ShearZ, -60f, 60f, 0f, plugin)
+            {
+                StringToValue = CreateStringToValueFunc(10f),
+                ValueToString = CreateValueToStringFunc(10f)
+            });
+
+
             button_HeelSave = e.AddControl(new MakerButton(displaySettings.Save_Heel_Settings, category, plugin));
             button_Reload = e.AddControl(new MakerButton(displaySettings.Reload_Configurations, category, plugin));
 
@@ -76,6 +131,38 @@ namespace Stiletto
 
             slider_Height.ValueChanged.Subscribe(value =>
                 MakerHeelInfoProcess(heel => heel.SafeProc(x => x.Height = value))
+            );
+
+            slider_ShoeAngle.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.ShoeAngle = value))
+            );
+
+            slider_ShoeScaleX.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.ShoeScaleX = value))
+            );
+
+            slider_ShoeScaleY.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.ShoeScaleY = value))
+            );
+
+            slider_ShoeScaleZ.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.ShoeScaleZ = value))
+            );
+
+            slider_ShoeTranslateY.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.ShoeTranslateY = value))
+            );
+
+            slider_ShoeTranslateZ.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.ShoeTranslateZ = value))
+            );
+
+            slider_ShoeShearY.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.ShoeShearY = value))
+            );
+
+            slider_ShoeShearZ.ValueChanged.Subscribe(value =>
+                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.ShoeShearZ = value))
             );
 
             button_HeelSave.OnClick.AddListener(() =>
@@ -95,6 +182,15 @@ namespace Stiletto
                     text_heelName.Text = heelInfo.HeelName ?? displaySettings.Default_Heel_Name;
                     slider_AnkleAngle.Value = heelInfo.CustomHeel.AnkleAngle;
                     slider_LegAngle.Value = heelInfo.CustomHeel.LegAngle;
+
+                    slider_ShoeAngle.Value = heelInfo.CustomHeel.ShoeAngle;
+                    slider_ShoeScaleX.Value = heelInfo.CustomHeel.ShoeScaleX;
+                    slider_ShoeScaleY.Value = heelInfo.CustomHeel.ShoeScaleY;
+                    slider_ShoeScaleZ.Value = heelInfo.CustomHeel.ShoeScaleZ;
+                    slider_ShoeTranslateY.Value = heelInfo.CustomHeel.ShoeTranslateY;
+                    slider_ShoeTranslateZ.Value = heelInfo.CustomHeel.ShoeTranslateZ;
+                    slider_ShoeShearY.Value = heelInfo.CustomHeel.ShoeShearY;
+                    slider_ShoeShearZ.Value = heelInfo.CustomHeel.ShoeShearZ;
                 }
             }
         }

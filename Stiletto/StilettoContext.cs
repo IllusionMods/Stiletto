@@ -1,6 +1,7 @@
 ﻿using Stiletto.Configurations;
 using Stiletto.Models;
 using Stiletto.Settings;
+using UnityEngine;
 using System;
 using System.IO;
 
@@ -14,6 +15,8 @@ namespace Stiletto
 
         public static CustomPoseProvider _customPoseProvider = new CustomPoseProvider(FilePathSettings.CUSTOM_POSE_PATH);
         public static AnimationFlagsProvider _animationFlagsProvider = new AnimationFlagsProvider(FilePathSettings.ANIMATION_FLAGS_PATH, FilePathSettings.FLAG_DEFAULT_PATH, FilePathSettings.FLAG_DUMP_PATH);
+
+        public static ConcurrentDictionary<string, Matrix4x4> _baseShoeBindPoses = new ConcurrentDictionary<string, Matrix4x4>();
 
         public static void RegisterHeelInfo(HeelInfo heelInfo)
         {
