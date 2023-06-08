@@ -1,0 +1,3 @@
+angleAnkle=32
+angleLeg=8
+height=0.07
