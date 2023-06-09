@@ -11,7 +11,7 @@ namespace Stiletto
     [BepInPlugin(GUID, nameof(Stiletto), Version)]
     public class Stiletto : BaseUnityPlugin
     {
-        public const string GUID = "com.essu.stiletto.custom";
+        public const string GUID = "com.essu.stiletto";
         public const string Version = "2.3.1";
         public const int WindowId = 670;
 
