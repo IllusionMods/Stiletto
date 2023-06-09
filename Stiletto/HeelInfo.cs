@@ -1,6 +1,6 @@
 ﻿using KKAPI.Studio;
-using RootMotion.FinalIK;
-using System.Linq;
+using Stiletto.Models;
+using Stiletto.Settings;
 using UnityEngine;
 using static ChaFileDefine;
 
@@ -8,221 +8,151 @@ namespace Stiletto
 {
     public class HeelInfo : MonoBehaviour
     {
-        public HeelFlags flags;
+        public AnimationFlags flags;
+        public string heelName;
+        public string animationName;
+        public string animationPath;
+        public ChaControl chaControl;
 
-        public string heelName = "-- NONE --";
-        public int id = -1;
-        public ChaControl cc;
-        internal Vector3 height;
-        internal Quaternion angleA;
-        private Quaternion angleB;
-        internal Quaternion angleLeg;
+        private Vector3 _height;
+        private Quaternion _ankleAngle;
+        private Quaternion _toeAngle;
+        private Quaternion _legAngle;
+        public CustomPose _customPose;
+        private bool _active;
 
-        private bool active;
+        private HeelInfoAnimation _animation;
 
-        private Vector3 Height => active && flags.ACTIVE && flags.HEIGHT ? height : Vector3.zero;
-        private Quaternion AngleA => active && flags.ACTIVE && flags.ANKLE_ROLL ? angleA : Quaternion.identity;
-        private Quaternion AngleB => active && flags.ACTIVE && flags.TOE_ROLL ? angleB : Quaternion.identity;
-        private Quaternion AngleLeg => active && flags.ACTIVE ? angleLeg : Quaternion.identity;
-
-        public float AnkleAnglef
+        public float AnkleAngle
         {
-            get => AngleA.eulerAngles.x;
+            get => _ankleAngle.eulerAngles.x;
             set
             {
-                angleA = Quaternion.Euler(value, 0f, 0f);
-                angleB = Quaternion.Euler(-value, 0f, 0f);
+                _ankleAngle = Quaternion.Euler(value, 0f, 0f);
+                _toeAngle = Quaternion.Euler(-value, 0f, 0f);
             }
         }
 
-        public float LegAnglef
+        public float LegAngle
         {
-            get => angleLeg.eulerAngles.x;
-            set => angleLeg = Quaternion.Euler(value, 0f, 0f);
+            get => _legAngle.eulerAngles.x;
+            set => _legAngle = Quaternion.Euler(value, 0f, 0f);
         }
 
-        public float Heightf
+        public float Height
         {
-            get => Height.y;
-            set => height = new Vector3(0, value, 0);
+            get => _height.y;
+            set => _height = new Vector3(0, value, 0);
         }
 
-        private void Awake()
+        public CustomPose CustomPose => _customPose;
+
+        public bool HasAnimation => _animation.AnimationPath != null && _animation.AnimationName != null;
+
+        public void Setup(ChaControl chaControl, string heelName)
         {
-            flags = new HeelFlags();
-            cc = gameObject.GetComponent<ChaControl>();
+            this.chaControl = chaControl;
+            _animation = new HeelInfoAnimation(chaControl);
 
-            //Stiletto.RegisterHeelInfo(this);
-        }
-
-        //void OnDisable()
-        //{
-        //    //Stiletto.UnregisterHeelInfo(this);
-        //}
-
-        //private bool registered = false;
-        //private NPC npc = null;
-
-        private void Start()
-        {
-            //npc = Singleton<Manager.Game>.Instance.actScene.npcList.FirstOrDefault(x => x.chaCtrl.chaID == cc.chaID);
-            //if (!npc)
-            //TODO: cry
-            Stiletto.RegisterHeelInfo(this);
-        }
-
-        private void OnDestroy()
-        {
-            //Console.WriteLine("ONDESTROY - " + cc.fileParam.fullname);
-            Stiletto.UnregisterHeelInfo(this);
-        }
-
-        private void Update()
-        {
-            var currentShoes = (int)(cc.fileStatus.shoesType == 0 ? ClothesKind.shoes_inner : ClothesKind.shoes_outer);
-            active = (cc.fileStatus.clothesState[currentShoes] == 0);
-            if(animBody == null) return;
-            var aci = animBody.GetCurrentAnimatorClipInfo(0);
-            if(aci.Length == 0) return;
-
-
-            var first = aci[0];
-            animationName = first.clip.name;
-
-            pathName = animBody.runtimeAnimatorController.name;
-#warning optimise by detecting animation change?
-            flags = Stiletto.FetchFlags(key);
-        }
-
-        private void LateUpdate()
-        {
-            if(solver == null)
+            if (!string.IsNullOrEmpty(heelName))
             {
-                OnPreRead();
+                this.heelName = heelName;
+                var customHeel = StilettoContext.CustomHeelProvider.Load(heelName);
+                Height = customHeel.Height;
+                AnkleAngle = customHeel.AnkleAngle;
+                LegAngle = customHeel.LegAngle;
+            }
+            else 
+            {
+                this.heelName = null;
+                Height = 0;
+                AnkleAngle = 0;
+                LegAngle = 0;
+            }
+
+
+            if (_animation.FullBodyBipedSolver != null)
+            {
+                _animation.FullBodyBipedSolver.OnPostUpdate = PostUpdate;
+            }
+
+            StilettoContext.NotifyHeelInfoUpdate(this);
+
+            if (StudioAPI.InsideStudio)
+            {
+                Update();
                 PostUpdate();
             }
         }
 
-        private void UpdateValues(float height, float angleAnkle, float angleLeg)
+        public void Reload() 
         {
-            this.height = new Vector3(0, height, 0);
-            angleA = Quaternion.Euler(angleAnkle, 0f, 0f);
-            angleB = Quaternion.Euler(-angleAnkle, 0f, 0f);
-            this.angleLeg = Quaternion.Euler(angleLeg, 0f, 0f);
-            StilettoGui.UpdateMakerValues(this);
-        }
-
-        internal void Setup(string heelName, int id, ChaControl chaControl, float height, float angleAnkle, float angleLeg)
-        {
-            animBody = chaControl.animBody;
-            this.heelName = heelName;
-            this.id = id;
-            cc = chaControl;
-            body = cc.objBodyBone.transform.parent;
-            UpdateValues(height, angleAnkle, angleLeg);
-
-            var waist = body.Find("cf_j_root/cf_n_height/cf_j_hips/cf_j_waist01/cf_j_waist02");
-            if(waist == null) return;
-
-            var legl3 = waist.Find("cf_j_thigh00_L/cf_j_leg01_L");
-            leg_L = legl3.Find("cf_j_leg03_L");
-            footL = leg_L.Find("cf_j_foot_L");
-            toesL = footL.Find("cf_j_toes_L");
-
-            var legr3 = waist.Find("cf_j_thigh00_R/cf_j_leg01_R");
-            leg_R = legr3.Find("cf_j_leg03_R");
-            footR = leg_R.Find("cf_j_foot_R");
-            toesR = footR.Find("cf_j_toes_R");
-
-            SetFBBIK(animBody.GetComponent<FullBodyBipedIK>());
-        }
-
-        private IKSolverFullBodyBiped solver;
-        private Transform body = null;
-
-        private Transform leg_L = null;
-        private Transform footL = null;
-        private Transform toesL = null;
-
-        private Transform leg_R = null;
-        private Transform footR = null;
-        private Transform toesR = null;
-
-        private Animator animBody;
-
-        public string animationName { get; private set; } = "-- NONE --";
-        public string pathName { get; private set; } = "-- NONE --";
-
-        public string key => $"{pathName}/{animationName}";
-
-        private void OnPreRead()
-        {
-#warning fix this
-            if(flags.KNEE_BEND && solver != null)
+            if (!string.IsNullOrEmpty(heelName)) 
             {
-                solver.bodyEffector.positionOffset = -Height;
+                Setup(chaControl, heelName);
             }
-            else
+
+            animationPath = null;
+            animationName = null;
+        }
+
+        private void Awake()
+        {
+            flags = new AnimationFlags();
+            chaControl = gameObject.GetComponent<ChaControl>();
+            _customPose = new CustomPose();
+        }
+
+        private void Start()
+        {
+            StilettoContext.RegisterHeelInfo(this);
+        }
+
+        private void OnDestroy()
+        {
+            StilettoContext.UnregisterHeelInfo(this);
+        }
+
+        private void Update()
+        {
+            var currentShoes = (int)(chaControl.fileStatus.shoesType == 0 ? ClothesKind.shoes_inner : ClothesKind.shoes_outer);
+            _active = chaControl.fileStatus.clothesState[currentShoes] == 0;
+
+            var path = _animation.AnimationPath;
+            var name = _animation.AnimationName;
+            var animationChange = false;
+
+            if (path != animationPath || name != animationName)
             {
-                body.localPosition = Height;
+                flags = StilettoContext.AnimationFlagsProvider.Load(path, name);
+                _customPose = StilettoContext.CustomPoseProvider.Load(path, name);
+                animationChange = true;
+            }
+
+            animationPath = path;
+            animationName = name;
+
+            if (animationChange) 
+            {
+                StilettoContext.NotifyHeelInfoUpdate(this);
             }
         }
 
         private void PostUpdate()
         {
-            if(flags.KNEE_BEND && solver != null)
-            {
-                solver.rightFootEffector.target.position += Height;
-                solver.leftFootEffector.target.position += Height;
-                body.localPosition = Vector3.zero;
-            }
-
-            footL.localRotation *= AngleA;
-            footR.localRotation *= AngleA;
-            toesL.localRotation *= AngleB;
-            toesR.localRotation *= AngleB;
-
-            //leg_L.localRotation = Quaternion.identity;
-            //leg_R.localRotation = Quaternion.identity;
-
-            leg_L.localRotation *= AngleLeg;
-            leg_R.localRotation *= AngleLeg;
+            var height = _active && flags.ACTIVE && flags.HEIGHT ? _height : Vector3.zero;
+            var ankleAngle = _active && flags.ACTIVE && flags.ANKLE_ROLL ? _ankleAngle : Quaternion.identity;
+            var toeAngle = _active && flags.ACTIVE && flags.TOE_ROLL ? _toeAngle : Quaternion.identity;
+            var legAngle = _active && flags.ACTIVE ? _legAngle : Quaternion.identity;
+            var customPose = _active && flags.ACTIVE && flags.CUSTOM_POSE ? _customPose : new CustomPose();
+            
+            _animation?.Update(flags, height, ankleAngle, toeAngle, legAngle, customPose);
         }
 
-
-        private void SetFBBIK(FullBodyBipedIK fbbik)
+        private void LateUpdate()
         {
-            if(fbbik != null) solver = fbbik.solver;
-
-            if(solver != null)
+            if (!_animation.FullBodyBipedEnabled)
             {
-
-                if(!StudioAPI.InsideStudio)
-                {
-                    var currentSceneName = fbbik.gameObject.scene.name;
-                    if(!new[] { SceneNames.CustomScene, SceneNames.H, SceneNames.MyRoom }.Contains(currentSceneName))
-                    {
-                        //Disable arm weights, we only affect feet/knees.
-                        fbbik.GetIKSolver().Initiate(fbbik.transform);
-                        fbbik.solver.leftHandEffector.positionWeight = 0f;
-                        fbbik.solver.rightHandEffector.positionWeight = 0f;
-                        fbbik.solver.leftArmChain.bendConstraint.weight = 0f;
-                        fbbik.solver.rightArmChain.bendConstraint.weight = 0f;
-                        fbbik.solver.leftFootEffector.rotationWeight = 0f;
-                        fbbik.solver.rightFootEffector.rotationWeight = 0f;
-                    }
-                    solver.IKPositionWeight = 1f;
-                    fbbik.enabled = true;
-                }
-                solver.OnPreRead = OnPreRead;
-                solver.OnPostUpdate = PostUpdate;
-            }
-#warning Detect overworld and adjust weights?
-
-            if(StudioAPI.InsideStudio)
-            {
-                Update();
-                OnPreRead();
                 PostUpdate();
             }
         }
