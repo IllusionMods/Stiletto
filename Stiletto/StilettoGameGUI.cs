@@ -210,6 +210,14 @@ namespace Stiletto
                 GUILayout.EndVertical();
                 GUILayout.BeginHorizontal();
                 {
+                    if (GUILayout.Button(_display.Save_For_All, GUILayout.Width(115)))
+                    {
+                        StilettoContext.AnimationFlagsProvider.Save(null, null, selectedCharacter.HeelInfo.flags);
+                    }
+                }
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                {
                     if (GUILayout.Button(_display.Save_For_Animation_Group, GUILayout.Width(115)))
                     {
                         StilettoContext.AnimationFlagsProvider.Save(selectedCharacter.AnimationPath, null, selectedCharacter.HeelInfo.flags);
@@ -290,6 +298,15 @@ namespace Stiletto
                     }
                 }
                 GUILayout.EndVertical();
+
+                GUILayout.BeginHorizontal();
+                {
+                    if (GUILayout.Button(_display.Save_For_All, GUILayout.Width(115)))
+                    {
+                        StilettoContext.CustomPoseProvider.Save(null, null, selectedCharacter.HeelInfo.CustomPose);
+                    }
+                }
+                GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 {

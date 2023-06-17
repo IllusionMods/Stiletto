@@ -46,7 +46,12 @@ namespace Stiletto.Configurations
 
         public AnimationSettingsValue(string path, string name, T value)
         {
-            if (string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(path) && string.IsNullOrEmpty(name))
+            {
+                Type = MatcherType.Regex;
+                Matcher = "";
+            }
+            else if (string.IsNullOrEmpty(name))
             {
                 Type = MatcherType.Path;
                 Matcher = path;
