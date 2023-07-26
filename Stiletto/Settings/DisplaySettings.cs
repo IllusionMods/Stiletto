@@ -122,6 +122,33 @@ namespace Stiletto.Settings
         public string Thigh_Angle { get; set; } = "Thigh Angle";
 
         [FileProperty]
+        public string Shoe_Warp { get; set; } = "Shoe Warp:";
+
+        [FileProperty]
+        public string Shoe_Angle { get; set; } = "Angle";
+
+        [FileProperty]
+        public string Shoe_ScaleX { get; set; } = "Scale X";
+
+        [FileProperty]
+        public string Shoe_ScaleY { get; set; } = "Scale Y";
+
+        [FileProperty]
+        public string Shoe_ScaleZ { get; set; } = "Scale Z";
+
+        [FileProperty]
+        public string Shoe_TranslateY { get; set; } = "Translate Y";
+
+        [FileProperty]
+        public string Shoe_TranslateZ { get; set; } = "Translate Z";
+
+        [FileProperty]
+        public string Shoe_ShearY { get; set; } = "Shear Y";
+
+        [FileProperty]
+        public string Shoe_ShearZ { get; set; } = "Shear Z";
+
+        [FileProperty]
         public string Knee_Bend_Settings { get; set; } = "Knee Bend Settings";
 
         [FileProperty]
