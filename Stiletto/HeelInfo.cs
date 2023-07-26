@@ -24,6 +24,7 @@ namespace Stiletto
         private Vector3 _shoeTranslate;
         private float _shoeShearY;
         private float _shoeShearZ;
+        private bool _shoeDirty;
 
         public CustomPose _customPose;
 
@@ -56,49 +57,81 @@ namespace Stiletto
         public float ShoeScaleX
         {
             get => _shoeScale.x;
-            set => _shoeScale.x = value;
+            set
+            {
+                _shoeScale.x = value;
+                _shoeDirty = true;
+            }
         }
 
         public float ShoeScaleY
         {
             get => _shoeScale.y;
-            set => _shoeScale.y = value;
+            set
+            {
+                _shoeScale.y = value;
+                _shoeDirty = true;
+            }
         }
 
         public float ShoeScaleZ
         {
             get => _shoeScale.z;
-            set => _shoeScale.z = value;
+            set
+            {
+                _shoeScale.z = value;
+                _shoeDirty = true;
+            }
         }
 
         public float ShoeAngle
         {
             get => _shoeAngle;
-            set => _shoeAngle = value;
+            set
+            {
+                _shoeAngle = value;
+                _shoeDirty = true;
+            }
         }
 
         public float ShoeTranslateY
         {
             get => _shoeTranslate.y;
-            set => _shoeTranslate.y = value;
+            set
+            {
+                _shoeTranslate.y = value;
+                _shoeDirty = true;
+            }
         }
 
         public float ShoeTranslateZ
         {
             get => _shoeTranslate.z;
-            set => _shoeTranslate.z = value;
+            set
+            {
+                _shoeTranslate.z = value;
+                _shoeDirty = true;
+            }
         }
 
         public float ShoeShearY
         {
             get => _shoeShearY;
-            set => _shoeShearY = value;
+            set
+            {
+                _shoeShearY = value;
+                _shoeDirty = true;
+            }
         }
 
         public float ShoeShearZ
         {
             get => _shoeShearZ;
-            set => _shoeShearZ = value;
+            set
+            {
+                _shoeShearZ = value;
+                _shoeDirty = true;
+            }
         }
 
         public CustomPose CustomPose => _customPose;
@@ -207,7 +240,11 @@ namespace Stiletto
                 StilettoContext.NotifyHeelInfoUpdate(this);
             }
 
-            UpdateShoeWarp();
+            if (_shoeDirty)
+            {
+                UpdateShoeWarp();
+                _shoeDirty = false;
+            }
         }
 
         private void PostUpdate()
