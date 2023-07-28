@@ -174,24 +174,36 @@ namespace Stiletto
 
         public void OnHeelInfoUpdate(object _, HeelInfoEventArgs heelInfo)
         {
-            if (MakerAPI.InsideMaker && heelInfo != null)
+            try
             {
-                if (slider_Height != null)
+                // When using Maker for a second time in a game session there is a
+                // [Error  :Null Checks] Swallowing exception to prevent game crash!
+                // when accessing heelInfo.CustomHeel.Height. heelInfo is disposed of
+                // on the first call before RegisterMakerControls on this occasion.
+                // OnHeelInfoUpdate event handler does not seem to be unloaded on 
+                // the Dispose method.
+                if (MakerAPI.InsideMaker && heelInfo != null)
                 {
-                    slider_Height.Value = heelInfo.CustomHeel.Height;
-                    text_heelName.Text = heelInfo.HeelName ?? displaySettings.Default_Heel_Name;
-                    slider_AnkleAngle.Value = heelInfo.CustomHeel.AnkleAngle;
-                    slider_LegAngle.Value = heelInfo.CustomHeel.LegAngle;
+                    if (slider_Height != null)
+                    {
+                        slider_Height.Value = heelInfo.CustomHeel.Height;
+                        text_heelName.Text = heelInfo.HeelName ?? displaySettings.Default_Heel_Name;
+                        slider_AnkleAngle.Value = heelInfo.CustomHeel.AnkleAngle;
+                        slider_LegAngle.Value = heelInfo.CustomHeel.LegAngle;
 
-                    slider_ShoeAngle.Value = heelInfo.CustomHeel.ShoeAngle;
-                    slider_ShoeScaleX.Value = heelInfo.CustomHeel.ShoeScaleX;
-                    slider_ShoeScaleY.Value = heelInfo.CustomHeel.ShoeScaleY;
-                    slider_ShoeScaleZ.Value = heelInfo.CustomHeel.ShoeScaleZ;
-                    slider_ShoeTranslateY.Value = heelInfo.CustomHeel.ShoeTranslateY;
-                    slider_ShoeTranslateZ.Value = heelInfo.CustomHeel.ShoeTranslateZ;
-                    slider_ShoeShearY.Value = heelInfo.CustomHeel.ShoeShearY;
-                    slider_ShoeShearZ.Value = heelInfo.CustomHeel.ShoeShearZ;
+                        slider_ShoeAngle.Value = heelInfo.CustomHeel.ShoeAngle;
+                        slider_ShoeScaleX.Value = heelInfo.CustomHeel.ShoeScaleX;
+                        slider_ShoeScaleY.Value = heelInfo.CustomHeel.ShoeScaleY;
+                        slider_ShoeScaleZ.Value = heelInfo.CustomHeel.ShoeScaleZ;
+                        slider_ShoeTranslateY.Value = heelInfo.CustomHeel.ShoeTranslateY;
+                        slider_ShoeTranslateZ.Value = heelInfo.CustomHeel.ShoeTranslateZ;
+                        slider_ShoeShearY.Value = heelInfo.CustomHeel.ShoeShearY;
+                        slider_ShoeShearZ.Value = heelInfo.CustomHeel.ShoeShearZ;
+                    }
                 }
+            }
+            catch
+            {
             }
         }
 
