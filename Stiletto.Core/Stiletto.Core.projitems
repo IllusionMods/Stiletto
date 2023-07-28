@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>3cc0eb5c-cbd9-434a-97e2-99369ebb6e0a</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Stiletto.Core</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Attributes\FilePropertyAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configurations\AnimationFlagsProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configurations\AnimationSettingsCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configurations\AnimationSettingsValue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configurations\CustomPoseProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configurations\DynamicFileProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configurations\DynamicProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configurations\FilePropertyResolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configurations\StringHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HeelInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HeelInfoAnimation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HeelInfoEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\AnimationFlags.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\CharaDisplayData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ConcurrentDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ConcurrentEnumerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ConcurrentList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\CustomHeel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\CustomPose.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\RegexMatcher.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\TextSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings\DisplaySettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings\FilePathSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings\GeneralSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stiletto.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StilettoContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StilettoGameGUI.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StilettoMakerGUI.cs" />
+  </ItemGroup>
+</Project>

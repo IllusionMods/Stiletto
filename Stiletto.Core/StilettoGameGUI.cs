@@ -440,12 +440,21 @@ namespace Stiletto
                 characters.Push(new CharaDisplayData(hflags.player));
                 return characters.ToArray();
             }
+#if KKS
+            var actScene = ActionScene.instance;
 
+            if (Game.initialized &&
+                actScene != null &&
+                actScene.AdvScene != null)
+            {
+                var advScene = actScene.AdvScene;
+#else
             if (Game.IsInstance() &&
                 Game.Instance.actScene != null &&
                 Game.Instance.actScene.AdvScene != null)
             {
                 var advScene = Game.Instance.actScene.AdvScene;
+#endif
                 if (advScene.Scenario?.currentHeroine != null)
                 {
                     return new CharaDisplayData[] {
@@ -458,7 +467,11 @@ namespace Stiletto
                 {
                     return new CharaDisplayData[] {
                         new CharaDisplayData(s.targetHeroine),
+#if KK
                         new CharaDisplayData(Game.Instance.Player)
+#else
+                        new CharaDisplayData(Game.Player)
+#endif
                     };
                 }
             }

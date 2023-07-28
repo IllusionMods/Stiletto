@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Stiletto</RootNamespace>
-    <AssemblyName>Stiletto</AssemblyName>
+    <AssemblyName>KK_Stiletto</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -17,16 +17,16 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;KK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE;KK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DebugSymbols>true</DebugSymbols>
@@ -73,38 +73,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\FilePropertyAttribute.cs" />
-    <Compile Include="Configurations\AnimationSettingsCollection.cs" />
-    <Compile Include="Configurations\CustomPoseProvider.cs" />
-    <Compile Include="Configurations\DynamicFileProvider.cs" />
-    <Compile Include="Configurations\DynamicProvider.cs" />
-    <Compile Include="Configurations\AnimationSettingsValue.cs" />
-    <Compile Include="Configurations\FilePropertyResolver.cs" />
-    <Compile Include="Configurations\StringHelper.cs" />
-    <Compile Include="Settings\DisplaySettings.cs" />
-    <Compile Include="Settings\GeneralSettings.cs" />
-    <Compile Include="Models\RegexMatcher.cs" />
-    <Compile Include="Models\ConcurrentDictionary.cs" />
-    <Compile Include="Models\ConcurrentEnumerator.cs" />
-    <Compile Include="Models\CustomPose.cs" />
-    <Compile Include="HeelInfoAnimation.cs" />
-    <Compile Include="Configurations\AnimationFlagsProvider.cs" />
-    <Compile Include="Models\ConcurrentList.cs" />
-    <Compile Include="Models\AnimationFlags.cs" />
-    <Compile Include="HeelInfoEventArgs.cs" />
-    <Compile Include="Models\TextSerializer.cs" />
-    <Compile Include="Settings\FilePathSettings.cs" />
-    <Compile Include="HeelInfo.cs" />
-    <Compile Include="StilettoContext.cs" />
-    <Compile Include="Models\CharaDisplayData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Models\CustomHeel.cs" />
-    <Compile Include="Stiletto.cs" />
-    <Compile Include="StilettoGameGUI.cs" />
-    <Compile Include="StilettoMakerGUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <Import Project="..\Stiletto.Core\Stiletto.Core.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
