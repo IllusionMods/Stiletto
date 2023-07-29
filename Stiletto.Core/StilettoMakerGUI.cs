@@ -178,8 +178,9 @@ namespace Stiletto
             {
                 // When using Maker for a second time in a game session there is a
                 // [Error  :Null Checks] Swallowing exception to prevent game crash!
-                // when accessing heelInfo.CustomHeel.Height. heelInfo is disposed of
-                // before a call to RegisterMakerControls on this occasion.
+                // This occurs when accessing 'heelInfo'. The error is because 'heelInfo'
+                // is disposed of before a call to RegisterMakerControls on this occasion.
+                // After RegisterMakerControls call everything seems to be Ok.
                 if (MakerAPI.InsideMaker && heelInfo != null)
                 {
                     if (slider_Height != null)
@@ -202,6 +203,7 @@ namespace Stiletto
             }
             catch
             {
+                // [Error  :Null Checks] Swallowing exception to prevent game crash! :)
             }
         }
 
