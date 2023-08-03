@@ -1,4 +1,6 @@
-﻿using KKAPI.Maker;
+﻿using BepInEx.Logging;
+
+using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
 using KKAPI.Studio.UI;
@@ -176,11 +178,7 @@ namespace Stiletto
         {
             try
             {
-                // When using Maker for a second time in a game session there is a
-                // [Error  :Null Checks] Swallowing exception to prevent game crash!
-                // This occurs when accessing 'heelInfo' that is disposed of.
-                // After RegisterMakerControls is called there are no more exceptions.
-                if (MakerAPI.InsideMaker && heelInfo != null)
+                if (MakerAPI.InsideAndLoaded && heelInfo != null)
                 {
                     if (slider_Height != null)
                     {
@@ -200,9 +198,9 @@ namespace Stiletto
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                // [Info   :   Console] Cannot access a disposed object.
+                Stiletto.Logger.Log(LogLevel.Error, $"OnHeelInfoUpdate: Error={e.Message}");
             }
         }
 
