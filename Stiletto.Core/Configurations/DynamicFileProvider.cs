@@ -21,7 +21,7 @@ namespace Stiletto.Configurations
             Value = Read();
         }
 
-        public void Initalize() 
+        public void Initialize() 
         {
             if (!File.Exists(_filePath)) 
             {
