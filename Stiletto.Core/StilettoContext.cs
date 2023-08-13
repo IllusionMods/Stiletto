@@ -55,8 +55,8 @@ namespace Stiletto
                 if (!directory.Exists) directory.Create();
             }
 
-            _generalSettingsProvider.Initalize();
-            _displaySettingsProvider.Initalize();
+            _generalSettingsProvider.Initialize();
+            _displaySettingsProvider.Initialize();
 
             ReloadConfigurations();
         }

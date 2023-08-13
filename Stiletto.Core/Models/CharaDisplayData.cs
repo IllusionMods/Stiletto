@@ -1,5 +1,10 @@
 ﻿using System.Linq;
+#if KK
 using static SaveData;
+#else
+using SaveData;
+#endif
+
 
 namespace Stiletto.Models
 {

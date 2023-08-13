@@ -1,19 +1,22 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
+
 using HarmonyLib;
+
 using Studio;
 using System.Linq;
 using UnityEngine;
+
 using static ChaFileDefine;
+
 
 namespace Stiletto
 {
-    [BepInPlugin(GUID, nameof(Stiletto), Version)]
-    public class Stiletto : BaseUnityPlugin
+    [BepInPlugin(GUID, PlugInName, Version)]
+    public partial class Stiletto : BaseUnityPlugin
     {
-        public const string GUID = "com.essu.stiletto";
-        public const string Version = "2.3.1";
-        public const int WindowId = 670;
+        internal static new ManualLogSource Logger { get; private set; }
 
         private StilettoGameGUI _gameWindow;
         private StilettoMakerGUI _makerWindow;
@@ -23,6 +26,7 @@ namespace Stiletto
 
         private void Awake()
         {
+            Logger = base.Logger;
             Harmony.CreateAndPatchAll(GetType());
         }
 

@@ -1,4 +1,6 @@
-﻿using KKAPI.Maker;
+﻿using BepInEx.Logging;
+
+using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
 using KKAPI.Studio.UI;
@@ -174,24 +176,31 @@ namespace Stiletto
 
         public void OnHeelInfoUpdate(object _, HeelInfoEventArgs heelInfo)
         {
-            if (MakerAPI.InsideMaker && heelInfo != null)
+            try
             {
-                if (slider_Height != null)
+                if (MakerAPI.InsideAndLoaded && heelInfo != null)
                 {
-                    slider_Height.Value = heelInfo.CustomHeel.Height;
-                    text_heelName.Text = heelInfo.HeelName ?? displaySettings.Default_Heel_Name;
-                    slider_AnkleAngle.Value = heelInfo.CustomHeel.AnkleAngle;
-                    slider_LegAngle.Value = heelInfo.CustomHeel.LegAngle;
+                    if (slider_Height != null)
+                    {
+                        slider_Height.Value = heelInfo.CustomHeel.Height;
+                        text_heelName.Text = heelInfo.HeelName ?? displaySettings.Default_Heel_Name;
+                        slider_AnkleAngle.Value = heelInfo.CustomHeel.AnkleAngle;
+                        slider_LegAngle.Value = heelInfo.CustomHeel.LegAngle;
 
-                    slider_ShoeAngle.Value = heelInfo.CustomHeel.ShoeAngle;
-                    slider_ShoeScaleX.Value = heelInfo.CustomHeel.ShoeScaleX;
-                    slider_ShoeScaleY.Value = heelInfo.CustomHeel.ShoeScaleY;
-                    slider_ShoeScaleZ.Value = heelInfo.CustomHeel.ShoeScaleZ;
-                    slider_ShoeTranslateY.Value = heelInfo.CustomHeel.ShoeTranslateY;
-                    slider_ShoeTranslateZ.Value = heelInfo.CustomHeel.ShoeTranslateZ;
-                    slider_ShoeShearY.Value = heelInfo.CustomHeel.ShoeShearY;
-                    slider_ShoeShearZ.Value = heelInfo.CustomHeel.ShoeShearZ;
+                        slider_ShoeAngle.Value = heelInfo.CustomHeel.ShoeAngle;
+                        slider_ShoeScaleX.Value = heelInfo.CustomHeel.ShoeScaleX;
+                        slider_ShoeScaleY.Value = heelInfo.CustomHeel.ShoeScaleY;
+                        slider_ShoeScaleZ.Value = heelInfo.CustomHeel.ShoeScaleZ;
+                        slider_ShoeTranslateY.Value = heelInfo.CustomHeel.ShoeTranslateY;
+                        slider_ShoeTranslateZ.Value = heelInfo.CustomHeel.ShoeTranslateZ;
+                        slider_ShoeShearY.Value = heelInfo.CustomHeel.ShoeShearY;
+                        slider_ShoeShearZ.Value = heelInfo.CustomHeel.ShoeShearZ;
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Stiletto.Logger.Log(LogLevel.Error, $"OnHeelInfoUpdate: Error={e.Message}");
             }
         }
 
