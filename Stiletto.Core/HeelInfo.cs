@@ -242,7 +242,8 @@ namespace Stiletto
                 StilettoContext.NotifyHeelInfoUpdate(this);
             }
 
-            if (_shoeDirty)
+            // The animationChange case is required to work in Communication.
+            if (animationChange || _shoeDirty)
             {
                 UpdateShoeWarp();
                 _shoeDirty = false;
