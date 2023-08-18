@@ -36,7 +36,7 @@ namespace Stiletto
 
             _makerWindow = new StilettoMakerGUI(this);
             _gameWindow = new StilettoGameGUI();
-            _showWindowKey = Config.Bind("Hotkeys", "Toggle stiletto window", new KeyboardShortcut(KeyCode.RightShift));
+            _showWindowKey = Config.Bind("Keyboard Shortcuts", "Toggle Stiletto window", new KeyboardShortcut(KeyCode.RightShift));
         }
 
         private void OnGUI()
