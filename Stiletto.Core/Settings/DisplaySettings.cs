@@ -23,10 +23,10 @@ namespace Stiletto.Settings
         public string Stiletto { get; set; } = "Stiletto";
 
         [FileProperty]
-        public string Ankle_Angle { get; set; } = "Ankle Angle";
+        public string Ankle_Angle { get; set; } = "Ankle + Toes";
 
         [FileProperty]
-        public string Leg_Angle { get; set; } = "Leg Angle";
+        public string Leg_Angle { get; set; } = "Whole Foot";
 
         [FileProperty]
         public string Height { get; set; } = "Height";
