@@ -32,6 +32,7 @@ namespace Stiletto
 
         private MakerButton button_HeelSave;
         private MakerButton button_Reload;
+        private MakerButton button_GameGui;
 
         private DisplaySettings displaySettings;
 
@@ -122,6 +123,13 @@ namespace Stiletto
 
             button_HeelSave = e.AddControl(new MakerButton(displaySettings.Save_Heel_Settings, category, plugin));
             button_Reload = e.AddControl(new MakerButton(displaySettings.Reload_Configurations, category, plugin));
+            // TODO: Maybe update the button label when the shortcut changes?
+            string suffix_GameGui = "";
+            if (plugin._showWindowKey != null)
+            {
+                suffix_GameGui = " (" + plugin._showWindowKey?.Value.Serialize() + ")";
+            }
+            button_GameGui = e.AddControl(new MakerButton(displaySettings.Toggle_Game_Gui + suffix_GameGui, category, plugin));
 
             slider_AnkleAngle.ValueChanged.Subscribe(value =>
                 MakerHeelInfoProcess(heel => heel.SafeProc(x => x.AnkleAngle = value))
@@ -172,6 +180,8 @@ namespace Stiletto
             ));
 
             button_Reload.OnClick.AddListener(StilettoContext.ReloadConfigurations);
+
+            button_GameGui.OnClick.AddListener(plugin.ToggleWindow);
         }
 
         public void OnHeelInfoUpdate(object _, HeelInfoEventArgs heelInfo)

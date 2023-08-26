@@ -38,6 +38,9 @@ namespace Stiletto.Settings
         public string Reload_Configurations { get; set; } = "Reload Configurations";
 
         [FileProperty]
+        public string Toggle_Game_Gui { get; set; } = "Manage Stiletto Settings";
+
+        [FileProperty]
         public string Active { get; set; } = "Active";
 
         [FileProperty]
