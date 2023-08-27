@@ -21,7 +21,7 @@ namespace Stiletto
         private StilettoGameGUI _gameWindow;
         private StilettoMakerGUI _makerWindow;
 
-        private ConfigEntry<KeyboardShortcut> _showWindowKey;
+        internal ConfigEntry<KeyboardShortcut> _showWindowKey;
         private bool _showWindow;
 
         private void Awake()
@@ -51,9 +51,14 @@ namespace Stiletto
         {
             if (_showWindowKey?.Value.IsDown() ?? false)
             {
-                _showWindow = !_showWindow;
-                _gameWindow.Show = _showWindow;
+                ToggleWindow();
             }
+        }
+
+        internal void ToggleWindow()
+        {
+            _showWindow = !_showWindow;
+            _gameWindow.Show = _showWindow;
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ActiveKinematicMode))]
