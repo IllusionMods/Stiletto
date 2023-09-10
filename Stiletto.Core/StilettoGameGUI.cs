@@ -18,7 +18,7 @@ namespace Stiletto
         private int selectedIndex = -1;
         private bool _show;
 
-        private DateTime? _lastCharaRefersh;
+        private DateTime? _lastCharaRefresh;
         private int _selectedTab;
         private int _selectedPoseSide;
         private bool _allCharacters = true;
@@ -416,13 +416,13 @@ namespace Stiletto
 
         private CharaDisplayData[] GetCurrentCharacters()
         {
-            if (_lastCharaRefersh != null && DateTime.Now - _lastCharaRefersh < TimeSpan.FromSeconds(2))
+            if (_lastCharaRefresh != null && DateTime.Now - _lastCharaRefresh < TimeSpan.FromSeconds(2))
             {
                 return _characters;
             }
             else
             {
-                _lastCharaRefersh = DateTime.Now;
+                _lastCharaRefresh = DateTime.Now;
             }
 
 
