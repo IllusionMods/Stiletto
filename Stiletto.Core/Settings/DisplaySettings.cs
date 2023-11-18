@@ -68,6 +68,9 @@ namespace Stiletto.Settings
         public string CustomHeel_Tab { get; set; } = "Heel";
 
         [FileProperty]
+        public string ShoeWarp_Tab { get; set; } = "Warp";
+
+        [FileProperty]
         public string Custom_Pose_Compatibility { get; set; } = "Custom Pose (Compatibility)";
 
         [FileProperty]
@@ -156,6 +159,9 @@ namespace Stiletto.Settings
 
         [FileProperty]
         public string Heel_Settings { get; set; } = "Heel Settings";
+
+        [FileProperty]
+        public string Shoe_Warp_Settings { get; set; } = "Shoe Warp Settings";
 
         [FileProperty]
         public string Save_Heel_Settings { get; set; } = "Save Heel Settings";
