@@ -54,7 +54,7 @@ namespace Stiletto
         public void CreateWindowContent(int id)
         {
             _display = StilettoContext._displaySettingsProvider.Value;
-            var settingTabs = new string[] { _display.Animation_Tab, _display.CustomPose_Tab, _display.CustomHeel_Tab };
+            var settingTabs = new string[] { _display.Animation_Tab, _display.CustomPose_Tab, _display.CustomHeel_Tab, _display.ShoeWarp_Tab };
 
             GUILayout.BeginVertical();
             {
@@ -96,7 +96,7 @@ namespace Stiletto
                         GUILayout.Space(10);
                     }
 
-                    _selectedTab = GUILayout.Toolbar(_selectedTab, settingTabs, GUILayout.Width(250));
+                    _selectedTab = GUILayout.Toolbar(_selectedTab, settingTabs, GUILayout.Width(300));
 
                     GUILayout.BeginVertical(GUILayout.Height(160));
                     {
@@ -113,6 +113,11 @@ namespace Stiletto
                         if (_selectedTab == 2 && selectedCharacter != null)
                         {
                             CreateHeelSettingsContent();
+                        }
+
+                        if (_selectedTab == 3 && selectedCharacter != null)
+                        {
+                            CreateShoeWarpSettingsContent();
                         }
                         GUILayout.Space(10);
                     }
@@ -343,6 +348,52 @@ namespace Stiletto
                     GUILayout.BeginHorizontal();
                     {
                         selectedCharacter.HeelInfo.Height = CreateNumberTextField(_display.Height, selectedCharacter.HeelInfo.Height, 1000);
+                    }
+                    GUILayout.EndHorizontal();
+                }
+                GUILayout.EndVertical();
+
+                if (GUILayout.Button(_display.Save_Heel_Settings))
+                {
+                    StilettoContext.CustomHeelProvider.Save(selectedCharacter.HeelInfo.heelName, new CustomHeel(selectedCharacter.HeelInfo));
+                }
+            }
+            GUILayout.EndVertical();
+        }
+
+        private void CreateShoeWarpSettingsContent()
+        {
+            GUILayout.BeginVertical();
+            {
+                GUILayout.BeginVertical(GUILayout.Height(125));
+                {
+                    GUILayout.Label(_display.Shoe_Warp_Settings);
+
+                    GUILayout.BeginHorizontal();
+                    {
+                        selectedCharacter.HeelInfo.ShoeAngle = CreateNumberTextField(_display.Shoe_Angle, selectedCharacter.HeelInfo.ShoeAngle, 10);
+                    }
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    {
+                        selectedCharacter.HeelInfo.ShoeScaleX = CreateNumberTextField(_display.Shoe_ScaleX, selectedCharacter.HeelInfo.ShoeScaleX, 1000);
+                        selectedCharacter.HeelInfo.ShoeScaleY = CreateNumberTextField(_display.Shoe_ScaleY, selectedCharacter.HeelInfo.ShoeScaleY, 1000);
+                        selectedCharacter.HeelInfo.ShoeScaleZ = CreateNumberTextField(_display.Shoe_ScaleZ, selectedCharacter.HeelInfo.ShoeScaleZ, 1000);
+                    }
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    {
+                        selectedCharacter.HeelInfo.ShoeTranslateY = CreateNumberTextField(_display.Shoe_TranslateY, selectedCharacter.HeelInfo.ShoeTranslateY, 1000);
+                        selectedCharacter.HeelInfo.ShoeTranslateZ = CreateNumberTextField(_display.Shoe_TranslateZ, selectedCharacter.HeelInfo.ShoeTranslateZ, 1000);
+                    }
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    {
+                        selectedCharacter.HeelInfo.ShoeShearY = CreateNumberTextField(_display.Shoe_ShearY, selectedCharacter.HeelInfo.ShoeShearY, 10);
+                        selectedCharacter.HeelInfo.ShoeShearZ = CreateNumberTextField(_display.Shoe_ShearZ, selectedCharacter.HeelInfo.ShoeShearZ, 10);
                     }
                     GUILayout.EndHorizontal();
                 }
