@@ -5,8 +5,6 @@ VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stiletto", "Stiletto\Stiletto.csproj", "{42428893-8CF1-47C5-AF76-775267E8F2BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stiletto_KKS", "Stiletto_KKS\Stiletto_KKS.csproj", "{064E7FAA-C0AA-42FB-A234-01DD0073FE15}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stiletto.Test", "Stiletto.Test\Stiletto.Test.csproj", "{D00D8151-226E-457F-90EE-088BD9435EFB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stiletto.KKS", "Stiletto.KKS\Stiletto.KKS.csproj", "{4F951C42-0F99-43DD-AB03-9724CE2D2924}"
@@ -23,10 +21,6 @@ Global
 		{42428893-8CF1-47C5-AF76-775267E8F2BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42428893-8CF1-47C5-AF76-775267E8F2BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42428893-8CF1-47C5-AF76-775267E8F2BF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{064E7FAA-C0AA-42FB-A234-01DD0073FE15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{064E7FAA-C0AA-42FB-A234-01DD0073FE15}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{064E7FAA-C0AA-42FB-A234-01DD0073FE15}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{064E7FAA-C0AA-42FB-A234-01DD0073FE15}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D00D8151-226E-457F-90EE-088BD9435EFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D00D8151-226E-457F-90EE-088BD9435EFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D00D8151-226E-457F-90EE-088BD9435EFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
