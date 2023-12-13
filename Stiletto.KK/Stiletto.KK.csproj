@@ -7,7 +7,7 @@
     <ProjectGuid>{42428893-8CF1-47C5-AF76-775267E8F2BF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Stiletto.KK</RootNamespace>
+    <RootNamespace>Stiletto</RootNamespace>
     <AssemblyName>KK_Stiletto</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
