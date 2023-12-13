@@ -7,7 +7,7 @@
     <ProjectGuid>{4F951C42-0F99-43DD-AB03-9724CE2D2924}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Stiletto.KKS</RootNamespace>
+    <RootNamespace>Stiletto</RootNamespace>
     <AssemblyName>KKS_Stiletto</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
