@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Stiletto\Stiletto.csproj" />
+    <ProjectReference Include="..\Stiletto.KK\Stiletto.KK.csproj" />
   </ItemGroup>
 
 </Project>

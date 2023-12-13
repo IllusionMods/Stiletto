@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stiletto", "Stiletto\Stiletto.csproj", "{42428893-8CF1-47C5-AF76-775267E8F2BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stiletto.KK", "Stiletto.KK\Stiletto.KK.csproj", "{42428893-8CF1-47C5-AF76-775267E8F2BF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stiletto.Test", "Stiletto.Test\Stiletto.Test.csproj", "{D00D8151-226E-457F-90EE-088BD9435EFB}"
 EndProject
