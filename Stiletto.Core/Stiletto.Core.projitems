@@ -30,7 +30,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\CustomPose.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\RegexMatcher.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\TextSerializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)properties\StilettoInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Properties\StilettoInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings\DisplaySettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings\FilePathSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings\GeneralSettings.cs" />
