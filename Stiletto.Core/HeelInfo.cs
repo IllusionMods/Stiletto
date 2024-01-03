@@ -1,6 +1,5 @@
 ﻿using KKAPI.Studio;
 using Stiletto.Models;
-using Stiletto.Settings;
 using UnityEngine;
 
 using static ChaFileDefine;
@@ -37,11 +36,13 @@ namespace Stiletto
         public float AnkleAngle
         {
             get => _ankleAngle.eulerAngles.x;
-            set
-            {
-                _ankleAngle = Quaternion.Euler(value, 0f, 0f);
-                _toeAngle = Quaternion.Euler(-value, 0f, 0f);
-            }
+            set => _ankleAngle = Quaternion.Euler(value, 0f, 0f);
+        }
+
+        public float ToesAngle
+        {
+            get => _toeAngle.eulerAngles.x;
+            set => _toeAngle = Quaternion.Euler(value, 0f, 0f);
         }
 
         public float LegAngle
@@ -150,8 +151,9 @@ namespace Stiletto
                 this.heelName = heelName;
                 var customHeel = StilettoContext.CustomHeelProvider.Load(heelName);
                 Height = customHeel.Height;
-                AnkleAngle = customHeel.AnkleAngle;
-                LegAngle = customHeel.LegAngle;
+                AnkleAngle = AngleValueToDisplay(customHeel.AnkleAngle);
+                ToesAngle = AngleValueToDisplay(customHeel.ToesAngle);
+                LegAngle = AngleValueToDisplay(customHeel.LegAngle);
                 // Work around config parser defaulting to 0.
                 ShoeScaleX = customHeel.ShoeScaleX != 0f ? customHeel.ShoeScaleX : 1f;
                 ShoeScaleY = customHeel.ShoeScaleY != 0f ? customHeel.ShoeScaleY : 1f;
@@ -167,6 +169,7 @@ namespace Stiletto
                 this.heelName = null;
                 Height = 0;
                 AnkleAngle = 0;
+                ToesAngle = 0;
                 LegAngle = 0;
                 _shoeScale = Vector3.one;
                 ShoeAngle = 0;
@@ -355,6 +358,21 @@ namespace Stiletto
                     shoesRenderer.sharedMesh.bindposes = shoesPoses;
                 }
             }
+        }
+
+        public static float AngleValueToDisplay(float angleValue)
+        {
+            var angleDisplay = angleValue;
+
+            if (angleValue > 60)
+                angleDisplay = -(360 - angleDisplay);
+
+            return angleDisplay;
+        }
+
+        public static float AngleDisplayToValue(float angleDisplay)
+        {
+            return angleDisplay;
         }
     }
 }

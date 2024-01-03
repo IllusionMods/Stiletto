@@ -49,6 +49,7 @@ namespace Stiletto
 
             var skinBack = GUI.skin;
             _windowRect = GUILayout.Window(id, _windowRect, CreateWindowContent, _display.Stiletto);
+            KKAPI.Utilities.IMGUIUtils.EatInputInRect(_windowRect);
         }
 
         public void CreateWindowContent(int id)
@@ -211,29 +212,23 @@ namespace Stiletto
                         );
                     }
                     GUILayout.EndHorizontal();
-                }
-                GUILayout.EndVertical();
-                GUILayout.BeginHorizontal();
-                {
-                    if (GUILayout.Button(_display.Save_For_All, GUILayout.Width(115)))
+
+                    GUILayout.Label(_display.Save_Settings);
+
+                    if (GUILayout.Button(_display.Save_For_All, GUILayout.Width(220)))
                     {
                         StilettoContext.AnimationFlagsProvider.Save(null, null, selectedCharacter.HeelInfo.flags);
                     }
-                }
-                GUILayout.EndHorizontal();
-                GUILayout.BeginHorizontal();
-                {
-                    if (GUILayout.Button(_display.Save_For_Animation_Group, GUILayout.Width(115)))
+                    if (GUILayout.Button(_display.Save_For_Animation_Group, GUILayout.Width(220)))
                     {
                         StilettoContext.AnimationFlagsProvider.Save(selectedCharacter.AnimationPath, null, selectedCharacter.HeelInfo.flags);
                     }
-                    GUILayout.Space(10);
-                    if (GUILayout.Button(_display.Save_For_Animation_Frame, GUILayout.Width(115)))
+                    if (GUILayout.Button(_display.Save_For_Animation_Frame, GUILayout.Width(220)))
                     {
                         StilettoContext.AnimationFlagsProvider.Save(selectedCharacter.AnimationPath, selectedCharacter.AnimationName, selectedCharacter.HeelInfo.flags);
                     }
                 }
-                GUILayout.EndHorizontal();
+                GUILayout.EndVertical();
             }
             GUILayout.EndVertical();
         }
@@ -273,15 +268,15 @@ namespace Stiletto
                     {
                         GUILayout.BeginHorizontal();
                         {
-                            selectedCharacter.HeelInfo.CustomPose.RightThighAngle = CreateNumberTextField(_display.Thigh_Angle, selectedCharacter.HeelInfo.CustomPose.RightThighAngle, 10);
+                            selectedCharacter.HeelInfo.CustomPose.RightThighAngle = CreateNumberTextField(_display.Thigh_Angle, selectedCharacter.HeelInfo.CustomPose.RightThighAngle, 1);
                             GUILayout.Space(10);
-                            selectedCharacter.HeelInfo.CustomPose.RightLegAngle = CreateNumberTextField(_display.Leg_Angle, selectedCharacter.HeelInfo.CustomPose.RightLegAngle, 10);
+                            selectedCharacter.HeelInfo.CustomPose.RightLegAngle = CreateNumberTextField(_display.Leg_Angle, selectedCharacter.HeelInfo.CustomPose.RightLegAngle, 1);
                         }
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
                         {
-                            selectedCharacter.HeelInfo.CustomPose.RightAnkleAngle = CreateNumberTextField(_display.Ankle_Angle, selectedCharacter.HeelInfo.CustomPose.RightAnkleAngle, 10);
+                            selectedCharacter.HeelInfo.CustomPose.RightAnkleAngle = CreateNumberTextField(_display.Ankle_Toes_Angle, selectedCharacter.HeelInfo.CustomPose.RightAnkleAngle, 1);
                         }
                         GUILayout.EndHorizontal();
                     }
@@ -289,43 +284,35 @@ namespace Stiletto
                     {
                         GUILayout.BeginHorizontal();
                         {
-                            selectedCharacter.HeelInfo.CustomPose.LeftThighAngle = CreateNumberTextField(_display.Thigh_Angle, selectedCharacter.HeelInfo.CustomPose.LeftThighAngle, 10);
+                            selectedCharacter.HeelInfo.CustomPose.LeftThighAngle = CreateNumberTextField(_display.Thigh_Angle, selectedCharacter.HeelInfo.CustomPose.LeftThighAngle, 1);
                             GUILayout.Space(10);
-                            selectedCharacter.HeelInfo.CustomPose.LeftLegAngle = CreateNumberTextField(_display.Leg_Angle, selectedCharacter.HeelInfo.CustomPose.LeftLegAngle, 10);
+                            selectedCharacter.HeelInfo.CustomPose.LeftLegAngle = CreateNumberTextField(_display.Leg_Angle, selectedCharacter.HeelInfo.CustomPose.LeftLegAngle, 1);
                         }
                         GUILayout.EndHorizontal();
 
                         GUILayout.BeginHorizontal();
                         {
-                            selectedCharacter.HeelInfo.CustomPose.LeftAnkleAngle = CreateNumberTextField(_display.Ankle_Angle, selectedCharacter.HeelInfo.CustomPose.LeftAnkleAngle, 10);
+                            selectedCharacter.HeelInfo.CustomPose.LeftAnkleAngle = CreateNumberTextField(_display.Ankle_Toes_Angle, selectedCharacter.HeelInfo.CustomPose.LeftAnkleAngle, 1);
                         }
                         GUILayout.EndHorizontal();
                     }
-                }
-                GUILayout.EndVertical();
 
-                GUILayout.BeginHorizontal();
-                {
-                    if (GUILayout.Button(_display.Save_For_All, GUILayout.Width(115)))
+                    GUILayout.Label(_display.Save_Settings);
+
+                    if (GUILayout.Button(_display.Save_For_All, GUILayout.Width(220)))
                     {
                         StilettoContext.CustomPoseProvider.Save(null, null, selectedCharacter.HeelInfo.CustomPose);
                     }
-                }
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                {
-                    if (GUILayout.Button(_display.Save_For_Animation_Group, GUILayout.Width(115)))
+                    if (GUILayout.Button(_display.Save_For_Animation_Group, GUILayout.Width(220)))
                     {
                         StilettoContext.CustomPoseProvider.Save(selectedCharacter.AnimationPath, null, selectedCharacter.HeelInfo.CustomPose);
                     }
-                    GUILayout.Space(10);
-                    if (GUILayout.Button(_display.Save_For_Animation_Frame, GUILayout.Width(115)))
+                    if (GUILayout.Button(_display.Save_For_Animation_Frame, GUILayout.Width(220)))
                     {
                         StilettoContext.CustomPoseProvider.Save(selectedCharacter.AnimationPath, selectedCharacter.AnimationName, selectedCharacter.HeelInfo.CustomPose);
                     }
                 }
-                GUILayout.EndHorizontal();
+                GUILayout.EndVertical();
             }
             GUILayout.EndVertical();
         }
@@ -336,20 +323,16 @@ namespace Stiletto
             {
                 GUILayout.BeginVertical(GUILayout.Height(125));
                 {
-                    GUILayout.Label(_display.Heel_Settings);
+                    GUILayout.Label(_display.Heels_Settings);
 
-                    GUILayout.BeginHorizontal();
+                    GUILayout.BeginVertical();
                     {
-                        selectedCharacter.HeelInfo.AnkleAngle = CreateNumberTextField(_display.Ankle_Angle, selectedCharacter.HeelInfo.AnkleAngle, 10);
-                        selectedCharacter.HeelInfo.LegAngle = CreateNumberTextField(_display.Leg_Angle, selectedCharacter.HeelInfo.LegAngle, 10);
-                    }
-                    GUILayout.EndHorizontal();
-
-                    GUILayout.BeginHorizontal();
-                    {
+                        selectedCharacter.HeelInfo.LegAngle = CreateNumberTextField(_display.Leg_Angle, HeelInfo.AngleValueToDisplay(selectedCharacter.HeelInfo.LegAngle), 1);
+                        selectedCharacter.HeelInfo.AnkleAngle = CreateNumberTextField(_display.Ankle_Angle, HeelInfo.AngleValueToDisplay(selectedCharacter.HeelInfo.AnkleAngle), 1);
+                        selectedCharacter.HeelInfo.ToesAngle = CreateNumberTextField(_display.Toes_Angle, HeelInfo.AngleValueToDisplay(selectedCharacter.HeelInfo.ToesAngle), 1);
                         selectedCharacter.HeelInfo.Height = CreateNumberTextField(_display.Height, selectedCharacter.HeelInfo.Height, 1000);
                     }
-                    GUILayout.EndHorizontal();
+                    GUILayout.EndVertical();
                 }
                 GUILayout.EndVertical();
 
@@ -371,29 +354,29 @@ namespace Stiletto
 
                     GUILayout.BeginHorizontal();
                     {
-                        selectedCharacter.HeelInfo.ShoeAngle = CreateNumberTextField(_display.Shoe_Angle, selectedCharacter.HeelInfo.ShoeAngle, 10);
+                        selectedCharacter.HeelInfo.ShoeAngle = CreateNumberTextField(_display.Shoe_Angle, selectedCharacter.HeelInfo.ShoeAngle, 1);
                     }
                     GUILayout.EndHorizontal();
 
                     GUILayout.BeginHorizontal();
                     {
-                        selectedCharacter.HeelInfo.ShoeScaleX = CreateNumberTextField(_display.Shoe_ScaleX, selectedCharacter.HeelInfo.ShoeScaleX, 1000);
-                        selectedCharacter.HeelInfo.ShoeScaleY = CreateNumberTextField(_display.Shoe_ScaleY, selectedCharacter.HeelInfo.ShoeScaleY, 1000);
-                        selectedCharacter.HeelInfo.ShoeScaleZ = CreateNumberTextField(_display.Shoe_ScaleZ, selectedCharacter.HeelInfo.ShoeScaleZ, 1000);
+                        selectedCharacter.HeelInfo.ShoeScaleX = CreateNumberTextField(_display.Shoe_ScaleX, selectedCharacter.HeelInfo.ShoeScaleX, 100);
+                        selectedCharacter.HeelInfo.ShoeScaleY = CreateNumberTextField(_display.Shoe_ScaleY, selectedCharacter.HeelInfo.ShoeScaleY, 100);
+                        selectedCharacter.HeelInfo.ShoeScaleZ = CreateNumberTextField(_display.Shoe_ScaleZ, selectedCharacter.HeelInfo.ShoeScaleZ, 100);
                     }
                     GUILayout.EndHorizontal();
 
                     GUILayout.BeginHorizontal();
                     {
-                        selectedCharacter.HeelInfo.ShoeTranslateY = CreateNumberTextField(_display.Shoe_TranslateY, selectedCharacter.HeelInfo.ShoeTranslateY, 1000);
-                        selectedCharacter.HeelInfo.ShoeTranslateZ = CreateNumberTextField(_display.Shoe_TranslateZ, selectedCharacter.HeelInfo.ShoeTranslateZ, 1000);
+                        selectedCharacter.HeelInfo.ShoeTranslateY = CreateNumberTextField(_display.Shoe_TranslateY, selectedCharacter.HeelInfo.ShoeTranslateY, 100);
+                        selectedCharacter.HeelInfo.ShoeTranslateZ = CreateNumberTextField(_display.Shoe_TranslateZ, selectedCharacter.HeelInfo.ShoeTranslateZ, 100);
                     }
                     GUILayout.EndHorizontal();
 
                     GUILayout.BeginHorizontal();
                     {
-                        selectedCharacter.HeelInfo.ShoeShearY = CreateNumberTextField(_display.Shoe_ShearY, selectedCharacter.HeelInfo.ShoeShearY, 10);
-                        selectedCharacter.HeelInfo.ShoeShearZ = CreateNumberTextField(_display.Shoe_ShearZ, selectedCharacter.HeelInfo.ShoeShearZ, 10);
+                        selectedCharacter.HeelInfo.ShoeShearY = CreateNumberTextField(_display.Shoe_ShearY, selectedCharacter.HeelInfo.ShoeShearY, 1);
+                        selectedCharacter.HeelInfo.ShoeShearZ = CreateNumberTextField(_display.Shoe_ShearZ, selectedCharacter.HeelInfo.ShoeShearZ, 1);
                     }
                     GUILayout.EndHorizontal();
                 }
@@ -445,8 +428,8 @@ namespace Stiletto
             int w = Screen.width, h = Screen.height;
             _screenRect = new Rect(ScreenOffset, ScreenOffset, w - ScreenOffset * 2, h - ScreenOffset * 2);
 
-            var windowHeight = 400;
-            var windowWidth = 270;
+            var windowHeight = 450;
+            var windowWidth = 330;
 
             _windowRect = new Rect(_screenRect.xMin, _screenRect.yMax - windowHeight, windowWidth, windowHeight);
         }
