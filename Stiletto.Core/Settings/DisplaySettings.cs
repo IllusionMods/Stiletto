@@ -20,13 +20,25 @@ namespace Stiletto.Settings
         public string Default_Animation_Name { get; set; } = "<animation_frame>";
 
         [FileProperty]
+        public string Disclaimer { get; set; } = "The following parameters are not saved to the character card, don't forget to click on \"Save Heel Settings\"";
+
+        [FileProperty]
+        public string Current_Shoes { get; set; } = "Current shoes: ";
+
+        [FileProperty]
         public string Stiletto { get; set; } = "Stiletto";
 
         [FileProperty]
-        public string Ankle_Angle { get; set; } = "Ankle + Toes";
+        public string Ankle_Toes_Angle { get; set; } = "Ankle + Toes Rotation";
 
         [FileProperty]
-        public string Leg_Angle { get; set; } = "Whole Foot";
+        public string Ankle_Angle { get; set; } = "Ankle Rotation";
+
+        [FileProperty]
+        public string Toes_Angle { get; set; } = "Toes Rotation";
+
+        [FileProperty]
+        public string Leg_Angle { get; set; } = "Whole Foot Rotation";
 
         [FileProperty]
         public string Height { get; set; } = "Height";
@@ -35,10 +47,10 @@ namespace Stiletto.Settings
         public string Save { get; set; } = "Save";
 
         [FileProperty]
-        public string Reload_Configurations { get; set; } = "Reload Configurations";
+        public string Reload_Configurations { get; set; } = "Reload Heels/Anims Settings";
 
         [FileProperty]
-        public string Toggle_Game_Gui { get; set; } = "Manage Stiletto Settings";
+        public string Toggle_Game_Gui { get; set; } = "Advanced Panel";
 
         [FileProperty]
         public string Active { get; set; } = "Active";
@@ -110,13 +122,16 @@ namespace Stiletto.Settings
         public string Custom_Pose { get; set; } = "Custom Pose";
 
         [FileProperty]
-        public string Save_For_All { get; set; } = "Save Wildcard";
+        public string Save_Settings { get; set; } = "Save these settings:";
 
         [FileProperty]
-        public string Save_For_Animation_Group { get; set; } = "Save PathOnly";
+        public string Save_For_All { get; set; } = "For all animations";
 
         [FileProperty]
-        public string Save_For_Animation_Frame { get; set; } = "Save Path+Name";
+        public string Save_For_Animation_Group { get; set; } = "For the whole Animation Path";
+
+        [FileProperty]
+        public string Save_For_Animation_Frame { get; set; } = "For this specific Animation Name";
 
         [FileProperty]
         public string Both_Legs { get; set; } = "Both Legs";
@@ -125,10 +140,10 @@ namespace Stiletto.Settings
         public string Waist_Angle { get; set; } = "Waist Angle";
 
         [FileProperty]
-        public string Thigh_Angle { get; set; } = "Thigh Angle";
+        public string Thigh_Angle { get; set; } = "Thigh Rotation";
 
         [FileProperty]
-        public string Shoe_Warp { get; set; } = "Shoe Warp:";
+        public string Shoe_Warp { get; set; } = "Shoe Warp";
 
         [FileProperty]
         public string Shoe_Angle { get; set; } = "Angle";
@@ -149,21 +164,21 @@ namespace Stiletto.Settings
         public string Shoe_TranslateZ { get; set; } = "Translate Z";
 
         [FileProperty]
-        public string Shoe_ShearY { get; set; } = "Shear Y";
+        public string Shoe_ShearY { get; set; } = "Shear Y Angle";
 
         [FileProperty]
-        public string Shoe_ShearZ { get; set; } = "Shear Z";
+        public string Shoe_ShearZ { get; set; } = "Shear Z Angle";
 
         [FileProperty]
         public string Knee_Bend_Settings { get; set; } = "Knee Bend Settings";
 
         [FileProperty]
-        public string Heel_Settings { get; set; } = "Heel Settings";
+        public string Heels_Settings { get; set; } = "Heels Settings";
 
         [FileProperty]
         public string Shoe_Warp_Settings { get; set; } = "Shoe Warp Settings";
 
         [FileProperty]
-        public string Save_Heel_Settings { get; set; } = "Save Heel Settings";
+        public string Save_Heel_Settings { get; set; } = "Save Heels Settings";
     }
 }

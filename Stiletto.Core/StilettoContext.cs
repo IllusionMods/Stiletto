@@ -57,6 +57,7 @@ namespace Stiletto
 
             _generalSettingsProvider.Initialize();
             _displaySettingsProvider.Initialize();
+            _animationFlagsProvider.Initialize();
 
             ReloadConfigurations();
         }

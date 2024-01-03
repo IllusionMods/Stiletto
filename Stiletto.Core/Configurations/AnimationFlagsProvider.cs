@@ -18,6 +18,13 @@ namespace Stiletto.Configurations
 
         private static object locker = new object();
 
+        private static AnimationFlags DefaultFlags = new AnimationFlags() {
+                ACTIVE = true,
+                TOE_ROLL = true,
+                ANKLE_ROLL = true,
+                HEIGHT = true
+        };
+
         public AnimationFlagsProvider(string rootDirectory, string defaultFile, string dumpFile) 
         {
             _rootDirectory = rootDirectory;
@@ -25,6 +32,11 @@ namespace Stiletto.Configurations
             _dumpFile = dumpFile;
             Directory.CreateDirectory(_rootDirectory);
             Reload();
+        }
+
+        public void Initialize()
+        {
+            _defaultSetting.Save(null, null, DefaultFlags);
         }
 
         public void Save(string path, string name, AnimationFlags flags) 

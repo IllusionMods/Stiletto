@@ -9,6 +9,7 @@ namespace Stiletto.Models
         public CustomHeel(HeelInfo heelInfo)
         {
             AnkleAngle = heelInfo.AnkleAngle;
+            ToesAngle = heelInfo.ToesAngle;
             LegAngle = heelInfo.LegAngle;
             Height = heelInfo.Height;
             ShoeScaleX = heelInfo.ShoeScaleX;
@@ -23,6 +24,9 @@ namespace Stiletto.Models
 
         [FileProperty("angleAnkle")]
         public float AnkleAngle { get; set; }
+
+        [FileProperty("angleToes")]
+        public float ToesAngle { get; set; }
 
         [FileProperty("angleLeg")]
         public float LegAngle { get; set; }
