@@ -36,7 +36,7 @@ namespace Stiletto
     public partial class Stiletto : BaseUnityPlugin
     {
         public const string GUID = "com.essu.stiletto";
-        public const string Version = "2.3.1";
+        public const string Version = "2.4.0";
         public const int WindowId = 670;
 #if DEBUG
         public const string PlugInName = "Stiletto (Debug)";
