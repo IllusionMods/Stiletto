@@ -34,9 +34,9 @@ The location of the heels config has changed it moved from [InstallFolder]/BepIn
 ![Maker_anoted](https://github.com/Cleep2/Stiletto/assets/106453167/849f7b57-990b-4cd6-9ad1-491b30ae9d8e)
 
 #### 1 - Disclaimer
-This disclaimer is important, **if you leave the panel without saving, you will lose you changes**. 
+This disclaimer is important, **if you leave the panel without saving, you will lose your changes**. 
 
-This is because of how Stiletto works. Stiletto will save a config file under [Install_Folder]/BepinEx/config/Stiletto/Heels/[you_shoes_name].txt and this file will be read whenever a character equips the said shoes. 
+This is because of how Stiletto works. Stiletto will save a config file under [Install_Folder]/BepinEx/config/Stiletto/Heels/[your_shoes_name].txt and this file will be read whenever a character equips the said shoes. 
 Because of that the values are not saved along with the card but on the other hand this avoids having to set the parameters for every one of your characters.
    
 #### 2 - Heels settings
@@ -68,12 +68,13 @@ You might need to tweak a little bit between the Whole Foot and the Ankle, becau
 #### 3 - Warp settings
 
 Can be used to fix some shoe models if needed. This section allows to translate, rotate, scale the shoe model without impacting the feet.
-As of now it only affect the "heel part" part of the model (not the toes).
+As of now it only affect the "heel part" of the model (not the toes).
 You can tweak the parameters here to see if it improves the result.
 
 #### 4 - Actions
 
 **Save Heels Settings**: again this is important, don't forget to click before leaving the Stiletto panel (opening the Advanced Panel won't reset the values)
+
 **Advanced Panel**: opens the advanced panel which is described in the Maker/Studio interface chapter.
 
 ## Game/Studio interface
@@ -84,7 +85,7 @@ The purpose of this interface is to tweak when you are in the game/studio but yo
 
 ### Reload Heels/Anims Settings
 
-This button is visible on all tobs, it rechecks all the heels settings and flags files in the Stilleto folder and clears the plugin cache. You should use it after you saved a new setting, if you added manually a new file while the game is running or if things start to act weird.
+This button is visible on all tabs, it re-checks all the heels settings and flags files in the Stilleto folder and clears the plugin cache. You should use it after you saved a new setting, if you added manually a new file while the game is running or if things start to act weird.
 
 The other features will be described from top to bottom
 
@@ -101,7 +102,7 @@ Anim Path: name of the animation group of the current animation/pose
 Anim Name: name of the current animation/pose
 Total: count of available characters (use Previous/Next to cycle between them)
 
-Under you have access to four tabs
+Under this section you have access to four tabs
 
 ### Animation
 ![advanced-anim](https://github.com/Cleep2/Stiletto/assets/106453167/b0f1f1d3-53f4-48b0-8cae-a4b7ed7e178d)
@@ -160,7 +161,7 @@ If someone has a 100% repro scenario don't hesitate to open an Issue for this, w
 
 ## For mod makers
 
-- The angles are in degree so this should match what you set in your CAD
+- The angles are in degree so this should match what you set in your CAD software
 - If you want your users to have the right values without tweaking you need to provide the **[name_of_your_shoes_in_list_file].txt** along with your zipmod and ask them to put it in the right place (or provide a zip with the file structure already set).
   - The location is **BepInEx/config/Stiletto/Heels/[name_of_your_shoes_in_list_file].txt**
 - It is probably easier to open your shoes in the Maker first and generate your config file from Save Heels Settings button (it will be at the same location) than making it from scratch
