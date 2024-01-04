@@ -9,6 +9,8 @@ namespace Stiletto
 {
     public class HeelInfo : MonoBehaviour
     {
+        public static float AngleRange = 60f;
+
         public AnimationFlags flags;
         public string heelName;
         public string animationName;
@@ -151,9 +153,9 @@ namespace Stiletto
                 this.heelName = heelName;
                 var customHeel = StilettoContext.CustomHeelProvider.Load(heelName);
                 Height = customHeel.Height;
-                AnkleAngle = AngleValueToDisplay(customHeel.AnkleAngle);
-                ToesAngle = AngleValueToDisplay(customHeel.ToesAngle);
-                LegAngle = AngleValueToDisplay(customHeel.LegAngle);
+                AnkleAngle = GetAngleInRange(customHeel.AnkleAngle);
+                ToesAngle = GetAngleInRange(customHeel.ToesAngle);
+                LegAngle = GetAngleInRange(customHeel.LegAngle);
                 // Work around config parser defaulting to 0.
                 ShoeScaleX = customHeel.ShoeScaleX != 0f ? customHeel.ShoeScaleX : 1f;
                 ShoeScaleY = customHeel.ShoeScaleY != 0f ? customHeel.ShoeScaleY : 1f;
@@ -261,6 +263,7 @@ namespace Stiletto
             var legAngle = _active && flags.ACTIVE ? _legAngle : Quaternion.identity;
             var customPose = _active && flags.ACTIVE && flags.CUSTOM_POSE ? _customPose : new CustomPose();
             
+
             _animation?.Update(flags, height, ankleAngle, toeAngle, legAngle, customPose);
         }
 
@@ -360,19 +363,20 @@ namespace Stiletto
             }
         }
 
-        public static float AngleValueToDisplay(float angleValue)
+        public static float GetAngleInRange(float angleValue)
         {
-            var angleDisplay = angleValue;
+            var angleInRange = angleValue;
 
-            if (angleValue > 60)
-                angleDisplay = -(360 - angleDisplay);
+            // Had issue with float precision
+            var epsilon = 0.001f;
 
-            return angleDisplay;
-        }
+            if (angleValue > (AngleRange + epsilon))
+            {
+                Stiletto.Logger.LogWarning($"angleValue={angleValue}, AngleRange={AngleRange}");
+                angleInRange = -(360 - angleInRange);
+            }
 
-        public static float AngleDisplayToValue(float angleDisplay)
-        {
-            return angleDisplay;
+            return angleInRange;
         }
     }
 }

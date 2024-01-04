@@ -67,17 +67,17 @@ namespace Stiletto
 
             e.AddControl(new MakerText(displaySettings.Heels_Settings, category, plugin));
             text_heelName = e.AddControl(new MakerText(displaySettings.Default_Heel_Name, category, plugin));
-            slider_LegAngle = e.AddControl(new MakerSlider(category, displaySettings.Leg_Angle, -60f, 60f, 0f, plugin)
+            slider_LegAngle = e.AddControl(new MakerSlider(category, displaySettings.Leg_Angle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
                 ValueToString = CreateValueToStringFunc(1f)
             });
-            slider_AnkleAngle = e.AddControl(new MakerSlider(category, displaySettings.Ankle_Angle, -60f, 60f, 0f, plugin)
+            slider_AnkleAngle = e.AddControl(new MakerSlider(category, displaySettings.Ankle_Angle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
                 ValueToString = CreateValueToStringFunc(1f),
             }); 
-            slider_ToesAngle = e.AddControl(new MakerSlider(category, displaySettings.Toes_Angle, -60f, 60f, 0f, plugin)
+            slider_ToesAngle = e.AddControl(new MakerSlider(category, displaySettings.Toes_Angle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
                 ValueToString = CreateValueToStringFunc(1f),
@@ -90,7 +90,7 @@ namespace Stiletto
 
             e.AddControl(new MakerSeparator(category, plugin));
             text_shoeWarp = e.AddControl(new MakerText(displaySettings.Shoe_Warp, category, plugin));
-            slider_ShoeAngle = e.AddControl(new MakerSlider(category, displaySettings.Shoe_Angle, -60f, 60f, 0f, plugin)
+            slider_ShoeAngle = e.AddControl(new MakerSlider(category, displaySettings.Shoe_Angle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
                 ValueToString = CreateValueToStringFunc(1f)
@@ -120,12 +120,12 @@ namespace Stiletto
                 StringToValue = CreateStringToValueFunc(1000f),
                 ValueToString = CreateValueToStringFunc(1000f)
             });
-            slider_ShoeShearY = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ShearY, -60f, 60f, 0f, plugin)
+            slider_ShoeShearY = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ShearY, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
                 ValueToString = CreateValueToStringFunc(1f)
             });
-            slider_ShoeShearZ = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ShearZ, -60f, 60f, 0f, plugin)
+            slider_ShoeShearZ = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ShearZ, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
                 ValueToString = CreateValueToStringFunc(1f)
@@ -142,15 +142,15 @@ namespace Stiletto
             button_GameGui = e.AddControl(new MakerButton(displaySettings.Toggle_Game_Gui + suffix_GameGui, category, plugin));
 
             slider_AnkleAngle.ValueChanged.Subscribe(value =>
-                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.AnkleAngle = HeelInfo.AngleDisplayToValue(value)))
+                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.AnkleAngle = value))
             );
 
             slider_ToesAngle.ValueChanged.Subscribe(value =>
-                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.ToesAngle = HeelInfo.AngleDisplayToValue(value)))
+                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.ToesAngle = value))
             );
 
             slider_LegAngle.ValueChanged.Subscribe(value =>
-                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.LegAngle = HeelInfo.AngleDisplayToValue(value)))
+                MakerHeelInfoProcess(heel => heel.SafeProc(x => x.LegAngle = value))
             );
 
             slider_Height.ValueChanged.Subscribe(value =>
@@ -206,9 +206,9 @@ namespace Stiletto
                     {
                         slider_Height.Value = heelInfo.CustomHeel.Height;
                         text_heelName.Text = displaySettings.Current_Shoes + heelInfo.HeelName ?? displaySettings.Default_Heel_Name;
-                        slider_AnkleAngle.Value = HeelInfo.AngleValueToDisplay(heelInfo.CustomHeel.AnkleAngle);
-                        slider_ToesAngle.Value = HeelInfo.AngleValueToDisplay(heelInfo.CustomHeel.ToesAngle);
-                        slider_LegAngle.Value = HeelInfo.AngleValueToDisplay(heelInfo.CustomHeel.LegAngle);
+                        slider_AnkleAngle.Value = HeelInfo.GetAngleInRange(heelInfo.CustomHeel.AnkleAngle);
+                        slider_ToesAngle.Value = HeelInfo.GetAngleInRange(heelInfo.CustomHeel.ToesAngle);
+                        slider_LegAngle.Value = HeelInfo.GetAngleInRange(heelInfo.CustomHeel.LegAngle);
 
                         slider_ShoeAngle.Value = heelInfo.CustomHeel.ShoeAngle;
                         slider_ShoeScaleX.Value = heelInfo.CustomHeel.ShoeScaleX;
@@ -245,9 +245,9 @@ namespace Stiletto
 
         private void RegisterStudioControls()
         {
-            var slider_AngleAnkle = CreateSlider(displaySettings.Ankle_Angle, ctrl => ctrl.AnkleAngle, (ctrl, f) => ctrl.AnkleAngle = f, -60f, 60f);
-            var slider_AngleToes = CreateSlider(displaySettings.Toes_Angle, ctrl => ctrl.ToesAngle, (ctrl, f) => ctrl.ToesAngle = f, -60f, 60f);
-            var slider_AngleLeg = CreateSlider(displaySettings.Leg_Angle, ctrl => ctrl.LegAngle, (ctrl, f) => ctrl.LegAngle = f, -60f, 60f);
+            var slider_AngleAnkle = CreateSlider(displaySettings.Ankle_Angle, ctrl => HeelInfo.GetAngleInRange(ctrl.AnkleAngle), (ctrl, f) => ctrl.AnkleAngle = f, -HeelInfo.AngleRange, HeelInfo.AngleRange);
+            var slider_AngleToes = CreateSlider(displaySettings.Toes_Angle, ctrl => HeelInfo.GetAngleInRange(ctrl.ToesAngle), (ctrl, f) => ctrl.ToesAngle = f, -HeelInfo.AngleRange, HeelInfo.AngleRange);
+            var slider_AngleLeg = CreateSlider(displaySettings.Leg_Angle, ctrl => HeelInfo.GetAngleInRange(ctrl.LegAngle), (ctrl, f) => ctrl.LegAngle = f, -HeelInfo.AngleRange, HeelInfo.AngleRange);
             var slider_Height = CreateSlider(displaySettings.Height, ctrl => ctrl.Height, (ctrl, f) => ctrl.Height = f, -0.5f, 0.5f);
 
             StudioAPI.GetOrCreateCurrentStateCategory(displaySettings.Stiletto).AddControls(slider_AngleAnkle, slider_AngleToes, slider_AngleLeg, slider_Height);
