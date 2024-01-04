@@ -33,7 +33,6 @@ namespace Stiletto
         private MakerSlider slider_ShoeShearZ;
 
         private MakerButton button_HeelSave;
-        private MakerButton button_Reload;
         private MakerButton button_GameGui;
 
         private DisplaySettings displaySettings;
@@ -134,7 +133,6 @@ namespace Stiletto
 
 
             button_HeelSave = e.AddControl(new MakerButton(displaySettings.Save_Heel_Settings, category, plugin));
-            button_Reload = e.AddControl(new MakerButton(displaySettings.Reload_Configurations, category, plugin));
             // TODO: Maybe update the button label when the shortcut changes?
             string suffix_GameGui = "";
             if (plugin._showWindowKey != null)
@@ -194,8 +192,6 @@ namespace Stiletto
             button_HeelSave.OnClick.AddListener(() =>
                 MakerHeelInfoProcess(heel => StilettoContext.CustomHeelProvider.Save(heel.heelName, new CustomHeel(heel))
             ));
-
-            button_Reload.OnClick.AddListener(StilettoContext.ReloadConfigurations);
 
             button_GameGui.OnClick.AddListener(plugin.ToggleWindow);
         }
