@@ -1,5 +1,6 @@
 ﻿using KKAPI.Studio;
 using Stiletto.Models;
+using System.Linq;
 using UnityEngine;
 
 using static ChaFileDefine;
@@ -294,71 +295,64 @@ namespace Stiletto
                 return;
             }
 
-            var shoesRenderer = shoesObject.GetComponentInChildren<SkinnedMeshRenderer>();
-            if (shoesRenderer == null)
-            {
-                return;
-            }
-            if (shoesRenderer.gameObject == null)
-            {
-                return;
-            }
-            if (shoesRenderer.sharedMesh == null)
+            var shoesRenderers = shoesObject.GetComponentsInChildren<SkinnedMeshRenderer>().ToList();
+            if (shoesRenderers == null)
             {
                 return;
             }
 
-            var shoesBones = shoesRenderer.bones;
-            if (shoesBones == null)
+            foreach (var shoesRenderer in shoesRenderers)
             {
-                return;
-            }
+                if (shoesRenderer.gameObject == null)
+                    return;
 
-            for (int boneIndex = 0; boneIndex < shoesBones.Length; boneIndex++)
-            {
-                if (shoesBones[boneIndex] == null)
+                if (shoesRenderer.sharedMesh == null)
+                    return;
+
+                var shoesBones = shoesRenderer.bones;
+                if (shoesBones == null)
+                    return;
+
+                for (int boneIndex = 0; boneIndex < shoesBones.Length; boneIndex++)
                 {
-                    continue;
-                }
+                    if (shoesBones[boneIndex] == null)
+                        return;
 
-                if (shoesBones[boneIndex].name == "cf_j_foot_L" || shoesBones[boneIndex].name == "cf_j_foot_R")
-                {
-                    Matrix4x4[] shoesPoses = shoesRenderer.sharedMesh.bindposes;
-                    if (shoesPoses == null)
+                    if (shoesBones[boneIndex].name == "cf_j_foot_L" || shoesBones[boneIndex].name == "cf_j_foot_R")
                     {
-                        continue;
-                    }
+                        Matrix4x4[] shoesPoses = shoesRenderer.sharedMesh.bindposes;
+                        if (shoesPoses == null)
+                            continue;
 
-                    Matrix4x4 footPose = shoesPoses[boneIndex];
-                    if (footPose == null)
-                    {
-                        continue;
-                    }
+                        Matrix4x4 footPose = shoesPoses[boneIndex];
+                        if (footPose == null)
+                            continue;
 
-                    // Key on both the bone name and the shoe name
-                    var poseKey = shoesBones[boneIndex].name + " " + heelName;
-                    if (StilettoContext._baseShoeBindPoses.ContainsKey(poseKey))
-                    {
-                        footPose = (Matrix4x4)StilettoContext._baseShoeBindPoses[poseKey];
-                    }
-                    else
-                    {
-                        StilettoContext._baseShoeBindPoses[poseKey] = footPose;
-                    }
+                        // Key on both the bone name and the shoe name
+                        var poseKey = shoesBones[boneIndex].name + " " + heelName;
+                        if (StilettoContext._baseShoeBindPoses.ContainsKey(poseKey))
+                        {
+                            footPose = (Matrix4x4)StilettoContext._baseShoeBindPoses[poseKey];
+                        }
+                        else
+                        {
+                            StilettoContext._baseShoeBindPoses[poseKey] = footPose;
+                        }
 
-                    // We apply the matrices in a specific order to make UX easier.
-                    // Intended workflow: Choose body angles, then shoe angle, then shoe translate+scale.
-                    Matrix4x4 matUndoAngle = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(-AnkleAngle - LegAngle, 0f, 0f), Vector3.one);
-                    Matrix4x4 matTranslate = Matrix4x4.Translate(translate);
-                    Matrix4x4 matScale = Matrix4x4.Scale(scale);
-                    Matrix4x4 matShear = Matrix4x4.identity;
-                    matShear.m12 = Mathf.Tan(Mathf.Deg2Rad * ShoeShearY);
-                    matShear.m21 = Mathf.Tan(Mathf.Deg2Rad * ShoeShearZ);
-                    Matrix4x4 matRedoAngleAndRotate = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(AnkleAngle + LegAngle + angle, 0f, 0f), Vector3.one);
-                    footPose = matUndoAngle * matShear * matTranslate * matScale * matRedoAngleAndRotate * footPose;
+                        // We apply the matrices in a specific order to make UX easier.
+                        // Intended workflow: Choose body angles, then shoe angle, then shoe translate+scale.
+                        Matrix4x4 matUndoAngle = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(-AnkleAngle - LegAngle, 0f, 0f), Vector3.one);
+                        Matrix4x4 matTranslate = Matrix4x4.Translate(translate);
+                        Matrix4x4 matScale = Matrix4x4.Scale(scale);
+                        Matrix4x4 matShear = Matrix4x4.identity;
+                        matShear.m12 = Mathf.Tan(Mathf.Deg2Rad * ShoeShearY);
+                        matShear.m21 = Mathf.Tan(Mathf.Deg2Rad * ShoeShearZ);
+                        Matrix4x4 matRedoAngleAndRotate = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(AnkleAngle + LegAngle + angle, 0f, 0f), Vector3.one);
+                        footPose = matUndoAngle * matShear * matTranslate * matScale * matRedoAngleAndRotate * footPose;
 
-                    shoesPoses[boneIndex] = footPose;
-                    shoesRenderer.sharedMesh.bindposes = shoesPoses;
+                        shoesPoses[boneIndex] = footPose;
+                        shoesRenderer.sharedMesh.bindposes = shoesPoses;
+                    }
                 }
             }
         }
@@ -372,7 +366,6 @@ namespace Stiletto
 
             if (angleValue > (AngleRange + epsilon))
             {
-                Stiletto.Logger.LogWarning($"angleValue={angleValue}, AngleRange={AngleRange}");
                 angleInRange = -(360 - angleInRange);
             }
 
