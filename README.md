@@ -17,17 +17,19 @@ Plugin for Koikatsu / Koikatsu Sunshine with the following features:
 
 1. Install the latest [BepInEx](https://github.com/BepInEx/BepInEx/releases)
 2. Install the latest [KKAPI](https://github.com/IllusionMods/IllusionModdingAPI/releases) (be sure to take the right version for your game KKAPI or KKSAPI).
-3. Download [the latest release]() for your game. **Warning:** You only need the version specific for your game (check the prefix, for example KK = for Koikatsu). Downloading version for the wrong game or multiple versions will break things!
+3. Download [the latest release](https://github.com/IllusionMods/Stiletto/releases) for your game. **Warning:** You only need the version specific for your game (check the prefix, for example KK = for Koikatsu). Downloading version for the wrong game or multiple versions will break things!
 4. Extract the archive into your game directory. The .dll file should end up inside BepInEx\plugins.
+5. If you already had a version of Stiletto delete **_dialog.txt** and **_config.txt** in **BepInEx/config/Stiletto** (keep a backup if you made changes in these files, to reapply them if needed), they will be re-created on startup. These files are not overriden if they exists so you might miss new texts or new features.
 
 ## How to use
 
 The plugin has two interfaces. One simplified for the Maker and one more advanced for the Main game / Studio.
 
-The default shortcut to open the advanced window is **RightShift**, this can be changed in the Plugins configuration (F1)
+- To access the Maker Stiletto menu you need to browse Clothes -> Stiletto
+- To open the **Advanced window** you can use **RightShift** this can be changed in the Plugins configuration (F1). Or click on Advanced Panel in the Maker Stiletto menu
 
-### Note for old users of Stiletto
-The location of the heels config has changed it moved from [InstallFolder]/BepInEx/Stiletto to [InstallFolder]/BepInEx/config/Stiletto/Heels. Please manually move all your existing files (an automated migration might be developped in the future, but not yet).
+### For old Stiletto users
+- For users of version < 2.4.0: the location of the heels config has changed it moved from [InstallFolder]/BepInEx/Stiletto to [InstallFolder]/BepInEx/config/Stiletto/Heels. Please manually move all your existing files (an automated migration might be developped in the future, but not yet).
 
 ### Maker interface
 
