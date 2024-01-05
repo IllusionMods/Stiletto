@@ -327,9 +327,9 @@ namespace Stiletto
 
                     GUILayout.BeginVertical();
                     {
-                        selectedCharacter.HeelInfo.LegAngle = CreateNumberTextField(_display.Leg_Angle, HeelInfo.AngleValueToDisplay(selectedCharacter.HeelInfo.LegAngle), 1);
-                        selectedCharacter.HeelInfo.AnkleAngle = CreateNumberTextField(_display.Ankle_Angle, HeelInfo.AngleValueToDisplay(selectedCharacter.HeelInfo.AnkleAngle), 1);
-                        selectedCharacter.HeelInfo.ToesAngle = CreateNumberTextField(_display.Toes_Angle, HeelInfo.AngleValueToDisplay(selectedCharacter.HeelInfo.ToesAngle), 1);
+                        selectedCharacter.HeelInfo.LegAngle = CreateNumberTextField(_display.Leg_Angle, HeelInfo.GetAngleInRange(selectedCharacter.HeelInfo.LegAngle), 1);
+                        selectedCharacter.HeelInfo.AnkleAngle = CreateNumberTextField(_display.Ankle_Angle, HeelInfo.GetAngleInRange(selectedCharacter.HeelInfo.AnkleAngle), 1);
+                        selectedCharacter.HeelInfo.ToesAngle = CreateNumberTextField(_display.Toes_Angle, HeelInfo.GetAngleInRange(selectedCharacter.HeelInfo.ToesAngle), 1);
                         selectedCharacter.HeelInfo.Height = CreateNumberTextField(_display.Height, selectedCharacter.HeelInfo.Height, 1000);
                     }
                     GUILayout.EndVertical();
