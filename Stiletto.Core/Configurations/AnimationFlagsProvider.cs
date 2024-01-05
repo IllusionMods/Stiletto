@@ -1,4 +1,5 @@
-﻿using Stiletto.Models;
+﻿using ADV.Commands.Base;
+using Stiletto.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,13 +19,6 @@ namespace Stiletto.Configurations
 
         private static object locker = new object();
 
-        private static AnimationFlags DefaultFlags = new AnimationFlags() {
-                ACTIVE = true,
-                TOE_ROLL = true,
-                ANKLE_ROLL = true,
-                HEIGHT = true
-        };
-
         public AnimationFlagsProvider(string rootDirectory, string defaultFile, string dumpFile) 
         {
             _rootDirectory = rootDirectory;
@@ -34,9 +28,9 @@ namespace Stiletto.Configurations
             Reload();
         }
 
-        public void Initialize()
+        public void Initialize(AnimationFlags initFlags)
         {
-            _defaultSetting.Save(null, null, DefaultFlags);
+            _defaultSetting.Save(null, null, initFlags);
         }
 
         public void Save(string path, string name, AnimationFlags flags) 

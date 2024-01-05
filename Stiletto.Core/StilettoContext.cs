@@ -57,7 +57,15 @@ namespace Stiletto
 
             _generalSettingsProvider.Initialize();
             _displaySettingsProvider.Initialize();
-            _animationFlagsProvider.Initialize();
+
+            var initFlags = new AnimationFlags()
+            {
+                ACTIVE = _generalSettingsProvider.Value.Enable_On_Start,
+                TOE_ROLL = true,
+                ANKLE_ROLL = true,
+                HEIGHT = true
+            };
+            _animationFlagsProvider.Initialize(initFlags);
 
             ReloadConfigurations();
         }

@@ -21,5 +21,8 @@ namespace Stiletto.Settings
 
         [FileProperty]
         public string DisplaySettingsFilePath { get; set; } = "_display.txt";
+
+        [FileProperty]
+        public bool Enable_On_Start { get; set; } = true;
     }
 }
