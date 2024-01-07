@@ -17,8 +17,8 @@ Plugin for Koikatsu / Koikatsu Sunshine with the following features:
 
 1. Install the latest [BepInEx](https://github.com/BepInEx/BepInEx/releases)
 2. Install the latest [KKAPI](https://github.com/IllusionMods/IllusionModdingAPI/releases) (be sure to take the right version for your game KKAPI or KKSAPI).
-3. Download [the latest release](https://github.com/IllusionMods/Stiletto/releases) for your game. **Warning:** You only need the version specific for your game (check the prefix, for example KK = for Koikatsu). Downloading version for the wrong game or multiple versions will break things!
-4. Extract the archive into your game directory. The .dll file should end up inside BepInEx\plugins.
+3. Download [the latest release](https://github.com/IllusionMods/Stiletto/releases) for your game (the .dll file). **Warning:** You only need the version specific for your game (check the prefix, for example KK = for Koikatsu). Downloading version for the wrong game or multiple versions will break things!
+4. Put the .dll file into your game directory, inside BepInEx\plugins.
 5. If you already had a version of Stiletto delete **_dialog.txt** and **_config.txt** in **BepInEx/config/Stiletto** (keep a backup if you made changes in these files, to reapply them if needed), they will be re-created on startup. These files are not overriden if they exists so you might miss new texts or new features.
 
 ## How to use
