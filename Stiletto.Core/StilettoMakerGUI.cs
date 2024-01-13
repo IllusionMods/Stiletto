@@ -1,5 +1,4 @@
 ﻿using BepInEx.Logging;
-
 using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
@@ -40,7 +39,7 @@ namespace Stiletto
         public StilettoMakerGUI(Stiletto plugin)
         {
             displaySettings = StilettoContext._displaySettingsProvider.Value;
-
+            
 
             if (StudioAPI.InsideStudio)
             {
@@ -65,22 +64,27 @@ namespace Stiletto
             text_disclaimer = e.AddControl(new MakerText(displaySettings.Disclaimer, category, plugin));
             e.AddControl(new MakerSeparator(category, plugin));
 
+            var mouseScrollValueChangeFunc = new Func<Vector2, float>(x => x.y > 0 ? -1 : 1);
+
             e.AddControl(new MakerText(displaySettings.Heels_Settings, category, plugin));
             text_heelName = e.AddControl(new MakerText(displaySettings.Default_Heel_Name, category, plugin));
             slider_LegAngle = e.AddControl(new MakerSlider(category, displaySettings.Leg_Angle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
-                ValueToString = CreateValueToStringFunc(1f)
+                ValueToString = CreateValueToStringFunc(1f),
+                MouseScrollValueChange = mouseScrollValueChangeFunc
             });
             slider_AnkleAngle = e.AddControl(new MakerSlider(category, displaySettings.Ankle_Angle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
                 ValueToString = CreateValueToStringFunc(1f),
+                MouseScrollValueChange = mouseScrollValueChangeFunc
             }); 
             slider_ToesAngle = e.AddControl(new MakerSlider(category, displaySettings.Toes_Angle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
                 ValueToString = CreateValueToStringFunc(1f),
+                MouseScrollValueChange = mouseScrollValueChangeFunc
             });
             slider_Height = e.AddControl(new MakerSlider(category, displaySettings.Height, -0.5f, 0.5f, 0f, plugin)
             {
@@ -93,7 +97,8 @@ namespace Stiletto
             slider_ShoeAngle = e.AddControl(new MakerSlider(category, displaySettings.Shoe_Angle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
-                ValueToString = CreateValueToStringFunc(1f)
+                ValueToString = CreateValueToStringFunc(1f),
+                MouseScrollValueChange = mouseScrollValueChangeFunc
             });
             slider_ShoeScaleX = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ScaleX, 0.1f, 10f, 1f, plugin)
             {
@@ -123,12 +128,14 @@ namespace Stiletto
             slider_ShoeShearY = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ShearY, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
-                ValueToString = CreateValueToStringFunc(1f)
+                ValueToString = CreateValueToStringFunc(1f),
+                MouseScrollValueChange = mouseScrollValueChangeFunc
             });
             slider_ShoeShearZ = e.AddControl(new MakerSlider(category, displaySettings.Shoe_ShearZ, -HeelInfo.AngleRange, HeelInfo.AngleRange, 0f, plugin)
             {
                 StringToValue = CreateStringToValueFunc(1f),
-                ValueToString = CreateValueToStringFunc(1f)
+                ValueToString = CreateValueToStringFunc(1f),
+                MouseScrollValueChange = mouseScrollValueChangeFunc
             });
 
 

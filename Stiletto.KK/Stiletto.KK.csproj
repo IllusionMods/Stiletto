@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -48,22 +48,6 @@
       <HintPath>..\packages\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.2019.4.27.4\lib\net35\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BepInEx, Version=5.4.20.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionLibs.BepInEx.5.4.20\lib\net35\BepInEx.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ExtensibleSaveFormat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExtensibleSaveFormat.Koikatu.16.8.1\lib\net35\ExtensibleSaveFormat.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="KKAPI, Version=1.36.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionModdingAPI.KKAPI.1.36.0\lib\net35\KKAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Sideloader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sideloader.Koikatu.15.1.2\lib\net35\Sideloader.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -74,6 +58,18 @@
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2.4\lib\net35\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="ExtensibleSaveFormat">
+      <HintPath>..\packages\ExtensibleSaveFormat.Koikatu.19.4.0\lib\net35\ExtensibleSaveFormat.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>..\packages\IllusionLibs.BepInEx.5.4.22\lib\net35\BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Include="KKAPI">
+      <HintPath>..\packages\IllusionModdingAPI.KKAPI.1.38.0\lib\net35\KKAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="Sideloader">
+      <HintPath>..\packages\Sideloader.Koikatu.19.4.0\lib\net35\Sideloader.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

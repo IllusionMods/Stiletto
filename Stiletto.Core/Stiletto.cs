@@ -1,15 +1,11 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-
 using HarmonyLib;
-
 using Studio;
 using System.Linq;
 using UnityEngine;
-
 using static ChaFileDefine;
-
 
 namespace Stiletto
 {
