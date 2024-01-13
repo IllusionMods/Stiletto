@@ -10,6 +10,7 @@ using static ChaFileDefine;
 namespace Stiletto
 {
     [BepInPlugin(GUID, PlugInName, Version)]
+    [BepInDependency(KKAPI.KoikatuAPI.GUID, KKAPI.KoikatuAPI.VersionConst)]
     public partial class Stiletto : BaseUnityPlugin
     {
         internal static new ManualLogSource Logger { get; private set; }
