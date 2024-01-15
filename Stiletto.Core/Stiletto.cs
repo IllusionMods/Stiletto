@@ -38,9 +38,11 @@ namespace Stiletto
 
         private void OnGUI()
         {
-            if (_gameWindow != null) 
+            if (_gameWindow != null)
             {
-                _gameWindow?.DisplayWindow(WindowId);
+                var gsButtonReset = new GUIStyle(GUI.skin.button);
+                var gsInput = new GUIStyle(GUI.skin.textArea);
+                _gameWindow?.DisplayWindow(WindowId, gsButtonReset, gsInput);
             }
         }
 

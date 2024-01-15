@@ -329,7 +329,7 @@ namespace Stiletto
                             continue;
 
                         // Key on both the bone name and the shoe name
-                        var poseKey = shoesBones[boneIndex].name + " " + heelName;
+                        var poseKey = shoesRenderer.name + " " + shoesBones[boneIndex].name + " " + heelName;
                         if (StilettoContext._baseShoeBindPoses.ContainsKey(poseKey))
                         {
                             footPose = (Matrix4x4)StilettoContext._baseShoeBindPoses[poseKey];
