@@ -173,6 +173,9 @@ namespace Stiletto.Settings
         public string Knee_Bend_Settings { get; set; } = "Knee Bend Settings";
 
         [FileProperty]
+        public string Knee_Angle { get; set; } = "Knee Rotation";
+
+        [FileProperty]
         public string Heels_Settings { get; set; } = "Heels Settings";
 
         [FileProperty]

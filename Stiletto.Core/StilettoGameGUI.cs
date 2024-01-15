@@ -272,22 +272,24 @@ namespace Stiletto
                     }
                     GUILayout.EndHorizontal();
 
-                    GUILayout.BeginHorizontal();
-                    {
-                        GUILayout.Label($"{_display.Knee_Bend_Settings}: ", GUILayout.Width(120));
-                    }
-                    GUILayout.EndHorizontal();
+                    GUILayout.Label($"{_display.Knee_Bend_Settings}: ", GUILayout.Width(120));
 
                     if (!selectedCharacter.HeelInfo.CustomPose.Split || _selectedPoseSide == 0)
                     {
                         selectedCharacter.HeelInfo.CustomPose.RightThighAngle = CreateSlider(_display.Thigh_Angle, selectedCharacter.HeelInfo.CustomPose.RightThighAngle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 1);
-                        selectedCharacter.HeelInfo.CustomPose.RightLegAngle = CreateSlider(_display.Leg_Angle, selectedCharacter.HeelInfo.CustomPose.RightLegAngle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 1);
+                        selectedCharacter.HeelInfo.CustomPose.RightLegAngle = CreateSlider(_display.Knee_Angle, selectedCharacter.HeelInfo.CustomPose.RightLegAngle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 1);
+                        GUILayout.Space(5);
+
+                        GUILayout.Label($"{_display.Heels_Settings}: ", GUILayout.Width(120));
                         selectedCharacter.HeelInfo.CustomPose.RightAnkleAngle = CreateSlider(_display.Ankle_Angle, selectedCharacter.HeelInfo.CustomPose.RightAnkleAngle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 1);
                     }
                     else
                     {
                         selectedCharacter.HeelInfo.CustomPose.LeftThighAngle = CreateSlider(_display.Thigh_Angle, selectedCharacter.HeelInfo.CustomPose.LeftThighAngle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 1);
-                        selectedCharacter.HeelInfo.CustomPose.LeftLegAngle = CreateSlider(_display.Leg_Angle, selectedCharacter.HeelInfo.CustomPose.LeftLegAngle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 1);
+                        selectedCharacter.HeelInfo.CustomPose.LeftLegAngle = CreateSlider(_display.Knee_Angle, selectedCharacter.HeelInfo.CustomPose.LeftLegAngle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 1);
+                        GUILayout.Space(5);
+
+                        GUILayout.Label($"{_display.Heels_Settings}: ", GUILayout.Width(120));
                         selectedCharacter.HeelInfo.CustomPose.LeftAnkleAngle = CreateSlider(_display.Ankle_Angle, selectedCharacter.HeelInfo.CustomPose.LeftAnkleAngle, -HeelInfo.AngleRange, HeelInfo.AngleRange, 1);
                     }
 
