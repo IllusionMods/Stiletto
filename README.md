@@ -16,17 +16,17 @@ Plugin for Koikatsu / Koikatsu Sunshine with the following features:
 ## How to install
 
 1. Install the latest [BepInEx](https://github.com/BepInEx/BepInEx/releases)
-2. Install the latest [KKAPI](https://github.com/IllusionMods/IllusionModdingAPI/releases) (be sure to take the right version for your game KKAPI or KKSAPI).
+2. Install the latest [KKAPI](https://github.com/IllusionMods/IllusionModdingAPI/releases) (be sure to take the right version for your game KKAPI or KKSAPI). **This is important, the plugin won't load if you don't have at least v1.38**
 3. Download [the latest release](https://github.com/IllusionMods/Stiletto/releases) for your game (the .dll file). **Warning:** You only need the version specific for your game (check the prefix, for example KK = for Koikatsu). Downloading version for the wrong game or multiple versions will break things!
 4. Put the .dll file into your game directory, inside BepInEx\plugins.
 5. If you already had a version of Stiletto delete **_dialog.txt** and **_config.txt** in **BepInEx/config/Stiletto** (keep a backup if you made changes in these files, to reapply them if needed), they will be re-created on startup. These files are not overriden if they exists so you might miss new texts or new features.
 
 ## How to use
 
-The plugin has two interfaces. One simplified for the Maker and one more advanced for the Main game / Studio.
+The plugin has two interfaces. One simplified that is only available in the Maker and one more advanced which is available everywhere (Main game / Studio / Maker).
 
-- To access the Maker Stiletto menu you need to browse Clothes -> Stiletto
-- To open the **Advanced window** you can use **RightShift** this can be changed in the Plugins configuration (F1). Or click on Advanced Panel in the Maker Stiletto menu
+- To access the simplified Stiletto menu you need to be in the maker and browse into Clothes -> Stiletto
+- To open the **Advanced Panel** you can use **RightShift**, this can be changed in the Plugins configuration (F1). Or also click on Advanced Panel if you are in the Maker Stiletto menu
 
 ### For old Stiletto users
 - For users of version < 2.4.0: the location of the heels config has changed it moved from [InstallFolder]/BepInEx/Stiletto to [InstallFolder]/BepInEx/config/Stiletto/Heels. Please manually move all your existing files (an automated migration might be developped in the future, but not yet).
@@ -123,34 +123,36 @@ Below the parameters you have three buttons under the "save these settings" titl
  - For this specific Animation Name: will apply these settings only to the current animation. This settings will always apply over the two other "wildcards" (all animations, and animation path)
 
 ### Custom
-![advanced-custom](https://github.com/Cleep2/Stiletto/assets/106453167/ddba47b1-1c5f-4723-9242-5b9e9dcb8cf8)
+![Custom](https://github.com/IllusionMods/Stiletto/assets/106453167/3cf93fd1-1bd0-403b-a9fd-f144dc3eb310)
 
 Is used to customize more precisely the parameters
- - Waist angle: sets the waist angle
+ - Waist angle
  - Both Legs toggle: Allow to edit legs one by one or both at the same time
- - Thigh rotation: sets the thigh/knee rotation
- - Whole foot rotation:
+ - Thigh Rotation
+ - Knee Rotation
+ - Ankle Rotation
 
 You have the same three buttons as in the Animation section, please check here for more details.
 
 **Custom toggle on Animation tab needs to be activated for these to work**
 
 ### Heel
-![advanced-heels](https://github.com/Cleep2/Stiletto/assets/106453167/dcfd2028-4921-414f-b6ee-5a28a03b2b79)
+![Heels](https://github.com/IllusionMods/Stiletto/assets/106453167/7254d8a3-0707-4925-ac33-550d1623e694)
 
 Is used to set the heels settings as in the Maker, see Maker interface > Heels settings section for more details
 **Don't forget to click on save**
 
 ### Warp
-![advanced-warp](https://github.com/Cleep2/Stiletto/assets/106453167/0db88022-f872-4d3e-b249-ed6531b21e0d)
+![Warp](https://github.com/IllusionMods/Stiletto/assets/106453167/b1d89ec8-180f-484b-afcf-7a6f34415f47)
 
-Is used to alter the shoe model as in the Maker, see Maker interface > Shoe warp section for morde details
+Is used to alter the shoe model as in the Maker, see Maker interface > Shoe warp section for more details
 **As for the Heels settings don't forget to click on save**
 
 ## Troubleshooting
 
 ### Nothing happens
 A few things might fix that
+ - Make sure you have the latest KKAPI, the plugin won't load if you don't.
  - Make sure that the Active checkbox is ticked in the advanced menu, it might be that the Active was disabled at a "Wildcard" or "Path" level.
  - Click on Reload Heels/Anims Settings
  - Make sure that the heels rotation indeed have parameters set (most likely to happen in Studio/Game as the parameters are inside a tab)
@@ -158,8 +160,8 @@ A few things might fix that
 If it is still not working you can open an issue with a clear reproduction scenario (with any information you can get, screenshots, name of the mod used, etc).
 
 ### Toe roll
-Under certain conditions the toes rotation my be reverted. You just need to change the shoes (either by changing the clothing set or switching between outdoor and indoor shoes).
-If someone has a 100% repro scenario don't hesitate to open an Issue for this, we will try to fix it.
+~~Under certain conditions the toes rotation my be reverted. You just need to change the shoes (either by changing the clothing set or switching between outdoor and indoor shoes).
+If someone has a 100% repro scenario don't hesitate to open an Issue for this, we will try to fix it.~~ **Fixed on 2.4.1**
 
 ## For mod makers
 
