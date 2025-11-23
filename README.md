@@ -16,8 +16,8 @@ Plugin for Koikatsu / Koikatsu Sunshine with the following features:
 ## How to install
 
 1. Install the latest [BepInEx](https://github.com/BepInEx/BepInEx/releases)
-2. Install the latest [KKAPI](https://github.com/IllusionMods/IllusionModdingAPI/releases) (be sure to take the right version for your game KKAPI or KKSAPI). **This is important, the plugin won't load if you don't have at least v1.38**
-3. Download [the latest release](https://github.com/IllusionMods/Stiletto/releases) for your game (the .dll file). **Warning:** You only need the version specific for your game (check the prefix, for example KK = for Koikatsu). Downloading version for the wrong game or multiple versions will break things!
+2. Install the latest [KKAPI](https://gitgoon.dev/IllusionMods/IllusionModdingAPI/releases) (be sure to take the right version for your game KKAPI or KKSAPI). **This is important, the plugin won't load if you don't have at least v1.38**
+3. Download [the latest release](https://gitgoon.dev/IllusionMods/Stiletto/releases) for your game (the .dll file). **Warning:** You only need the version specific for your game (check the prefix, for example KK = for Koikatsu). Downloading version for the wrong game or multiple versions will break things!
 4. Put the .dll file into your game directory, inside BepInEx\plugins.
 5. If you already had a version of Stiletto delete **_dialog.txt** and **_config.txt** in **BepInEx/config/Stiletto** (keep a backup if you made changes in these files, to reapply them if needed), they will be re-created on startup. These files are not overriden if they exists so you might miss new texts or new features.
 
@@ -33,7 +33,7 @@ The plugin has two interfaces. One simplified that is only available in the Make
 
 ### Maker interface
 
-![Maker_anoted](https://github.com/Cleep2/Stiletto/assets/106453167/849f7b57-990b-4cd6-9ad1-491b30ae9d8e)
+![Maker interface annotated](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/Maker-interface-annotated.jpg)
 
 #### 1 - Disclaimer
 This disclaimer is important, **if you leave the panel without saving, you will lose your changes**. 
@@ -46,26 +46,26 @@ Because of that the values are not saved along with the card but on the other ha
 Here you can set the different values for the heels. 
 
 If you select shoes that were not already set you should arrive on the heels all flatened (you probably already seen that on a few mods)
-![Heels Settings 1](https://github.com/Cleep2/Stiletto/assets/106453167/867f01f8-b524-448e-819f-30654040b7a8)
+![Heels Settings 1](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/Heels-Settings-1.jpg)
 
 You can set the values in any order but here is a step by step show the effect of each slider
 
 **Whole Foot Rotation**
-![Heels Settings 2](https://github.com/Cleep2/Stiletto/assets/106453167/f880b605-df31-48f2-b8ea-6f6391874dd9)
+![Heels Settings 2](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/Heels-Settings-2.jpg)
 
 **Ankle Rotation**
-![Heels Settings 3](https://github.com/Cleep2/Stiletto/assets/106453167/a0293a80-6ec1-4f49-9a3f-2e995fbcfe75)
+![Heels Settings 3](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/Heels-Settings-3.jpg)
 Rotates with a center point lower than Whole Foot. Basically it doesn't move the tip of the heel.
 
 **Toes Rotation**
-![Heels Settings 4](https://github.com/Cleep2/Stiletto/assets/106453167/6ca0c963-add0-4886-b4ab-b793354ad8ec)
+![Heels Settings 4](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/Heels-Settings-4.jpg)
 
 **Height**
-![Heels Settings 5](https://github.com/Cleep2/Stiletto/assets/106453167/1948a102-de1e-440c-9046-c6e587ac84c1)
+![Heels Settings 5](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/Heels-Settings-5.jpg)
 
 **Note**
 You might need to tweak a little bit between the Whole Foot and the Ankle, because in extreme values the Whole Foot will tend to give a "unnatural heel angle" like in the example below
-![tweaking](https://github.com/Cleep2/Stiletto/assets/106453167/33bc8bf5-ebbd-48e4-8235-d31650dc6dd1)
+![tweaking](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/tweaking.jpg)
 
 #### 3 - Warp settings
 
@@ -83,7 +83,7 @@ You can tweak the parameters here to see if it improves the result.
 
 The purpose of this interface is to tweak when you are in the game/studio but you can also open it in the Maker if you want.
 
-![advanced](https://github.com/Cleep2/Stiletto/assets/106453167/d431ad58-6d50-4974-821b-e8dee32aae7f)
+![advanced](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/advanced.jpg)
 
 ### Reload Heels/Anims Settings
 
@@ -107,7 +107,7 @@ Total: count of available characters (use Previous/Next to cycle between them)
 Under this section you have access to four tabs
 
 ### Animation
-![advanced-anim](https://github.com/Cleep2/Stiletto/assets/106453167/b0f1f1d3-53f4-48b0-8cae-a4b7ed7e178d)
+![advanced-anim](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/advanced-anim.jpg)
 
 Is used to set the flags for the current animation. By flags we mean to enable/disable some parameters
  - Active: enable/disable Stiletto for the current animation
@@ -123,7 +123,7 @@ Below the parameters you have three buttons under the "save these settings" titl
  - For this specific Animation Name: will apply these settings only to the current animation. This settings will always apply over the two other "wildcards" (all animations, and animation path)
 
 ### Custom
-![Custom](https://github.com/IllusionMods/Stiletto/assets/106453167/3cf93fd1-1bd0-403b-a9fd-f144dc3eb310)
+![Custom](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/Custom.jpg)
 
 Is used to customize more precisely the parameters
  - Waist angle
@@ -137,13 +137,13 @@ You have the same three buttons as in the Animation section, please check here f
 **Custom toggle on Animation tab needs to be activated for these to work**
 
 ### Heel
-![Heels](https://github.com/IllusionMods/Stiletto/assets/106453167/7254d8a3-0707-4925-ac33-550d1623e694)
+![Heels](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/Heels.jpg)
 
 Is used to set the heels settings as in the Maker, see Maker interface > Heels settings section for more details
 **Don't forget to click on save**
 
 ### Warp
-![Warp](https://github.com/IllusionMods/Stiletto/assets/106453167/b1d89ec8-180f-484b-afcf-7a6f34415f47)
+![Warp](https://gitgoon.dev/IllusionMods/Stiletto/raw/branch/master/doc/Warp.jpg)
 
 Is used to alter the shoe model as in the Maker, see Maker interface > Shoe warp section for more details
 **As for the Heels settings don't forget to click on save**
