@@ -1,7 +1,7 @@
 <Project>
 	<PropertyGroup>
 		<!-- This is the master version, only change this one -->
-		<Version>2.4.2</Version>
+		<Version>2.4.2.1</Version>
 
 		<!-- Sets the 'Company' field on the dll file -->
 		<Authors>https://gitgoon.dev/IllusionMods/Stiletto</Authors>
